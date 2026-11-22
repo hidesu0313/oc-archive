@@ -294,6 +294,49 @@ legend{font-family:var(--display);font-weight:700;padding:0 6px}
 body{font-family:var(--body)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:420px){.wrap{padding:0 14px}}
+
+/* [樣式] 檔案感：直角紙張、檔案標籤、證件照 */
+.btn,.chips button,.search,.inp,.selx,.edit,.status,.toast,.linkbtn{border-radius:3px}
+.sheet,.panel,.empty,details.more,fieldset,.modal,.storyrow,.exportbox,.fopt,.catrow input[type=color]{border-radius:4px}
+.field input,.field select,.field textarea,.imgrow .th,.palrow input[type=color]{border-radius:3px}
+.modal{border-top:6px solid var(--black)}
+.gitem,.rel-card,.ev,.pill,.tag,.chip,.ex{border-radius:2px}
+.sheet{border-top:6px solid var(--black)}
+.dock{border-radius:6px;padding:5px;gap:2px}
+.dock a{border-radius:4px;min-width:0;padding:9px 16px}
+.dock a span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dock a svg,.dock .sunflower{width:24px;height:24px}
+.fab{border-radius:6px}
+.ptitle h1{border-bottom:1px solid var(--ink);padding-bottom:6px}
+.ptitle .ornament{font-family:var(--latin);letter-spacing:.14em;text-transform:uppercase}
+/* 檔案小卡 */
+.grid{gap:30px 16px;padding-top:12px}
+.ccard{position:relative;border-radius:0 3px 3px 3px;border-left:4px solid var(--cc);padding:14px 14px 12px;gap:14px;overflow:visible}
+.ftab{position:absolute;top:-19px;left:-4px;height:19px;padding:0 12px;display:flex;align-items:center;background:var(--surface);border:1px solid var(--line);border-bottom:0;border-left:4px solid var(--cc);border-radius:5px 5px 0 0;font-family:var(--latin);font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--muted)}
+.ccard .av{width:62px;height:76px;border-radius:2px;border:3px solid #fff;box-shadow:0 1px 4px rgba(90,60,20,.25);transform:rotate(-2deg)}
+.ccard .info{gap:4px}
+/* 角色檔案 */
+.cbox{border-radius:3px}
+.cbox > h2::before{width:4px;height:16px;border-radius:0}
+.cbox.file{padding-top:0;border-top:6px solid var(--black)}
+.filehead{display:flex;justify-content:space-between;align-items:center;margin:0 -28px 22px;padding:10px 28px;border-bottom:1px solid var(--line);font-family:var(--latin);font-weight:600;font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:var(--paper2)}
+.filehead b{color:var(--ink);font-weight:600}
+.hero{grid-template-columns:190px minmax(0,1fr)}
+.avbox{position:relative;padding:8px 6px 0}
+.avbox img{width:178px;height:222px;border-radius:2px;border:7px solid #fff;box-shadow:0 2px 10px rgba(90,60,20,.25);transform:rotate(-1.6deg)}
+.avbox .clip{position:absolute;top:-6px;right:26px;width:16px;height:46px;stroke:#a89a7e;z-index:2}
+.avbtn{bottom:-14px;border-radius:3px}
+.facts{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:0 22px}
+.facts div{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding:7px 0}
+.facts dt{flex:none;font-size:12px;letter-spacing:.06em}
+.facts dt::after{content:"："}
+.facts dd{flex:1;min-width:0}
+.sw i{border-radius:2px}
+.cbox .sec h3{font-family:var(--latin);font-weight:600;font-size:13px;letter-spacing:.18em;color:var(--muted);border-bottom:1px dashed var(--line);padding-bottom:4px;margin-bottom:8px}
+details.more > summary{padding:16px 28px}
+.story{border-left-width:2px}
+.nframe img{width:190px;height:236px;border-radius:2px;border:7px solid #fff;box-shadow:0 2px 10px rgba(90,60,20,.25);transform:rotate(-1.6deg)}
+@media (max-width:640px){.filehead{margin:0 -18px 18px;padding:10px 18px;font-size:13px}.hero{grid-template-columns:1fr}.facts div{text-align:left}}
 </style>
 </head>
 <body>
@@ -327,9 +370,9 @@ function fmtTime(iso){ if(!iso) return "尚無紀錄"; var d = new Date(iso); if
 var LABEL_DEFS = [
   ["導覽列", [["nav_list","CHARACTERS"],["nav_rel","RELATIONS"],["nav_tl","TIMELINE"],["nav_notes","站長的話"]]],
   ["篩選", [["all","全部"]]],
-  ["角色頁分頁", [["grp_info","資料"],["grp_img","圖片"],["tab_basic","基本資料"],["tab_story","個性・外觀・背景"],["tab_art","角色圖"],["tab_outfits","衣服"],["tab_gallery","寫真"],["tab_stories","故事"],["tab_timeline","時間軸"]]],
+  ["角色頁分頁", [["grp_info","資料"],["grp_img","圖片"],["tab_basic","基本資料"],["tab_story","個性・背景故事"],["tab_art","角色圖"],["tab_outfits","衣服"],["tab_gallery","寫真"],["tab_stories","故事"],["tab_timeline","時間軸"]]],
   ["檔案上的文字", [["file_header","CHARACTER FILE"],["file_bar","APPEARANCE"],["file_filed","建檔日期"],["file_keywords","KEYWORDS"]]],
-  ["資料欄位與段落", [["f_project","所屬"],["f_gender","性別"],["f_age","年齡"],["f_birthday","生日"],["f_height","身高"],["f_species","種族"],["f_role","身分"],["sec_personality","個性"],["sec_appearance","外觀"],["sec_background","背景"],["sec_fields","其他設定"],["sec_rel","角色關係"]]]
+  ["資料欄位與段落", [["f_project","所屬"],["f_gender","性別"],["f_age","年齡"],["f_birthday","生日"],["f_height","身高"],["f_species","種族"],["f_role","身分"],["sec_personality","個性"],["sec_appearance","外觀"],["sec_background","背景故事"],["sec_fields","其他設定"],["sec_rel","角色關係"]]]
 ];
 var LABEL_DEFAULT = {};
 LABEL_DEFS.forEach(function(g){ g[1].forEach(function(p){ LABEL_DEFAULT[p[0]] = p[1]; }); });
@@ -511,7 +554,7 @@ function shell(inner, r){
   var items = [["list","",L("nav_list"),IC.list],["relations","relations",L("nav_rel"),IC.rel],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
   var dock = items.map(function(n){
     var on = r.view===n[0] || (n[0]==="list" && r.view==="char");
-    return '<a href="#'+n[1]+'" class="'+(on?"on":"")+'"'+(on?' aria-current="page"':'')+'>'+n[3]+'<span>'+esc(n[2])+'</span></a>';
+    return '<a href="#'+n[1]+'" class="'+(on?"on":"")+'"'+(on?' aria-current="page"':'')+' title="'+esc(n[2])+'">'+n[3]+'<span>'+esc(n[2])+'</span></a>';
   }).join("");
   return (ui.guest?'<div class="guestbar editor-only">訪客模式預覽中，訪客看到的就是這個畫面。<button class="btn sm" data-act="guest">離開訪客模式</button></div>':'')+
     '<span id="status" class="status needs-write'+(statusWarn?" warn":"")+'">'+esc(statusMsg)+'</span>'+
@@ -553,7 +596,7 @@ function sortChars(arr){
 }
 function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? o.name : "未分類"; }
 function card(c){
-  return '<button class="ccard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'"><img class="av" src="'+cover(c)+'" alt="">'+
+  return '<button class="ccard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'"><span class="ftab">'+fileNo(c)+'</span><img class="av" src="'+cover(c)+'" alt="">'+
     '<span class="info"><span class="nm">'+esc(c.name)+'</span>'+(c.alias?'<span class="al">'+esc(c.alias)+'</span>':'')+
     '<span class="meta">'+catPill(c)+(ym(c.created)?'<span>'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</span></span></button>';
 }
@@ -585,12 +628,12 @@ function charView(c){
   var pal = (c.palette||[]).filter(function(p){ return p.k||p.color; });
   var sw = (pal.length ? pal : [{k:"代表色", color:c.color}]).map(function(p){ return '<span class="sw"><i style="background:'+color(p.color)+'"></i>'+esc(p.k||"顏色")+'</span>'; }).join("");
   var tags = (c.tags||[]).length ? '<div class="pills tagrow">'+c.tags.map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join("")+'</div>' : '';
-  var hero = '<section class="cbox" style="--cc:'+color(c.color)+'"><div class="hero">'+
-    '<div class="avbox"><img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
+  var hero = '<section class="cbox file" style="--cc:'+color(c.color)+'"><div class="filehead"><span>Character file</span><b>'+fileNo(c)+'</b></div><div class="hero">'+
+    '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
     '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+editBtn(c,"basic","編輯資料")+'</div>'+
     (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
     (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
-  var intro = [["sec_personality","personality"],["sec_appearance","appearance"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
+  var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
     .map(function(x){ return '<div class="sec"><h3>'+esc(L(x[0]))+'</h3><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
   var introBox = (intro || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>介紹'+editBtn(c,"story")+'</h2>'+(intro||'<div class="muted">還沒有介紹。</div>')+'</section>' : '';
   var art = (c.mainImages||[]).filter(function(x){ return safeSrc(x.src); }), gal = (c.gallery||[]).filter(function(x){ return safeSrc(x.src); });
@@ -894,7 +937,7 @@ function lightbox(c, key, i){
 }
 
 /* 角色編輯器 */
-var SECNAME = {basic:"基本資料", story:"個性・外觀・背景", stories:"故事", art:"角色圖", outfits:"衣服", gallery:"寫真"};
+var SECNAME = {basic:"基本資料", story:"個性・背景故事", stories:"故事", art:"角色圖", outfits:"衣服", gallery:"寫真"};
 function editChar(id, only){
   if(!id) only = null;
   if(typeof only==="string" && only.indexOf(",")>=0) only = only.split(",");
@@ -953,7 +996,7 @@ function editChar(id, only){
       '<div class="field"><label for="f-color">代表色</label><input id="f-color" type="color" data-f="color" value="'+color(d.color)+'"></div></div>'+
       '<div style="margin-top:14px"><div class="hint" style="margin-bottom:4px">配色（顯示在檔案的外觀欄，例如髮色、瞳色；沒填會顯示代表色）</div>'+palList()+'</div>'+
       '<div style="margin-top:14px"><div class="hint" style="margin-bottom:4px">自訂欄位（口頭禪、技能、PL 等）</div>'+fieldsList()+'</div></fieldset>':'')+
-      (show("story")?'<fieldset><legend>個性・外觀・背景</legend><div class="fgrid">'+f("個性","personality","textarea",true)+f("外觀","appearance","textarea",true)+f("背景","background","textarea",true)+'</div></fieldset>':'')+
+      (show("story")?'<fieldset><legend>個性・背景故事</legend><div class="fgrid">'+f("個性","personality","textarea",true)+f("背景故事","background","textarea",true)+'</div></fieldset>':'')+
       (show("stories")?'<fieldset><legend>故事</legend><p class="hint" style="margin-top:0">有填日期的故事會依日期排列，也會出現在時間軸上。取消勾選「公開」的故事，只有你自己看得到。</p>'+storyList()+'</fieldset>':'')+
       (show("art")?'<fieldset><legend>角色圖</legend><div class="hint" style="margin-top:0">第一張會當作頭貼。</div>'+imgList("mainImages",false)+'</fieldset>':'')+
       (show("outfits")?'<fieldset><legend>衣服</legend><label class="check"><input type="checkbox" id="f-oe" data-oe '+(d.outfitsEnabled?"checked":"")+'>顯示「衣服」分頁</label>'+(d.outfitsEnabled?imgList("outfits",true):'')+'</fieldset>':'')+
