@@ -336,6 +336,19 @@ details.more > summary{padding:16px 28px}
 .story{border-left-width:2px}
 .nframe img{width:190px;height:236px;border-radius:2px;border:7px solid #fff;box-shadow:0 2px 10px rgba(90,60,20,.25);transform:rotate(-1.6deg)}
 @media (max-width:640px){.filehead{margin:0 -18px 18px;padding:10px 18px;font-size:13px}.hero{grid-template-columns:1fr}.facts div{text-align:left}}
+
+/* [樣式] 簡約年表 */
+.yr{display:flex;gap:18px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line)}
+.yr .months{flex:1;min-width:0}
+.yr:first-of-type{border-top:0}
+.yr h2{flex:none;width:90px;font-family:var(--latin);font-weight:600;font-size:26px;letter-spacing:.04em;line-height:1.2}
+.mrow{display:flex;gap:14px;align-items:flex-start;padding:4px 0}
+.mrow .m{flex:none;width:42px;font-size:13px;color:var(--accent);padding-top:7px}
+.who-list{display:flex;flex-wrap:wrap;gap:8px 18px}
+.who{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);padding:3px 0}
+.who img{width:30px;height:36px;object-fit:cover;border-radius:2px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.who:hover{color:var(--accent)}
+@media (max-width:520px){.yr{flex-direction:column;gap:4px}}
 </style>
 </head>
 <body>
@@ -842,14 +855,16 @@ function tlPicked(){
 function tlView(){
   var withDate = state.chars.filter(function(c){ return ym(c.created); }).sort(function(a,b){ var x = ym(a.created), y = ym(b.created); return x<y?-1:x>y?1:0; });
   var noDate = state.chars.filter(function(c){ return !ym(c.created); });
-  var lastY = null, items = withDate.map(function(c){
-    var d = ym(c.created), y = d.slice(0,4), mo = d.slice(5,7), mark = "";
-    if(y!==lastY){ mark = '<div class="year-mark">'+esc(y)+'</div>'; lastY = y; }
-    return mark+'<button class="ev era" data-go="c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><span class="era-m">'+(mo?esc(+mo)+' 月':'')+'</span><img src="'+cover(c)+'" alt=""><span class="era-n"><b>'+esc(c.name)+'</b>'+(c.alias?'<small>'+esc(c.alias)+'</small>':'')+'</span><span class="era-c">'+catPill(c)+(c.project?'<span class="tag">'+esc(c.project)+'</span>':'')+'</span></button>';
+  var years = [], by = {};
+  withDate.forEach(function(c){ var d = ym(c.created), y = d.slice(0,4), m = d.slice(5,7) || "";
+    if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(c); });
+  function who(c){ return '<a class="who" href="#c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt="">'+esc(c.name)+'</a>'; }
+  var body = years.map(function(y){
+    var months = Object.keys(by[y]).sort();
+    return '<div class="yr"><h2>'+esc(y)+'</h2><div class="months">'+months.map(function(m){ return '<div class="mrow"><span class="m">'+(m?(+m)+' 月':'')+'</span><div class="who-list">'+by[y][m].map(who).join("")+'</div></div>'; }).join("")+'</div></div>';
   }).join("");
-  var none = noDate.length ? '<div class="sec" style="margin-top:26px"><h3>未填創角年月</h3><div class="pills">'+noDate.map(chip).join("")+'</div></div>' : '';
-  return '<div class="head" style="margin-bottom:22px"><div><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1><div class="muted">依創角年月排列，點角色可以打開檔案。</div></div></div>'+
-    (items ? '<div class="tl">'+items+'</div>' : '<div class="empty">還沒有填寫創角年月的角色。</div>') + none;
+  if(noDate.length) body += '<div class="yr"><h2 class="muted" style="font-size:18px">未填年月</h2><div class="months"><div class="mrow"><span class="m"></span><div class="who-list">'+noDate.map(who).join("")+'</div></div></div></div>';
+  return '<div class="head" style="margin-bottom:18px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1></div>'+(body || '<div class="empty">還沒有填寫創角年月的角色。</div>');
 }
 function tlList(ids, compact){
   var has = function(list){ if(!ids) return true; return (list||[]).some(function(id){ return ids.indexOf(id)>=0; }); };
