@@ -356,7 +356,7 @@ table.rt td:nth-child(1),table.rt td:nth-child(3){white-space:nowrap}
 <body>
 <div id="root"></div>
 <script type="application/json" id="data">{"settings":{"cats":[{"id":"企劃","name":"企劃","sub":"企劃名稱","color":"#2e4d86"},{"id":"TRPG","name":"TRPG","sub":"劇本名稱","color":"#2b6a52"}],"font":"serif","labels":{"nav_notes":"－"}},"chars":[],"relations":[],"timeline":[]}</script>
-<script>window.OC_GH={owner:"hidesu0313",repo:"oc-archive",branch:"main"};</script>
+<script>window.OC_GH={owner:"hidesu0313",repo:"oc-archive",branch:"main",admin:false};</script>
 <script id="app-js">
 (function(){
 "use strict";
@@ -565,7 +565,7 @@ function shell(inner, r){
     '<nav class="main">'+nav+'</nav><span class="spacer"></span><span id="status" class="status needs-write'+(statusWarn?" warn":"")+'">'+esc(statusMsg)+'</span>'+
     '<button class="btn sm editor-only" data-act="guest">'+(ui.guest?"離開訪客模式":"訪客模式")+'</button><button class="btn sm needs-write" data-act="settings">設定與備份</button><button class="btn sm primary needs-write" data-act="new">新增角色</button></div></header>'+
     (ui.guest?'<div class="guestbar editor-only"><div class="wrap">訪客模式預覽中：訪客看到的就是這個畫面，編輯按鈕都已隱藏。<button class="btn sm" data-act="guest">離開訪客模式</button></div></div>':'')+
-    '<main><div class="wrap">'+inner+'</div></main><footer class="foot"><div class="wrap">最後更新：'+esc(fmtTime(state.settings.updatedAt))+(GH?(canEdit?'<button class="footlink" data-act="ghlogout">登出管理者</button>':'<button class="footlink" data-act="ghlogin">管理者登入</button>'):'')+'</div></footer>';
+    '<main><div class="wrap">'+inner+'</div></main><footer class="foot"><div class="wrap">最後更新：'+esc(fmtTime(state.settings.updatedAt))+(GH&&GH.admin?(canEdit?'<button class="footlink" data-act="ghlogout">登出管理者</button>':'<button class="footlink" data-act="ghlogin">管理者登入</button>')+'<a class="footlink" href="./" target="_blank" rel="noopener">查看公開頁面</a>':'')+'</div></footer>';
 }
 function render(){
   var r = route(), html;
@@ -1297,10 +1297,10 @@ var use = (!GH && !state.settings.exportMode && window.claude && typeof window.c
 function none(){ return null; }
 if(GH){
   use = null;
-  var savedTk = null, savedLocal = false; try{ savedLocal = !!localStorage.getItem("oc-gh-token"); savedTk = localStorage.getItem("oc-gh-token") || sessionStorage.getItem("oc-gh-token"); }catch(e){}
+  var savedTk = null, savedLocal = false; if(GH.admin) try{ savedLocal = !!localStorage.getItem("oc-gh-token"); savedTk = localStorage.getItem("oc-gh-token") || sessionStorage.getItem("oc-gh-token"); }catch(e){}
   var loadPublic = function(){ return fetch("data.json?v="+Date.now(), {cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); }); };
   (savedTk ? ghLogin(savedTk, savedLocal).then(ghLoad).then(function(d){ canEdit = true; return d; }).catch(function(){ try{ localStorage.removeItem("oc-gh-token"); }catch(e){} return loadPublic(); }) : loadPublic())
-    .then(function(d){ state = d; normalize(); setStatus(canEdit ? "已登入，修改會存到 GitHub" : "", false); applyMode(); })
+    .then(function(d){ state = d; normalize(); setStatus(canEdit ? "已登入，修改會存到 GitHub" : "", false); applyMode(); if(GH.admin && !canEdit) loginBox(); })
     .catch(function(){ root.innerHTML = '<div class="wrap" style="padding:60px 20px;color:#f1e6d0">資料載入失敗，請重新整理頁面。</div>'; });
 } else if(use){
   Promise.all([use("artifact").catch(none), use("assets").catch(none), use("user").catch(none)]).then(function(r){
