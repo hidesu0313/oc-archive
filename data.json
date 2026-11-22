@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-22T17:13:53.531Z",
+  "updatedAt": "2026-11-22T17:47:39.168Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -32,9 +32,9 @@
    "alias": "",
    "cat": "企劃",
    "stories": [],
-   "project": "",
+   "project": "蓮英超能企劃",
    "gender": "男",
-   "created": "2026-11-22",
+   "created": "2026-11",
    "age": "",
    "birthday": "",
    "height": "",
@@ -51,7 +51,7 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-22T17:13:53.531Z"
+   "updatedAt": "2026-11-22T17:47:39.167Z"
   }
  ],
  "relations": [],
