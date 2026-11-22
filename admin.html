@@ -635,7 +635,7 @@ function listView(){
 /* 角色頁 */
 function editBtn(c, sec, label){ return '<button class="edit needs-write" data-act="edit" data-id="'+esc(c.id)+'" data-sec="'+sec+'">'+(label||"編輯")+'</button>'; }
 function charView(c){
-  var facts = [[L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role],["創角年月",ym(c.created)]]
+  var facts = [[(catObj(c.cat)&&catObj(c.cat).sub)||L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role],["創角年月",ym(c.created)]]
     .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
     .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
   var pal = (c.palette||[]).filter(function(p){ return p.k||p.color; });
@@ -967,6 +967,12 @@ function editChar(id, only){
     var inner = type==="textarea" ? '<textarea id="f-'+key+'" data-f="'+key+'">'+v+'</textarea>' : '<input id="f-'+key+'" type="'+(type||"text")+'" data-f="'+key+'" value="'+v+'">';
     return '<div class="field'+(wide?" wide":"")+'"><label for="f-'+key+'">'+label+'</label>'+inner+'</div>';
   }
+  function projField(){
+    var o = catObj(d.cat); if(!o || !o.sub) return '';
+    var list = []; state.chars.forEach(function(c){ if(c.cat===d.cat && c.project && list.indexOf(c.project)<0) list.push(c.project); });
+    return '<div class="field"><label for="f-project">'+esc(o.name)+' › '+esc(o.sub)+'</label><input id="f-project" data-f="project" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(d.project||"")+'">'+
+      '<datalist id="projlist">'+list.map(function(x){ return '<option value="'+esc(x)+'"></option>'; }).join("")+'</datalist></div>';
+  }
   function catSel(){ return '<div class="field"><label for="f-cat">分類</label><select id="f-cat" data-f="cat">'+cats().map(function(x){ return '<option value="'+esc(x.id)+'"'+(d.cat===x.id?" selected":"")+'>'+esc(x.name)+'</option>'; }).join("")+'<option value=""'+(!catObj(d.cat)?" selected":"")+'>未分類</option></select></div>'; }
   function sel(label, key, opts){ return '<div class="field"><label for="f-'+key+'">'+label+'</label><select id="f-'+key+'" data-f="'+key+'">'+opts.map(function(o){return '<option'+(d[key]===o?" selected":"")+'>'+o+'</option>';}).join("")+'</select></div>'; }
   function imgList(key, named){
@@ -1005,7 +1011,7 @@ function editChar(id, only){
   function paint(){
     var scroll = m ? m.scrollTop : 0;
     var html = '<h2>'+(orig?(only?"編輯："+(Array.isArray(only)?only.map(function(k){ return SECNAME[k]; }).join("・"):SECNAME[only]):"編輯角色"):"新增角色")+'</h2>'+(only?'<p class="hint" style="margin-top:-6px">'+esc(d.name)+'</p>':'')+
-      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+f("所屬企劃／團名","project")+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
+      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+projField()+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
       f("年齡","age")+f("生日","birthday")+f("身高","height")+f("種族","species")+f("身分／職業","role")+
       '<div class="field"><label for="f-tags">標籤（用逗號分隔）</label><input id="f-tags" data-tags value="'+esc(d.tags.join("、"))+'"></div>'+
       '<div class="field"><label for="f-color">代表色</label><input id="f-color" type="color" data-f="color" value="'+color(d.color)+'"></div></div>'+
@@ -1029,6 +1035,7 @@ function editChar(id, only){
   });
   m.addEventListener("change", function(e){
     var t = e.target;
+    if(t.id==="f-cat"){ d.cat = t.value; paint(); var pf = m.querySelector("#f-project"); if(pf) pf.focus(); return; }
     if(t.dataset.pola){ d.polaroidSrc = d[t.dataset.pola][+t.dataset.i].src; paint(); }
     else if(t.name==="polamode" && t.value!=="custom"){ d.polaroidSrc = t.value; paint(); }
     else if(t.hasAttribute("data-oe")){ d.outfitsEnabled = t.checked; paint(); }
