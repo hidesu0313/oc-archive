@@ -349,6 +349,16 @@ table.rt td:nth-child(1),table.rt td:nth-child(3){white-space:nowrap}
 .imghint{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
 .footlink{background:none;border:0;color:var(--desk-muted);font:inherit;text-decoration:underline;cursor:pointer;margin-left:16px;padding:0}
 .footlink:hover{color:#fff}
+.ev.era{display:grid;grid-template-columns:52px 44px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit;border-left:4px solid var(--cc)}
+.ev.era:hover{background:var(--surface)}
+.ev.era::before{border-color:var(--cc);top:50%;margin-top:-6px}
+.era-m{font-family:var(--type);color:var(--accent);font-variant-numeric:tabular-nums}
+.ev.era img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.era-n{display:flex;flex-direction:column;min-width:0}
+.era-n b{font-family:var(--display);font-size:17px}
+.era-n small{font-family:var(--type);color:var(--muted);font-size:12px}
+.era-c{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:560px){.ev.era{grid-template-columns:44px 40px minmax(0,1fr)}.era-c{grid-column:2/-1;justify-content:flex-start}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:420px){.wrap{padding:0 16px}}
 </style>
@@ -378,12 +388,13 @@ var root = document.getElementById("root");
 var art = null, assets = null, connected = false, canEdit = false, statusMsg = "連線中…", statusWarn = false;
 function ro(){ return !canEdit || !!ui.guest; }
 function applyMode(){ var b = document.body.classList; ["font-serif","font-kai","font-sans"].forEach(function(f){ b.remove(f); }); b.add("font-"+(state.settings.font||"serif")); b.toggle("ro", ro()); b.toggle("can-edit", canEdit); b.toggle("protect", ro() && state.settings.protectImages!==false); render(); }
+function ym(v){ v = String(v||""); return /^\d{4}-\d{2}/.test(v) ? v.slice(0,7) : v; }
 function fmtTime(iso){ if(!iso) return "尚無紀錄"; var d = new Date(iso); if(isNaN(d)) return "尚無紀錄"; function z(n){return (n<10?"0":"")+n;} return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes()); }
 
 var LABEL_DEFS = [
   ["導覽列", [["nav_list","CHARACTERS"],["nav_rel","RELATIONS"],["nav_tl","TIMELINE"],["nav_notes","站長的話"]]],
   ["篩選", [["all","全部"]]],
-  ["角色頁分頁", [["grp_info","資料"],["grp_img","圖片"],["grp_rec","紀錄"],["tab_basic","基本資料"],["tab_story","個性・外觀・背景"],["tab_art","角色圖"],["tab_outfits","衣服"],["tab_gallery","寫真"],["tab_stories","故事"],["tab_timeline","時間軸"]]],
+  ["角色頁分頁", [["grp_info","資料"],["grp_img","圖片"],["tab_basic","基本資料"],["tab_story","個性・外觀・背景"],["tab_art","角色圖"],["tab_outfits","衣服"],["tab_gallery","寫真"],["tab_stories","故事"],["tab_timeline","時間軸"]]],
   ["檔案上的文字", [["file_header","CHARACTER FILE"],["file_bar","APPEARANCE"],["file_filed","建檔日期"],["file_keywords","KEYWORDS"]]],
   ["資料欄位與段落", [["f_project","所屬"],["f_gender","性別"],["f_age","年齡"],["f_birthday","生日"],["f_height","身高"],["f_species","種族"],["f_role","身分"],["sec_personality","個性"],["sec_appearance","外觀"],["sec_background","背景"],["sec_fields","其他設定"],["sec_rel","角色關係"]]]
 ];
@@ -603,7 +614,7 @@ function card(c){
     '<span class="fbody">'+(c.example?'<span class="fstamp">範例</span>':'')+
     '<span class="fphoto"><img src="'+cover(c)+'" alt="">'+CLIP+'</span>'+
     '<span class="fname">'+esc(c.name)+(c.alias?'<small>'+esc(c.alias)+'</small>':'')+'</span>'+
-    '<span class="fmeta"><span>'+esc(c.gender||"—")+'</span><span>'+esc(c.created||"未填日期")+'</span></span>'+
+    '<span class="fmeta"><span>'+esc(c.gender||"—")+'</span><span>'+esc(ym(c.created)||"未填日期")+'</span></span>'+
     (c.project?'<span class="fproj">'+esc(c.project)+'</span>':'')+'</span></button>';
 }
 function listView(){
@@ -628,7 +639,7 @@ function listView(){
 }
 
 /* 角色頁 */
-var TAB_GROUPS = [["grp_info",["basic","story","stories"]],["grp_img",["art","outfits","gallery"]],["grp_rec",["timeline"]]];
+var TAB_GROUPS = [["grp_info",["basic","story","stories"]],["grp_img",["art","outfits","gallery"]]];
 var TABS = [["basic","tab_basic"],["story","tab_story"],["stories","tab_stories"],["art","tab_art"],["outfits","tab_outfits"],["gallery","tab_gallery"],["timeline","tab_timeline"]];
 function firstImg(c){
   if(c.polaroidSrc==="none") return null;
@@ -650,7 +661,7 @@ function charView(c){
     if(g[1].indexOf("outfits")>=0 && !c.outfitsEnabled) inner += '<button class="addtab needs-write" data-act="edit" data-id="'+esc(c.id)+'" data-sec="outfits" title="開啟衣服分頁">＋ '+esc(L("tab_outfits"))+'</button>';
     return inner ? '<div class="tgroup"><span class="tglabel">'+esc(L(g[0]))+'</span><div class="tgtabs">'+inner+'</div></div>' : '';
   }).join("");
-  var rows = [[L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_species"),c.species],[L("f_role"),c.role],[L("file_filed"),c.created]]
+  var rows = [[L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_species"),c.species],[L("f_role"),c.role],[L("file_filed"),ym(c.created)]]
     .filter(function(r){return r[1];}).map(function(r){ return '<div class="drow"><dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd></div>'; }).join("");
   var pal = (c.palette||[]).filter(function(p){ return p.k || p.color; });
   var cells = (c.height?'<div class="acell"><span>'+esc(L("f_height"))+'</span>'+esc(c.height)+'</div>':'') +
@@ -870,20 +881,16 @@ function tlPicked(){
   ui.tlChars = ok; return ok;
 }
 function tlView(){
-  var picked = tlPicked(), all = ui.tlMode==="all";
-  var pick = state.chars.map(function(c){
-    var on = !all && picked.indexOf(c.id)>=0;
-    return '<button class="pickc'+(on?" on":"")+'" style="--cc:'+color(c.color)+'" data-tlc="'+esc(c.id)+'" aria-pressed="'+on+'"><img src="'+cover(c)+'" alt="">'+esc(c.name)+'</button>';
+  var withDate = state.chars.filter(function(c){ return ym(c.created); }).sort(function(a,b){ var x = ym(a.created), y = ym(b.created); return x<y?-1:x>y?1:0; });
+  var noDate = state.chars.filter(function(c){ return !ym(c.created); });
+  var lastY = null, items = withDate.map(function(c){
+    var d = ym(c.created), y = d.slice(0,4), mo = d.slice(5,7), mark = "";
+    if(y!==lastY){ mark = '<div class="year-mark">'+esc(y)+'</div>'; lastY = y; }
+    return mark+'<button class="ev era" data-go="c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><span class="era-m">'+(mo?esc(+mo)+' 月':'')+'</span><img src="'+cover(c)+'" alt=""><span class="era-n"><b>'+esc(c.name)+'</b>'+(c.alias?'<small>'+esc(c.alias)+'</small>':'')+'</span><span class="era-c">'+catPill(c)+(c.project?'<span class="tag">'+esc(c.project)+'</span>':'')+'</span></button>';
   }).join("");
-  var names = all ? "全部角色" : picked.map(function(id){ return byId(id).name; }).join("、");
-  var pre = all ? [] : picked;
-  return '<div class="head" style="margin-bottom:14px"><div><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1><div class="muted">正在看：'+esc(names||"—")+'</div></div>'+
-    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="check"><input type="checkbox" id="showc" '+(ui.showCreated?"checked":"")+'>顯示創角日</label><button class="btn primary sm needs-write" data-ev="" data-pre="'+esc(pre.join(","))+'">新增事件</button></div></div>'+
-    '<div class="panel" style="margin-bottom:22px;padding:12px 14px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><span class="seg">'+
-    '<button class="'+(!all&&!ui.tlMulti?"on":"")+'" data-tlmode="single">單一角色</button><button class="'+(!all&&ui.tlMulti?"on":"")+'" data-tlmode="multi">指定多位</button><button class="'+(all?"on":"")+'" data-tlmode="all">全部</button></span>'+
-    '<span class="muted" style="font-size:13px">'+(all?"顯示所有角色的事件":ui.tlMulti?"點角色可以加入或移除，事件會依日期合併":"點一位角色查看他的時間軸")+'</span></div>'+
-    '<div class="picks">'+pick+'</div></div>'+
-    tlList(all ? null : picked, false);
+  var none = noDate.length ? '<div class="sec" style="margin-top:26px"><h3>未填創角年月</h3><div class="pills">'+noDate.map(chip).join("")+'</div></div>' : '';
+  return '<div class="head" style="margin-bottom:22px"><div><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1><div class="muted">依創角年月排列，點角色可以打開檔案。</div></div></div>'+
+    (items ? '<div class="tl">'+items+'</div>' : '<div class="empty">還沒有填寫創角年月的角色。</div>') + none;
 }
 function tlList(ids, compact){
   var has = function(list){ if(!ids) return true; return (list||[]).some(function(id){ return ids.indexOf(id)>=0; }); };
@@ -975,8 +982,9 @@ function editChar(id, only){
   if(!id) only = null;
   function show(k){ return !only || only===k; }
   var orig = id ? byId(id) : null;
-  var d = orig ? JSON.parse(JSON.stringify(orig)) : {id:uid("c"), name:"", alias:"", cat:catObj(ui.cat)?ui.cat:(catIds()[0]||""), stories:[], project:"", gender:"女", created:new Date().toISOString().slice(0,10), age:"", birthday:"", height:"", species:"", role:"", tags:[], palette:[], color:"#5b7fb5", personality:"", appearance:"", background:"", fields:[], mainImages:[], outfitsEnabled:false, outfits:[], gallery:[]};
+  var d = orig ? JSON.parse(JSON.stringify(orig)) : {id:uid("c"), name:"", alias:"", cat:catObj(ui.cat)?ui.cat:(catIds()[0]||""), stories:[], project:"", gender:"女", created:new Date().toISOString().slice(0,7), age:"", birthday:"", height:"", species:"", role:"", tags:[], palette:[], color:"#5b7fb5", personality:"", appearance:"", background:"", fields:[], mainImages:[], outfitsEnabled:false, outfits:[], gallery:[]};
   ["fields","mainImages","outfits","gallery","tags","palette","stories"].forEach(function(k){ d[k] = d[k]||[]; });
+  d.created = ym(d.created);
   if(only==="outfits" && !d.outfitsEnabled) d.outfitsEnabled = true;
   function f(label, key, type, wide){
     var v = esc(d[key]||"");
@@ -1021,7 +1029,7 @@ function editChar(id, only){
   function paint(){
     var scroll = m ? m.scrollTop : 0;
     var html = '<h2>'+(orig?(only?"編輯："+SECNAME[only]:"編輯角色"):"新增角色")+'</h2>'+(only?'<p class="hint" style="margin-top:-6px">'+esc(d.name)+'</p>':'')+
-      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+f("所屬企劃／團名","project")+sel("性別","gender",GENDERS)+f("創角日期","created","date")+
+      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+f("所屬企劃／團名","project")+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
       f("年齡","age")+f("生日","birthday")+f("身高","height")+f("種族","species")+f("身分／職業","role")+
       '<div class="field"><label for="f-tags">標籤（用逗號分隔）</label><input id="f-tags" data-tags value="'+esc(d.tags.join("、"))+'"></div>'+
       '<div class="field"><label for="f-color">代表色</label><input id="f-color" type="color" data-f="color" value="'+color(d.color)+'"></div></div>'+
