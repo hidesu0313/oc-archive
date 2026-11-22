@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-22T12:47:25.890Z",
+  "updatedAt": "2026-11-22T17:11:22.282Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -25,7 +25,35 @@
   ],
   "notesImg": ""
  },
- "chars": [],
+ "chars": [
+  {
+   "id": "cp3v0dd",
+   "name": "雅雷．哈里斯",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "",
+   "gender": "女",
+   "created": "2026-11-22",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "updatedAt": "2026-11-22T17:11:22.282Z"
+  }
+ ],
  "relations": [],
  "timeline": []
 }
