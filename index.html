@@ -347,13 +347,16 @@ table.rt td:nth-child(1),table.rt td:nth-child(3){white-space:nowrap}
 .exportbox .hint{margin:4px 0 10px}
 #exp-msg{margin-left:10px}
 .imghint{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.footlink{background:none;border:0;color:var(--desk-muted);font:inherit;text-decoration:underline;cursor:pointer;margin-left:16px;padding:0}
+.footlink:hover{color:#fff}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:420px){.wrap{padding:0 16px}}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="application/json" id="data">{"settings":{"siteTitle":"原創角色檔案館","notes":"－","protectImages":true,"updatedAt":"2026-11-22T12:47:25.890Z","labels":{"nav_notes":"－"},"notesCaption":"－","font":"serif","cats":[{"id":"企劃","name":"企劃","sub":"企劃名稱","color":"#2e4d86"},{"id":"TRPG","name":"TRPG","sub":"劇本名稱","color":"#2b6a52"}],"notesImg":"","exportMode":true},"chars":[],"relations":[],"timeline":[]}</script>
+<script type="application/json" id="data">{"settings":{"cats":[{"id":"企劃","name":"企劃","sub":"企劃名稱","color":"#2e4d86"},{"id":"TRPG","name":"TRPG","sub":"劇本名稱","color":"#2b6a52"}],"font":"serif","labels":{"nav_notes":"－"}},"chars":[],"relations":[],"timeline":[]}</script>
+<script>window.OC_GH={owner:"hidesu0313",repo:"oc-archive",branch:"main"};</script>
 <script id="app-js">
 (function(){
 "use strict";
@@ -387,25 +390,59 @@ var LABEL_DEFS = [
 var LABEL_DEFAULT = {};
 LABEL_DEFS.forEach(function(g){ g[1].forEach(function(p){ LABEL_DEFAULT[p[0]] = p[1]; }); });
 function L(k){ var v = (state.settings.labels||{})[k]; return (v && String(v).trim()) || LABEL_DEFAULT[k] || k; }
-state.settings.labels = state.settings.labels || {};
-if(state.settings.notesTitle && !state.settings.labels.nav_notes && state.settings.notesTitle!=="站長的話") state.settings.labels.nav_notes = state.settings.notesTitle;
-delete state.settings.notesTitle;
-if(!Array.isArray(state.settings.cats)){
-  var lb0 = state.settings.labels;
-  state.settings.cats = [
-    {id:"企劃", name:lb0["cat_企劃"]||"企劃", sub:lb0.pick_plan||"企劃名稱", color:"#2e4d86"},
-    {id:"TRPG", name:lb0["cat_TRPG"]||"TRPG", sub:lb0.pick_trpg||"劇本名稱", color:"#2b6a52"}
-  ];
-  ["cat_企劃","cat_TRPG","cat_無","pick_plan","pick_trpg"].forEach(function(k){ delete lb0[k]; });
-  state.chars.forEach(function(c){ if(c.cat==="無") c.cat = ""; });
+function normalize(){
+  state.settings = state.settings || {};
+  state.chars = state.chars || []; state.relations = state.relations || []; state.timeline = state.timeline || [];
+  state.settings.labels = state.settings.labels || {};
+  if(state.settings.notesTitle && !state.settings.labels.nav_notes && state.settings.notesTitle!=="站長的話") state.settings.labels.nav_notes = state.settings.notesTitle;
+  delete state.settings.notesTitle;
+  if(!Array.isArray(state.settings.cats)){
+    var lb0 = state.settings.labels;
+    state.settings.cats = [
+      {id:"企劃", name:lb0["cat_企劃"]||"企劃", sub:lb0.pick_plan||"企劃名稱", color:"#2e4d86"},
+      {id:"TRPG", name:lb0["cat_TRPG"]||"TRPG", sub:lb0.pick_trpg||"劇本名稱", color:"#2b6a52"}
+    ];
+    ["cat_企劃","cat_TRPG","cat_無","pick_plan","pick_trpg"].forEach(function(k){ delete lb0[k]; });
+    state.chars.forEach(function(c){ if(c.cat==="無") c.cat = ""; });
+  }
+  state.chars.forEach(function(c){ c.stories = c.stories || []; });
 }
-state.chars.forEach(function(c){ c.stories = c.stories || []; });
+normalize();
 var CLIP = '<svg class="clip" viewBox="0 0 24 60" aria-hidden="true"><path d="M8 50V12a6 6 0 0 1 12 0v40a9 9 0 0 1-18 0V18" fill="none" stroke-width="2.5" stroke-linecap="round"/></svg>';
 function fileNo(c){ var i = state.chars.indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function uid(p){ return (p||"x") + Math.random().toString(36).slice(2,8); }
 function color(c){ return /^#[0-9a-fA-F]{6}$/.test(c||"") ? c : "#737986"; }
-function safeSrc(s){ s = String(s||""); return (/^data:image\//.test(s) || /^\/_blob\//.test(s) || /^blob:/.test(s)) ? s : ""; }
+var GH = window.OC_GH || null, ghToken = null, ghSha = null, imgCache = {};
+function safeSrc(s){ s = String(s||""); if(/^images\/[\w.-]+$/.test(s)) return imgCache[s] || s; return (/^data:image\//.test(s) || /^\/_blob\//.test(s) || /^blob:/.test(s)) ? s : ""; }
+function ghApi(path, opts){
+  opts = opts || {};
+  var h = {"Accept":"application/vnd.github+json","Authorization":"Bearer "+(opts.token||ghToken)};
+  if(opts.body) h["Content-Type"] = "application/json";
+  return fetch("https://api.github.com/repos/"+GH.owner+"/"+GH.repo+path, {method:opts.method||"GET", headers:h, body:opts.body?JSON.stringify(opts.body):undefined, cache:"no-store"})
+    .then(function(r){ if(!r.ok){ var e = new Error("github "+r.status); e.status = r.status; throw e; } return r.status===204 ? null : r.json(); });
+}
+function b64(str){ var bytes = new TextEncoder().encode(str), bin = "", k = 0x8000; for(var i=0;i<bytes.length;i+=k) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+k)); return btoa(bin); }
+function unb64(b){ var bin = atob(String(b).replace(/\s/g,"")), arr = new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i); return new TextDecoder().decode(arr); }
+function ghLoad(){
+  return ghApi("/contents/data.json?ref="+GH.branch).then(function(j){
+    ghSha = j.sha;
+    if(j.content) return JSON.parse(unb64(j.content));
+    return fetch(j.download_url, {cache:"no-store"}).then(function(r){ return r.json(); });
+  });
+}
+function ghSaveData(){
+  return ghApi("/contents/data.json", {method:"PUT", body:{message:"更新角色資料", content:b64(JSON.stringify(state, null, 1)), sha:ghSha||undefined, branch:GH.branch}})
+    .then(function(r){ ghSha = r.content.sha; });
+}
+function ghLogin(token, remember){
+  return ghApi("", {token:token}).then(function(repo){
+    if(!repo.permissions || !repo.permissions.push) throw {status:403};
+    ghToken = token;
+    try{ if(remember) localStorage.setItem("oc-gh-token", token); else sessionStorage.setItem("oc-gh-token", token); }catch(e){}
+  });
+}
+function ghLogout(){ ghToken = null; ghSha = null; try{ localStorage.removeItem("oc-gh-token"); sessionStorage.removeItem("oc-gh-token"); }catch(e){} canEdit = false; ui.guest = false; applyMode(); setStatus("", false); toast("已登出"); }
 function byId(id){ for(var i=0;i<state.chars.length;i++) if(state.chars[i].id===id) return state.chars[i]; return null; }
 function placeholder(c){
   var col = color(c && c.color), ch = esc(((c && c.name)||"?").trim().charAt(0)||"?");
@@ -428,6 +465,19 @@ function buildDoc(jsonStr){
 }
 var saveTimer = null;
 function save(){
+  if(GH){
+    if(!canEdit || !ghToken){ setStatus("請先登入管理者", true); return; }
+    state.settings.updatedAt = new Date().toISOString();
+    setStatus("儲存中…", false); clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      ghSaveData().then(function(){ setStatus("已存到 GitHub，約 1～3 分鐘後訪客看得到", false); }).catch(function(e){
+        if(e && (e.status===409 || e.status===422)) setStatus("其他裝置有新的修改，請重新整理頁面再改", true);
+        else if(e && e.status===401) setStatus("登入已失效，請重新登入", true);
+        else setStatus("儲存失敗，請檢查網路後再試一次", true);
+      });
+    }, 1500);
+    return;
+  }
   if(!connected){ setStatus("未連線：修改只在這次瀏覽有效", true); return; }
   if(!canEdit){ setStatus("你只有檢視權限，修改不會保存", true); return; }
   state.settings.updatedAt = new Date().toISOString();
@@ -467,6 +517,13 @@ function toJpeg(file){
   });
 }
 function readImage(file){
+  if(GH) return toJpeg(file).then(function(cv){
+    var dataUrl = cv.toDataURL("image/jpeg", IMG_Q), path = "images/" + Date.now().toString(36) + Math.random().toString(36).slice(2,6) + ".jpg";
+    setStatus("上傳圖片中…", false);
+    return ghApi("/contents/"+path, {method:"PUT", body:{message:"上傳圖片", content:dataUrl.split(",")[1], branch:GH.branch}}).then(function(){
+      imgCache[path] = dataUrl; setStatus("圖片已上傳", false); return path;
+    });
+  });
   return toJpeg(file).then(function(cv){
     if(assets){
       return new Promise(function(res){ cv.toBlob(res, "image/jpeg", IMG_Q); }).then(function(blob){
@@ -508,7 +565,7 @@ function shell(inner, r){
     '<nav class="main">'+nav+'</nav><span class="spacer"></span><span id="status" class="status needs-write'+(statusWarn?" warn":"")+'">'+esc(statusMsg)+'</span>'+
     '<button class="btn sm editor-only" data-act="guest">'+(ui.guest?"離開訪客模式":"訪客模式")+'</button><button class="btn sm needs-write" data-act="settings">設定與備份</button><button class="btn sm primary needs-write" data-act="new">新增角色</button></div></header>'+
     (ui.guest?'<div class="guestbar editor-only"><div class="wrap">訪客模式預覽中：訪客看到的就是這個畫面，編輯按鈕都已隱藏。<button class="btn sm" data-act="guest">離開訪客模式</button></div></div>':'')+
-    '<main><div class="wrap">'+inner+'</div></main><footer class="foot"><div class="wrap">最後更新：'+esc(fmtTime(state.settings.updatedAt))+'</div></footer>';
+    '<main><div class="wrap">'+inner+'</div></main><footer class="foot"><div class="wrap">最後更新：'+esc(fmtTime(state.settings.updatedAt))+(GH?(canEdit?'<button class="footlink" data-act="ghlogout">登出管理者</button>':'<button class="footlink" data-act="ghlogin">管理者登入</button>'):'')+'</div></footer>';
 }
 function render(){
   var r = route(), html;
@@ -1062,6 +1119,22 @@ function exportSite(btn, msg){
   }).catch(function(){ say("匯出失敗，請再試一次。"); }).then(function(){ btn.disabled = false; });
 }
 
+/* 管理者登入（GitHub） */
+function loginBox(){
+  var m = modal('<h2>管理者登入</h2><p class="hint" style="margin-top:0">貼上你的 GitHub 存取權杖（token）。權杖只會存在這台裝置的瀏覽器裡，不會傳到 GitHub 以外的地方。</p>'+
+    '<div class="field"><label for="gh-tk">存取權杖</label><input id="gh-tk" type="password" autocomplete="off" placeholder="github_pat_…"></div>'+
+    '<label class="check" style="margin-top:10px"><input type="checkbox" id="gh-rm" checked>在這台裝置記住我（共用電腦請取消勾選）</label>'+
+    '<p class="hint" id="gh-msg"></p><div class="mfoot"><button class="btn" data-x>取消</button><button class="btn primary" data-s>登入</button></div>', "small");
+  m.querySelector("[data-x]").onclick = function(){ m.remove(); };
+  m.querySelector("[data-s]").onclick = function(){
+    var tk = m.querySelector("#gh-tk").value.trim(), msg = m.querySelector("#gh-msg"), btn = this;
+    if(!tk){ msg.textContent = "請貼上存取權杖。"; return; }
+    btn.disabled = true; msg.textContent = "確認中…";
+    ghLogin(tk, m.querySelector("#gh-rm").checked).then(ghLoad).then(function(d){ state = d; normalize(); canEdit = true; m.remove(); applyMode(); setStatus("已登入，修改會存到 GitHub", false); toast("登入成功"); })
+      .catch(function(e){ btn.disabled = false; msg.textContent = (e && e.status===401) ? "權杖不正確或已過期。" : (e && (e.status===403||e.status===404)) ? "這個權杖沒有 "+GH.repo+" 的寫入權限。" : "無法連線到 GitHub，請稍後再試。"; });
+  };
+}
+
 /* 分類管理 */
 function manageCats(){
   var cd = JSON.parse(JSON.stringify(cats())), m;
@@ -1111,7 +1184,7 @@ function settings(){
       return '<label class="fopt font-'+f[0]+'"><input type="radio" name="s-font" value="'+f[0]+'" '+((state.settings.font||"serif")===f[0]?"checked":"")+'><b>'+f[1]+'</b><span>'+f[2]+'</span><em>白鷺澪的檔案 2023</em></label>'; }).join("")+'</div></div>'+
     '<label class="check" style="margin:14px 0 4px"><input type="checkbox" id="s-prot" '+(state.settings.protectImages!==false?"checked":"")+'>訪客瀏覽時保護圖片（停用右鍵、拖曳和長按另存）</label>'+
     '<p class="muted" style="font-size:13px">備份會把所有角色、關係和時間軸複製成一段文字，可以貼到記事本保存。用「匯入」貼回去就能還原。</p>'+
-    '<div class="exportbox needs-write"><b>匯出公開網站</b><p class="hint">產生一份可以直接放上 GitHub Pages 的 index.html。圖片會一起打包進去，編輯功能和不公開的故事都會移除。</p><button class="btn primary" data-export>匯出公開網站</button><span class="hint" id="exp-msg"></span></div>'+
+    (GH?'':'<div class="exportbox needs-write"><b>匯出公開網站</b><p class="hint">產生一份可以直接放上 GitHub Pages 的 index.html。圖片會一起打包進去，編輯功能和不公開的故事都會移除。</p><button class="btn primary" data-export>匯出公開網站</button><span class="hint" id="exp-msg"></span></div>')+
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-copy>複製備份文字</button><button class="btn needs-write" data-imp>匯入備份</button>'+
     '<button class="btn danger needs-write" data-clr>刪除所有範例角色</button><button class="btn needs-write" data-mcats>管理分類</button></div>'+
     '<h2 style="margin-top:26px;font-size:20px">標題文字</h2><p class="hint">把網站上的標題換成你想要的文字。留空就使用預設文字。</p>'+labelsHTML+
@@ -1188,6 +1261,8 @@ root.addEventListener("click", function(e){
   else if(ds.act==="edit"){ editChar(ds.id, ds.sec || null); }
   else if(ds.act==="settings"){ settings(); }
   else if(ds.act==="cats"){ manageCats(); }
+  else if(ds.act==="ghlogin"){ loginBox(); }
+  else if(ds.act==="ghlogout"){ ghLogout(); }
   else if(ds.act==="notes"){ editNotes(); }
   else if(ds.act==="guest"){ ui.guest = !ui.guest; keepUI(); applyMode(); toast(ui.guest?"已切換為訪客模式":"已回到編輯模式"); }
   else if(ds.act==="del"){ var cc = byId(ds.id); confirmBox("要刪除「"+cc.name+"」嗎？他的關係也會一起刪除。", function(){
@@ -1218,9 +1293,16 @@ document.addEventListener("dragstart", function(e){ if(isProtected(e.target)) e.
 try{ var lh = sessionStorage.getItem("oc-hash"); if(lh && !location.hash){ sessionStorage.removeItem("oc-hash"); history.replaceState(null,"",lh); } }catch(e){}
 document.body.classList.add("ro","protect","font-"+(state.settings.font||"serif"));
 render();
-var use = (!state.settings.exportMode && window.claude && typeof window.claude.use === "function") ? window.claude.use.bind(window.claude) : null;
+var use = (!GH && !state.settings.exportMode && window.claude && typeof window.claude.use === "function") ? window.claude.use.bind(window.claude) : null;
 function none(){ return null; }
-if(use){
+if(GH){
+  use = null;
+  var savedTk = null, savedLocal = false; try{ savedLocal = !!localStorage.getItem("oc-gh-token"); savedTk = localStorage.getItem("oc-gh-token") || sessionStorage.getItem("oc-gh-token"); }catch(e){}
+  var loadPublic = function(){ return fetch("data.json?v="+Date.now(), {cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); }); };
+  (savedTk ? ghLogin(savedTk, savedLocal).then(ghLoad).then(function(d){ canEdit = true; return d; }).catch(function(){ try{ localStorage.removeItem("oc-gh-token"); }catch(e){} return loadPublic(); }) : loadPublic())
+    .then(function(d){ state = d; normalize(); setStatus(canEdit ? "已登入，修改會存到 GitHub" : "", false); applyMode(); })
+    .catch(function(){ root.innerHTML = '<div class="wrap" style="padding:60px 20px;color:#f1e6d0">資料載入失敗，請重新整理頁面。</div>'; });
+} else if(use){
   Promise.all([use("artifact").catch(none), use("assets").catch(none), use("user").catch(none)]).then(function(r){
     art = r[0]; assets = r[1]; connected = !!art;
     var u = r[2];

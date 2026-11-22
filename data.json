@@ -1,0 +1,31 @@
+{
+ "settings": {
+  "siteTitle": "原創角色檔案館",
+  "notes": "－",
+  "protectImages": true,
+  "updatedAt": "2026-11-22T12:47:25.890Z",
+  "labels": {
+   "nav_notes": "－"
+  },
+  "notesCaption": "－",
+  "font": "serif",
+  "cats": [
+   {
+    "id": "企劃",
+    "name": "企劃",
+    "sub": "企劃名稱",
+    "color": "#2e4d86"
+   },
+   {
+    "id": "TRPG",
+    "name": "TRPG",
+    "sub": "劇本名稱",
+    "color": "#2b6a52"
+   }
+  ],
+  "notesImg": ""
+ },
+ "chars": [],
+ "relations": [],
+ "timeline": []
+}
