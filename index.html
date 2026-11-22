@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>原創角色檔案館</title>
+<title>角色名單</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@400;500;700;900&amp;family=LXGW+WenKai+TC:wght@400;700&amp;family=Oswald:wght@500;700&amp;family=Special+Elite&amp;display=swap" rel="stylesheet">
@@ -421,7 +421,7 @@ function buildDoc(jsonStr){
   var app = document.getElementById("app-js").textContent;
   var json = (jsonStr || JSON.stringify(state)).replace(/</g,"\\u003c");
   var S = "<"+"/script>";
-  return '<!DOCTYPE html>\n<html lang="zh-Hant">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>原創角色檔案館</title>\n'+
+  return '<!DOCTYPE html>\n<html lang="zh-Hant">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>角色名單</title>\n'+
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'+
     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@400;500;700;900&amp;family=LXGW+WenKai+TC:wght@400;700&amp;family=Oswald:wght@500;700&amp;family=Special+Elite&amp;display=swap" rel="stylesheet">\n'+
     '<style id="css">'+css+'</style>\n</head>\n<body>\n<div id="root"></div>\n<script type="application/json" id="data">'+json+S+'\n<script id="app-js">'+app+S+'\n</body>\n</html>\n';
