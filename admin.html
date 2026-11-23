@@ -509,29 +509,8 @@ function ghLogin(token, remember){
 }
 function ghLogout(){ ghToken = null; ghSha = null; try{ localStorage.removeItem("oc-gh-token"); sessionStorage.removeItem("oc-gh-token"); }catch(e){} canEdit = false; ui.guest = false; applyMode(); setStatus("", false); toast("已登出"); }
 function byId(id){ for(var i=0;i<state.chars.length;i++) if(state.chars[i].id===id) return state.chars[i]; return null; }
-function placeholder(c){
-  var col = color(c && c.color), ch = esc(((c && c.name)||"?").trim().charAt(0)||"?");
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250"><rect width="200" height="250" fill="'+col+'" opacity="0.14"/><circle cx="100" cy="98" r="42" fill="'+col+'" opacity="0.55"/><path d="M28 250c4-58 34-88 72-88s68 30 72 88z" fill="'+col+'" opacity="0.55"/><text x="100" y="112" text-anchor="middle" font-size="40" font-family="serif" font-weight="700" fill="#fff">'+ch+'</text></svg>';
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-}
-var TONES = [["","原色"],["mono","黑白"],["sepia","懷舊褐"],["tint","代表色單色"]];
-function toneId(c){ return "tint-" + String(c.id).replace(/[^\w-]/g,""); }
-function toneStyle(c){
-  var t = c && c.avatarTone;
-  if(t==="mono") return ' style="filter:grayscale(1) contrast(1.05)"';
-  if(t==="sepia") return ' style="filter:grayscale(1) sepia(.85) contrast(.95)"';
-  if(t==="tint") return ' style="filter:url(#'+toneId(c)+')"';
-  return '';
-}
-function toneDefs(){
-  var f = (ALLCHARS||state.chars).filter(function(c){ return c.avatarTone==="tint"; }).map(function(c){
-    var h = color(c.color), r = parseInt(h.substr(1,2),16)/255, g = parseInt(h.substr(3,2),16)/255, b = parseInt(h.substr(5,2),16)/255;
-    function dk(v){ return (v*0.38).toFixed(3); } function lt(v){ return (v+(1-v)*0.86).toFixed(3); }
-    return '<filter id="'+toneId(c)+'" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feComponentTransfer>'+
-      '<feFuncR type="table" tableValues="'+dk(r)+' '+r.toFixed(3)+' '+lt(r)+'"/><feFuncG type="table" tableValues="'+dk(g)+' '+g.toFixed(3)+' '+lt(g)+'"/><feFuncB type="table" tableValues="'+dk(b)+' '+b.toFixed(3)+' '+lt(b)+'"/></feComponentTransfer></filter>';
-  }).join("");
-  return f ? '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>'+f+'</defs></svg>' : '';
-}
+var PLACEHOLDER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250"><rect width="200" height="250" fill="#e4e1db"/><circle cx="100" cy="98" r="42" fill="#b8b3aa"/><path d="M28 250c4-58 34-88 72-88s68 30 72 88z" fill="#b8b3aa"/></svg>');
+function placeholder(){ return PLACEHOLDER; }
 function cover(c){ var m=(c.mainImages||[]).filter(function(x){return safeSrc(x.src);})[0]; return m ? safeSrc(m.src) : placeholder(c); }
 function imgOr(src, c){ return safeSrc(src) || placeholder(c); }
 
@@ -656,7 +635,7 @@ function shell(inner, r){
   }).join("");
   return (ui.guest?'<div class="guestbar editor-only">訪客模式預覽中，訪客看到的就是這個畫面。<button class="btn sm" data-act="guest">離開訪客模式</button></div>':'')+
     '<span id="status" class="status needs-write'+(statusWarn?" warn":"")+'">'+esc(statusMsg)+'</span>'+
-    toneDefs()+'<main><div class="wrap">'+inner+'</div></main>'+
+    '<main><div class="wrap">'+inner+'</div></main>'+
     '<footer class="foot">最後更新：'+esc(fmtTime(state.settings.updatedAt))+(GH&&GH.admin?(canEdit?'<button class="footlink" data-act="ghlogout">登出管理者</button>':'<button class="footlink" data-act="ghlogin">管理者登入</button>')+'<a class="footlink" href="./" target="_blank" rel="noopener">查看公開頁面</a>':'')+'</footer>'+
     '<div class="fmenu"><div class="fitems" id="fitems">'+dock+
     '<span class="fdiv needs-write"></span>'+
@@ -709,7 +688,7 @@ var TILTS = [-2.2, 1.6, -1, 2.4, -1.8, 0.8];
 function card(c){
   var k = (ALLCHARS||state.chars).indexOf(c);
   return '<button class="pcard" style="--cc:'+color(c.color)+';--r:'+TILTS[(k<0?0:k)%TILTS.length]+'deg" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(c.project?'（'+esc(c.project)+'）':'')+'">'+
-    '<span class="ph'+(hasAvatar(c)?'':' noav')+'"><img src="'+cover(c)+'" alt=""'+toneStyle(c)+'>'+(hasAvatar(c)?'':'<span class="hidden-note">未放頭貼<br>訪客看不到</span>')+'</span>'+
+    '<span class="ph'+(hasAvatar(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(hasAvatar(c)?'':'<span class="hidden-note">未放頭貼<br>訪客看不到</span>')+'</span>'+
     '<span class="slide"><span class="no">'+fileNo(c)+'</span><span class="nm">'+esc(c.name)+'</span>'+(c.alias?'<span class="al">'+esc(c.alias)+'</span>':'')+
     (c.project?'<span class="proj">'+esc(c.project)+'</span>':'')+'<span class="meta">'+catPill(c)+(ym(c.created)?'<span>'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</span></span>'+
     '</button>';
@@ -743,7 +722,7 @@ function charView(c){
   var sw = (pal.length ? pal : [{k:"代表色", color:c.color}]).map(function(p){ return '<span class="sw"><i style="background:'+color(p.color)+'"></i>'+esc(p.k||"顏色")+'</span>'; }).join("");
   var tags = (c.tags||[]).length ? '<div class="pills tagrow">'+c.tags.map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join("")+'</div>' : '';
   var hero = '<section class="cbox file" style="--cc:'+color(c.color)+'"><div class="filehead"><span>Character file</span><b>'+fileNo(c)+'</b></div><div class="hero">'+
-    '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"'+toneStyle(c)+'><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
+    '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
     '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+editBtn(c,"basic","編輯資料")+'</div>'+
     (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
     (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
@@ -799,7 +778,7 @@ function dirText(r, cid){ return r.mutual ? "互相" : (r.a===cid ? "單向（�
 function relRow(r, cid){
   var o = relOther(r, cid); if(!o) return "";
   var name = o.ext ? '<b>'+esc(o.name)+'</b>' : '<a href="#c-'+esc(o.id)+'"><b>'+esc(o.name)+'</b></a>';
-  return '<div class="rel-card'+(o.ext?" ext":"")+'"><img src="'+o.img+'" alt=""'+(o.c?toneStyle(o.c):'')+'>'+
+  return '<div class="rel-card'+(o.ext?" ext":"")+'"><img src="'+o.img+'" alt="">'+
     '<div class="rel-main"><div class="rel-line">'+name+(o.ext?'<span class="owner">'+esc(o.owner?o.owner+" 的角色":"他人角色")+'</span>':'')+
     '<span class="rel-label">'+esc(r.label||"—")+'</span><span class="muted" style="font-size:12px">'+dirText(r,cid)+'</span></div>'+
     (r.note?'<div class="rel-note">'+esc(r.note)+'</div>':'')+'</div>'+
@@ -844,7 +823,7 @@ function foldHead(key, title, open){
 function graphSVG(ego){
   var nodes = [], ids = {}, edges = [];
   function addNode(n){ if(!ids[n.id]){ ids[n.id] = n; nodes.push(n); } }
-  function charNode(c){ return {id:c.id, name:c.name, img:cover(c), color:color(c.color), ext:false, c:c}; }
+  function charNode(c){ return {id:c.id, name:c.name, img:cover(c), color:color(c.color), ext:false}; }
   if(ego){
     var me = byId(ego); addNode(charNode(me));
     relsOf(ego).forEach(function(r){ var o = relOther(r, ego); if(!o) return; addNode(o); edges.push({r:r, from: r.a===ego ? ego : o.id, to: r.a===ego ? o.id : ego}); });
@@ -887,7 +866,7 @@ function graphSVG(ego){
     var p = pos[nd.id], hl = foc && (foc===nd.id || edges.some(function(e){ return (e.from===foc&&e.to===nd.id)||(e.to===foc&&e.from===nd.id); })) ? " hl" : "";
     var big = ego && i===0, isCenter = ego && i===0;
     out += '<g class="node'+hl+(nd.ext?" ext":"")+'" '+(nd.ext?'':'data-node="'+esc(nd.id)+'" tabindex="0"')+'><circle class="ring" cx="'+p.x+'" cy="'+p.y+'" r="'+(big?32:30)+'" stroke="'+nd.color+'"/>'+
-      '<image href="'+nd.img+'" x="'+(p.x-27)+'" y="'+(p.y-27)+'" width="54" height="54" preserveAspectRatio="xMidYMin slice" clip-path="url(#cp'+i+')"'+(nd.c?toneStyle(nd.c):'')+'/></g>';
+      '<image href="'+nd.img+'" x="'+(p.x-27)+'" y="'+(p.y-27)+'" width="54" height="54" preserveAspectRatio="xMidYMin slice" clip-path="url(#cp'+i+')"/></g>';
     var up = !isCenter && (p.y - cy) < -20;
     var owner = nd.ext ? (nd.owner ? nd.owner+" 的角色" : "他人角色") : "";
     var y1 = up ? p.y - (owner ? 60 : 44) : p.y + 52, y2 = y1 + 16;
@@ -960,7 +939,7 @@ function tlView(){
   var years = [], by = {};
   withDate.forEach(function(c){ var d = ym(c.created), y = d.slice(0,4), m = d.slice(5,7) || "";
     if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(c); });
-  function who(c){ return '<a class="who" href="#c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""'+toneStyle(c)+'><span class="whon">'+esc(c.name)+(c.project?'<small>'+esc(c.project)+'</small>':'')+'</span></a>'; }
+  function who(c){ return '<a class="who" href="#c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""><span class="whon">'+esc(c.name)+(c.project?'<small>'+esc(c.project)+'</small>':'')+'</span></a>'; }
   var body = years.map(function(y){
     var months = Object.keys(by[y]).sort();
     return '<div class="yr"><h2>'+esc(y)+'</h2><div class="months">'+months.map(function(m){ return '<div class="mrow"><span class="m">'+(m?(+m)+' 月':'')+'</span><div class="who-list">'+by[y][m].map(who).join("")+'</div></div>'; }).join("")+'</div></div>';
@@ -1026,7 +1005,7 @@ function editNotes(){
   m.querySelector("[data-s]").onclick = function(){ var nt = m.querySelector("#n-title").value.trim(); if(nt && nt!==LABEL_DEFAULT.nav_notes) st.labels.nav_notes = nt; else delete st.labels.nav_notes;
     st.notes = m.querySelector("#n-body").value; st.notesImg = img; st.notesCaption = m.querySelector("#n-cap").value.trim(); m.remove(); save(); render(); toast("已儲存"); };
 }
-function chip(c){ return '<span class="chip" data-go="c-'+esc(c.id)+'"><img src="'+cover(c)+'" alt=""'+toneStyle(c)+'>'+esc(c.name)+'</span>'; }
+function chip(c){ return '<span class="chip" data-go="c-'+esc(c.id)+'"><img src="'+cover(c)+'" alt="">'+esc(c.name)+'</span>'; }
 
 /* ---------- 對話框 ---------- */
 function modal(html, cls){
@@ -1121,9 +1100,7 @@ function editChar(id, only){
       '<div style="margin-top:14px"><div class="hint" style="margin-bottom:4px">自訂欄位（口頭禪、技能、PL 等）</div>'+fieldsList()+'</div></fieldset>':'')+
       (show("story")?'<fieldset><legend>個性・背景故事</legend><div class="fgrid">'+f("個性","personality","textarea",true)+f("背景故事","background","textarea",true)+'</div></fieldset>':'')+
       (show("stories")?'<fieldset><legend>故事</legend><p class="hint" style="margin-top:0">有填日期的故事會依日期排列，也會出現在時間軸上。取消勾選「公開」的故事，只有你自己看得到。</p>'+storyList()+'</fieldset>':'')+
-      (show("art")?'<fieldset><legend>角色圖</legend><div class="hint" style="margin-top:0">第一張會當作頭貼。</div>'+
-        '<div class="field" style="max-width:240px;margin:8px 0 4px"><label for="f-avatarTone">頭貼色調</label><select id="f-avatarTone" data-f="avatarTone">'+TONES.map(function(t){ return '<option value="'+t[0]+'"'+((d.avatarTone||"")===t[0]?" selected":"")+'>'+t[1]+'</option>'; }).join("")+'</select></div>'+
-        '<p class="hint" style="margin-top:0">只改變網站上的顯示方式，原本的圖片不會被修改。「代表色單色」會使用角色的代表色。</p>'+imgList("mainImages",false)+'</fieldset>':'')+
+      (show("art")?'<fieldset><legend>角色圖</legend><div class="hint" style="margin-top:0">第一張會當作頭貼。</div>'+imgList("mainImages",false)+'</fieldset>':'')+
       (show("outfits")?'<fieldset><legend>衣服</legend><label class="check"><input type="checkbox" id="f-oe" data-oe '+(d.outfitsEnabled?"checked":"")+'>顯示「衣服」分頁</label>'+(d.outfitsEnabled?imgList("outfits",true):'')+'</fieldset>':'')+
       (show("gallery")?'<fieldset><legend>寫真</legend>'+imgList("gallery",false)+'</fieldset>':'')+
       '<div class="mfoot"><button class="btn" type="button" data-x>取消</button><button class="btn primary" type="button" data-save>'+(only?"儲存":"儲存角色")+'</button></div>';
