@@ -382,6 +382,37 @@ details.more > summary{padding:16px 28px}
 }
 @media (max-width:520px){.grid.photos{gap:22px 18px;justify-content:center}.pcard,.pcard .ph,.pcard .tcap{width:120px}.pcard .ph{height:150px}}
 @media (prefers-reduced-motion: reduce){.pcard .slide{transition:none}}
+
+/* [樣式] 懸浮選單 */
+.fmenu{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;flex-direction:column;align-items:center;gap:10px}
+.fitems{display:flex;flex-direction:column;gap:8px;align-items:center;opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s}
+.fmenu.open .fitems{opacity:1;transform:none;pointer-events:auto;visibility:visible}
+.fitem{width:46px;height:46px;border-radius:6px;background:var(--surface);border:1px solid var(--line);box-shadow:0 3px 10px rgba(90,60,20,.16);display:grid;place-items:center;color:var(--ink);cursor:pointer;text-decoration:none;padding:0}
+.fitem span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fitem svg,.fitem .sunflower{width:22px;height:22px}
+.fitem:hover{border-color:var(--gold)}
+.fitem.on{background:var(--bg2);border-color:var(--gold)}
+.fdiv{width:22px;height:1px;background:var(--line);margin:2px 0}
+.ftoggle{width:54px;height:54px;border-radius:6px;border:0;background:var(--black);color:#fffaf0;box-shadow:0 6px 18px rgba(90,60,20,.28);cursor:pointer;display:grid;place-items:center}
+.ftoggle svg{width:24px;height:24px;grid-area:1/1}
+.ftoggle .i-close{display:none}
+.fmenu.open .ftoggle .i-close{display:block}
+.fmenu.open .ftoggle .i-menu{display:none}
+.foot{padding-bottom:90px}
+/* [樣式] 未放頭貼標示（管理者） */
+.ph.noav img{opacity:.45}
+.ph.noav{outline:2px dashed var(--accent);outline-offset:3px}
+.hidden-note{position:absolute;left:6px;right:6px;top:50%;transform:translateY(-50%);text-align:center;font-size:11px;line-height:1.4;color:var(--accent);background:rgba(255,253,246,.9);padding:4px 2px}
+/* [樣式] 手機點選照片 */
+.pcard.active{z-index:6}
+.pcard.active .ph{transform:rotate(0deg) scale(1.04)}
+.pc-focus .pcard:not(.active){opacity:.28;filter:grayscale(.6)}
+@media (hover:none){
+  .pcard{height:166px}
+  .pcard .slide,.pcard.flip .slide{display:flex;top:calc(100% - 6px);left:50%;right:auto;transform:translateX(-50%);width:min(240px,88vw);min-height:0;padding:12px 14px;border:1px solid var(--line);border-top:4px solid var(--cc);clip-path:inset(0 0 100% 0);z-index:3}
+  .pcard.active .slide,.pcard.flip.active .slide{clip-path:inset(0 0 0 0)}
+}
+@media (max-width:520px){.pcard{height:150px}}
 </style>
 </head>
 <body>
@@ -441,7 +472,9 @@ function normalize(){
 }
 normalize();
 var CLIP = '<svg class="clip" viewBox="0 0 24 60" aria-hidden="true"><path d="M8 50V12a6 6 0 0 1 12 0v40a9 9 0 0 1-18 0V18" fill="none" stroke-width="2.5" stroke-linecap="round"/></svg>';
-function fileNo(c){ var i = state.chars.indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
+var ALLCHARS = null;
+function hasAvatar(c){ return (c.mainImages||[]).some(function(x){ return safeSrc(x.src); }); }
+function fileNo(c){ var i = (ALLCHARS||state.chars).indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function uid(p){ return (p||"x") + Math.random().toString(36).slice(2,8); }
 function color(c){ return /^#[0-9a-fA-F]{6}$/.test(c||"") ? c : "#737986"; }
@@ -593,24 +626,38 @@ var IC = {
   tl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>',
+  menu:'<svg class="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg>',
+  close:'<svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
 };
 function shell(inner, r){
   var items = [["list","",L("nav_list"),IC.list],["relations","relations",L("nav_rel"),IC.rel],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
   var dock = items.map(function(n){
     var on = r.view===n[0] || (n[0]==="list" && r.view==="char");
-    return '<a href="#'+n[1]+'" class="'+(on?"on":"")+'"'+(on?' aria-current="page"':'')+' title="'+esc(n[2])+'">'+n[3]+'<span>'+esc(n[2])+'</span></a>';
+    return '<a href="#'+n[1]+'" class="fitem'+(on?" on":"")+'"'+(on?' aria-current="page"':'')+' title="'+esc(n[2])+'">'+n[3]+'<span>'+esc(n[2])+'</span></a>';
   }).join("");
   return (ui.guest?'<div class="guestbar editor-only">訪客模式預覽中，訪客看到的就是這個畫面。<button class="btn sm" data-act="guest">離開訪客模式</button></div>':'')+
     '<span id="status" class="status needs-write'+(statusWarn?" warn":"")+'">'+esc(statusMsg)+'</span>'+
     '<main><div class="wrap">'+inner+'</div></main>'+
     '<footer class="foot">最後更新：'+esc(fmtTime(state.settings.updatedAt))+(GH&&GH.admin?(canEdit?'<button class="footlink" data-act="ghlogout">登出管理者</button>':'<button class="footlink" data-act="ghlogin">管理者登入</button>')+'<a class="footlink" href="./" target="_blank" rel="noopener">查看公開頁面</a>':'')+'</footer>'+
-    '<nav class="dock" aria-label="主選單">'+dock+'</nav>'+
-    '<div class="tools"><button class="fab editor-only'+(ui.guest?" on":"")+'" data-act="guest" title="'+(ui.guest?"離開訪客模式":"訪客模式預覽")+'" aria-label="'+(ui.guest?"離開訪客模式":"訪客模式預覽")+'">'+IC.eye+'</button>'+
-    '<button class="fab needs-write" data-act="settings" title="設定與備份" aria-label="設定與備份">'+IC.gear+'</button>'+
-    '<button class="fab main needs-write" data-act="new" title="新增角色" aria-label="新增角色">'+IC.plus+'</button></div>';
+    '<div class="fmenu"><div class="fitems" id="fitems">'+dock+
+    '<span class="fdiv needs-write"></span>'+
+    '<button class="fitem needs-write" data-act="new" title="新增角色" aria-label="新增角色">'+IC.plus+'</button>'+
+    '<button class="fitem needs-write" data-act="settings" title="設定與備份" aria-label="設定與備份">'+IC.gear+'</button>'+
+    '<button class="fitem editor-only'+(ui.guest?" on":"")+'" data-act="guest" title="'+(ui.guest?"離開訪客模式":"訪客模式預覽")+'" aria-label="'+(ui.guest?"離開訪客模式":"訪客模式預覽")+'">'+IC.eye+'</button></div>'+
+    '<button class="ftoggle" data-act="menu" aria-expanded="false" aria-controls="fitems" aria-label="開啟選單">'+IC.menu+IC.close+'</button></div>';
 }
 function render(){
+  var keepC = state.chars, keepR = state.relations;
+  if(ro()){
+    var ok = {}; ALLCHARS = keepC;
+    state.chars = keepC.filter(function(c){ if(hasAvatar(c)){ ok[c.id] = 1; return true; } return false; });
+    state.relations = keepR.filter(function(r){ return ok[r.a] && (r.ext || ok[r.b]); });
+  }
+  try{ render0(); } finally { state.chars = keepC; state.relations = keepR; ALLCHARS = null; }
+}
+function render0(){
+  root.classList.remove("pc-focus");
   var r = route(), html;
   if(r.view==="char"){ var c = byId(r.id); html = c ? charView(c) : '<div class="empty">找不到這個角色。<a href="#">回到列表</a></div>'; }
   else if(r.view==="relations") html = relView();
@@ -642,12 +689,12 @@ function sortChars(arr){
 function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? o.name : "未分類"; }
 var TILTS = [-2.2, 1.6, -1, 2.4, -1.8, 0.8];
 function card(c){
-  var k = state.chars.indexOf(c);
+  var k = (ALLCHARS||state.chars).indexOf(c);
   return '<button class="pcard" style="--cc:'+color(c.color)+';--r:'+TILTS[(k<0?0:k)%TILTS.length]+'deg" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(c.project?'（'+esc(c.project)+'）':'')+'">'+
-    '<span class="ph"><img src="'+cover(c)+'" alt=""></span>'+
+    '<span class="ph'+(hasAvatar(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(hasAvatar(c)?'':'<span class="hidden-note">未放頭貼<br>訪客看不到</span>')+'</span>'+
     '<span class="slide"><span class="no">'+fileNo(c)+'</span><span class="nm">'+esc(c.name)+'</span>'+(c.alias?'<span class="al">'+esc(c.alias)+'</span>':'')+
     (c.project?'<span class="proj">'+esc(c.project)+'</span>':'')+'<span class="meta">'+catPill(c)+(ym(c.created)?'<span>'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</span></span>'+
-    '<span class="tcap">'+esc(c.name)+'</span></button>';
+    '</button>';
 }
 function listView(){
   var keys = ["全部"].concat(catIds()); if(state.chars.some(function(c){ return !catObj(c.cat); })) keys.push("__none");
@@ -972,7 +1019,8 @@ function modal(html, cls){
   var f = bg.querySelector("input,textarea,select,button"); if(f) f.focus();
   return bg;
 }
-document.addEventListener("keydown", function(e){ if(e.key==="Escape"){ var m = document.querySelectorAll(".modal-bg"); if(m.length) m[m.length-1].remove(); } });
+document.addEventListener("click", function(e){ var fm = root.querySelector(".fmenu.open"); if(fm && !e.target.closest(".fmenu")){ fm.classList.remove("open"); var tg = fm.querySelector(".ftoggle"); tg.setAttribute("aria-expanded","false"); tg.setAttribute("aria-label","開啟選單"); } });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape"){ var fm0 = root.querySelector(".fmenu.open"); if(fm0) fm0.classList.remove("open"); var m = document.querySelectorAll(".modal-bg"); if(m.length) m[m.length-1].remove(); } });
 function confirmBox(msg, yes){
   var m = modal('<h2>確認</h2><p>'+esc(msg)+'</p><div class="mfoot"><button class="btn" data-x>取消</button><button class="btn danger" data-y>確定刪除</button></div>', "small");
   m.querySelector("[data-x]").onclick = function(){ m.remove(); };
@@ -1248,8 +1296,18 @@ function settings(){
 }
 
 /* ---------- 事件委派 ---------- */
+var TOUCH = window.matchMedia && matchMedia("(hover: none)").matches;
 root.addEventListener("click", function(e){
   var t = e.target;
+  var pc = TOUCH && t.closest && t.closest(".pcard");
+  if(pc && !pc.classList.contains("active")){
+    e.preventDefault();
+    root.querySelectorAll(".pcard.active").forEach(function(x){ x.classList.remove("active"); });
+    var r0 = pc.getBoundingClientRect(); pc.classList.toggle("flip", r0.left + r0.width/2 > (document.documentElement.clientWidth||innerWidth)/2);
+    pc.classList.add("active"); root.querySelector(".grid.photos") && root.classList.add("pc-focus");
+    return;
+  }
+  if(TOUCH && !pc){ var act = root.querySelector(".pcard.active"); if(act && !t.closest(".fmenu")){ act.classList.remove("active"); root.classList.remove("pc-focus"); } }
   var g = t.closest("[data-go]"); if(g){ go(g.getAttribute("data-go")); return; }
   var b = t.closest("button,[data-node],[data-zoom]"); if(!b) return;
   var ds = b.dataset;
@@ -1287,6 +1345,7 @@ root.addEventListener("click", function(e){
   else if(ds.act==="edit"){ editChar(ds.id, ds.sec || null); }
   else if(ds.act==="settings"){ settings(); }
   else if(ds.act==="cats"){ manageCats(); }
+  else if(ds.act==="menu"){ var fm = root.querySelector(".fmenu"), open = !fm.classList.contains("open"); fm.classList.toggle("open", open); b.setAttribute("aria-expanded", open); b.setAttribute("aria-label", open?"關閉選單":"開啟選單"); }
   else if(ds.act==="avatar"){ changeAvatar(ds.id); }
   else if(ds.act==="ghlogin"){ loginBox(); }
   else if(ds.act==="ghlogout"){ ghLogout(); }
