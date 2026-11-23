@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-23T14:41:18.885Z",
+  "updatedAt": "2026-11-23T14:50:54.038Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -52,6 +52,33 @@
    "outfits": [],
    "gallery": [],
    "updatedAt": "2026-11-23T14:41:18.884Z"
+  },
+  {
+   "id": "ckc0c0v",
+   "name": "柳伊",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "薪御能",
+   "gender": "男",
+   "created": "2020-05",
+   "age": "？",
+   "birthday": "",
+   "height": "",
+   "species": "鹿仙",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "updatedAt": "2026-11-23T14:50:54.037Z"
   }
  ],
  "relations": [],
