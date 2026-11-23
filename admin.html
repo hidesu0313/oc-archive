@@ -355,6 +355,33 @@ details.more > summary{padding:16px 28px}
 .ccard .proj{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:9px;border-left:2px solid var(--line)}
 .whon{display:flex;flex-direction:column;line-height:1.3}
 .whon small{font-size:11.5px;color:var(--muted)}
+
+/* [樣式] 照片牆 */
+.grid.photos{display:flex;flex-wrap:wrap;gap:28px 30px;padding:8px 4px 20px}
+.pcard{position:relative;width:132px;height:166px;border:0;background:none;padding:0;cursor:pointer;font:inherit;color:inherit;text-align:left;transition:opacity .25s,filter .25s}
+.pcard .ph{position:relative;z-index:2;display:block;width:132px;height:166px;background:#fff;padding:6px;box-shadow:0 2px 8px rgba(90,60,20,.22);transform:rotate(var(--r));transition:transform .25s}
+.pcard .ph::after{content:"";position:absolute;left:6px;right:6px;bottom:0;height:3px;background:var(--cc)}
+.pcard img{width:100%;height:100%;object-fit:cover;background:var(--paper2)}
+.pcard .slide{position:absolute;z-index:1;top:12px;left:108px;width:236px;min-height:142px;background:var(--surface);border:1px solid var(--line);border-left:0;border-right:4px solid var(--cc);box-shadow:0 6px 18px rgba(90,60,20,.18);padding:12px 14px 12px 36px;display:flex;flex-direction:column;gap:3px;clip-path:inset(0 100% 0 0);transition:clip-path .32s ease;pointer-events:none}
+.pcard .no{font-family:var(--latin);font-weight:600;font-size:12px;letter-spacing:.14em;color:var(--muted)}
+.pcard .nm{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.3}
+.pcard .al{font-family:var(--latin);font-style:italic;font-size:14px;color:var(--muted)}
+.pcard .proj{font-size:12px;color:var(--muted);border-left:2px solid var(--line);padding-left:8px}
+.pcard .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:auto;padding-top:4px}
+.pcard .tcap{display:none}
+.pcard:hover,.pcard:focus-visible{z-index:6}
+.pcard:hover .ph,.pcard:focus-visible .ph{transform:rotate(0deg) scale(1.04)}
+.pcard:hover .slide,.pcard:focus-visible .slide{clip-path:inset(0 0 0 0)}
+.pcard.flip .slide{left:auto;right:108px;border-right:0;border-left:4px solid var(--cc);padding:12px 36px 12px 14px;clip-path:inset(0 0 0 100%)}
+.pcard.flip:hover .slide,.pcard.flip:focus-visible .slide{clip-path:inset(0 0 0 0)}
+.wrap:has(.pcard:hover) .pcard:not(:hover),.wrap:has(.pcard:focus-visible) .pcard:not(:focus-visible){opacity:.28;filter:grayscale(.6)}
+@media (hover:none){
+  .pcard{height:auto}
+  .pcard .slide{display:none}
+  .pcard .tcap{display:block;margin-top:10px;width:132px;text-align:center;font-family:var(--display);font-size:14px;line-height:1.3}
+}
+@media (max-width:520px){.grid.photos{gap:22px 18px;justify-content:center}.pcard,.pcard .ph,.pcard .tcap{width:120px}.pcard .ph{height:150px}}
+@media (prefers-reduced-motion: reduce){.pcard .slide{transition:none}}
 </style>
 </head>
 <body>
@@ -613,10 +640,14 @@ function sortChars(arr){
   });
 }
 function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? o.name : "未分類"; }
+var TILTS = [-2.2, 1.6, -1, 2.4, -1.8, 0.8];
 function card(c){
-  return '<button class="ccard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'"><span class="ftab">'+fileNo(c)+'</span><img class="av" src="'+cover(c)+'" alt="">'+
-    '<span class="info"><span class="nm">'+esc(c.name)+'</span>'+(c.alias?'<span class="al">'+esc(c.alias)+'</span>':'')+(c.project?'<span class="proj">'+esc(c.project)+'</span>':'')+
-    '<span class="meta">'+catPill(c)+(ym(c.created)?'<span>'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</span></span></button>';
+  var k = state.chars.indexOf(c);
+  return '<button class="pcard" style="--cc:'+color(c.color)+';--r:'+TILTS[(k<0?0:k)%TILTS.length]+'deg" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(c.project?'（'+esc(c.project)+'）':'')+'">'+
+    '<span class="ph"><img src="'+cover(c)+'" alt=""></span>'+
+    '<span class="slide"><span class="no">'+fileNo(c)+'</span><span class="nm">'+esc(c.name)+'</span>'+(c.alias?'<span class="al">'+esc(c.alias)+'</span>':'')+
+    (c.project?'<span class="proj">'+esc(c.project)+'</span>':'')+'<span class="meta">'+catPill(c)+(ym(c.created)?'<span>'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</span></span>'+
+    '<span class="tcap">'+esc(c.name)+'</span></button>';
 }
 function listView(){
   var keys = ["全部"].concat(catIds()); if(state.chars.some(function(c){ return !catObj(c.cat); })) keys.push("__none");
@@ -628,8 +659,8 @@ function listView(){
   else if(ui.group){
     var groups = {}, order = [];
     list.forEach(function(c){ var y = ym(c.created).slice(0,4) || "未填年月"; if(!groups[y]){ groups[y]=[]; order.push(y); } groups[y].push(c); });
-    body = order.map(function(y){ return '<div class="group-h"><h2>'+esc(y)+'</h2><span>'+groups[y].length+' 位</span></div><div class="grid">'+groups[y].map(card).join("")+'</div>'; }).join("");
-  } else body = '<div class="grid">'+list.map(card).join("")+'</div>';
+    body = order.map(function(y){ return '<div class="group-h"><h2>'+esc(y)+'</h2><span>'+groups[y].length+' 位</span></div><div class="grid photos">'+groups[y].map(card).join("")+'</div>'; }).join("");
+  } else body = '<div class="grid photos">'+list.map(card).join("")+'</div>';
   return '<div class="ptitle"><h1>'+esc(L("nav_list"))+'<span class="ornament">共 '+state.chars.length+' 位角色</span></h1>'+
     '<input class="search" id="q" type="search" aria-label="搜尋角色" placeholder="搜尋名字、企劃、標籤" value="'+esc(ui.q)+'"></div>'+
     '<div class="filters"><div class="chips">'+cats+'</div><span class="fsep"></span><div class="chips">'+gen+'</div><span class="fsep"></span>'+
@@ -1271,6 +1302,15 @@ root.addEventListener("click", function(e){
 });
 root.addEventListener("input", function(e){
   if(e.target.id==="q"){ ui.q = e.target.value; keepUI(); var pos = e.target.selectionStart; render(); var q = root.querySelector("#q"); q.focus(); try{q.setSelectionRange(pos,pos);}catch(x){} }
+});
+root.addEventListener("mouseover", function(e){
+  var pc = e.target.closest && e.target.closest(".pcard"); if(!pc || pc.__seen) return; pc.__seen = true;
+  setTimeout(function(){ pc.__seen = false; }, 400);
+  var r = pc.getBoundingClientRect(); pc.classList.toggle("flip", r.right + 250 > (document.documentElement.clientWidth || innerWidth));
+});
+root.addEventListener("focusin", function(e){
+  var pc = e.target.closest && e.target.closest(".pcard"); if(!pc) return;
+  var r = pc.getBoundingClientRect(); pc.classList.toggle("flip", r.right + 250 > (document.documentElement.clientWidth || innerWidth));
 });
 root.addEventListener("toggle", function(e){ if(e.target.matches && e.target.matches("details.more")){ ui.moreOpen = e.target.open; keepUI(); } }, true);
 root.addEventListener("change", function(e){
