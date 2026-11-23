@@ -413,6 +413,9 @@ details.more > summary{padding:16px 28px}
   .pcard.active .slide,.pcard.flip.active .slide{clip-path:inset(0 0 0 0)}
 }
 @media (max-width:520px){.pcard{height:150px}}
+
+/* [樣式] 不公開標示 */
+.privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 </style>
 </head>
 <body>
@@ -473,7 +476,7 @@ function normalize(){
 normalize();
 var CLIP = '<svg class="clip" viewBox="0 0 24 60" aria-hidden="true"><path d="M8 50V12a6 6 0 0 1 12 0v40a9 9 0 0 1-18 0V18" fill="none" stroke-width="2.5" stroke-linecap="round"/></svg>';
 var ALLCHARS = null;
-function hasAvatar(c){ return (c.mainImages||[]).some(function(x){ return safeSrc(x.src); }); }
+function isPublic(c){ return !c.hidden; }
 function fileNo(c){ var i = (ALLCHARS||state.chars).indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function uid(p){ return (p||"x") + Math.random().toString(36).slice(2,8); }
@@ -648,7 +651,7 @@ function render(){
   var keepC = state.chars, keepR = state.relations;
   if(ro()){
     var ok = {}; ALLCHARS = keepC;
-    state.chars = keepC.filter(function(c){ if(hasAvatar(c)){ ok[c.id] = 1; return true; } return false; });
+    state.chars = keepC.filter(function(c){ if(isPublic(c)){ ok[c.id] = 1; return true; } return false; });
     state.relations = keepR.filter(function(r){ return ok[r.a] && (r.ext || ok[r.b]); });
   }
   try{ render0(); } finally { state.chars = keepC; state.relations = keepR; ALLCHARS = null; }
@@ -688,7 +691,7 @@ var TILTS = [-2.2, 1.6, -1, 2.4, -1.8, 0.8];
 function card(c){
   var k = (ALLCHARS||state.chars).indexOf(c);
   return '<button class="pcard" style="--cc:'+color(c.color)+';--r:'+TILTS[(k<0?0:k)%TILTS.length]+'deg" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(c.project?'（'+esc(c.project)+'）':'')+'">'+
-    '<span class="ph'+(hasAvatar(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(hasAvatar(c)?'':'<span class="hidden-note">未放頭貼<br>訪客看不到</span>')+'</span>'+
+    '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開<br>訪客看不到</span>')+'</span>'+
     '<span class="slide"><span class="no">'+fileNo(c)+'</span><span class="nm">'+esc(c.name)+'</span>'+(c.alias?'<span class="al">'+esc(c.alias)+'</span>':'')+
     (c.project?'<span class="proj">'+esc(c.project)+'</span>':'')+'<span class="meta">'+catPill(c)+(ym(c.created)?'<span>'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</span></span>'+
     '</button>';
@@ -723,7 +726,7 @@ function charView(c){
   var tags = (c.tags||[]).length ? '<div class="pills tagrow">'+c.tags.map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join("")+'</div>' : '';
   var hero = '<section class="cbox file" style="--cc:'+color(c.color)+'"><div class="filehead"><span>Character file</span><b>'+fileNo(c)+'</b></div><div class="hero">'+
     '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
-    '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+editBtn(c,"basic","編輯資料")+'</div>'+
+    '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+(isPublic(c)?'':'<span class="privbadge needs-write">不公開</span>')+'<button class="edit needs-write" data-act="vis" data-id="'+esc(c.id)+'">'+(isPublic(c)?"設為不公開":"設為公開")+'</button>'+editBtn(c,"basic","編輯資料")+'</div>'+
     (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
     (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
   var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
@@ -1092,7 +1095,7 @@ function editChar(id, only){
   function paint(){
     var scroll = m ? m.scrollTop : 0;
     var html = '<h2>'+(orig?(only?"編輯："+(Array.isArray(only)?only.map(function(k){ return SECNAME[k]; }).join("・"):SECNAME[only]):"編輯角色"):"新增角色")+'</h2>'+(only?'<p class="hint" style="margin-top:-6px">'+esc(d.name)+'</p>':'')+
-      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+projField()+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
+      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+'<div class="field wide"><label class="check"><input type="checkbox" data-pub '+(d.hidden?'':'checked')+'>公開這位角色（取消勾選後，只有登入的你看得到）</label></div>'+''+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+projField()+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
       f("年齡","age")+f("生日","birthday")+f("身高","height")+f("種族","species")+f("身分／職業","role")+
       '<div class="field"><label for="f-tags">標籤（用逗號分隔）</label><input id="f-tags" data-tags value="'+esc(d.tags.join("、"))+'"></div>'+
       '<div class="field"><label for="f-color">代表色</label><input id="f-color" type="color" data-f="color" value="'+color(d.color)+'"></div></div>'+
@@ -1116,6 +1119,7 @@ function editChar(id, only){
   });
   m.addEventListener("change", function(e){
     var t = e.target;
+    if(t.hasAttribute("data-pub")){ if(t.checked) delete d.hidden; else d.hidden = true; return; }
     if(t.id==="f-cat"){ d.cat = t.value; paint(); var pf = m.querySelector("#f-project"); if(pf) pf.focus(); return; }
     if(t.dataset.pola){ d.polaroidSrc = d[t.dataset.pola][+t.dataset.i].src; paint(); }
     else if(t.name==="polamode" && t.value!=="custom"){ d.polaroidSrc = t.value; paint(); }
@@ -1342,6 +1346,7 @@ root.addEventListener("click", function(e){
   else if(ds.act==="edit"){ editChar(ds.id, ds.sec || null); }
   else if(ds.act==="settings"){ settings(); }
   else if(ds.act==="cats"){ manageCats(); }
+  else if(ds.act==="vis"){ var vc = byId(ds.id); if(vc){ if(vc.hidden) delete vc.hidden; else vc.hidden = true; vc.updatedAt = new Date().toISOString(); save(); render(); toast(vc.hidden ? "已設為不公開，訪客看不到這位角色" : "已公開"); } }
   else if(ds.act==="menu"){ var fm = root.querySelector(".fmenu"), open = !fm.classList.contains("open"); fm.classList.toggle("open", open); b.setAttribute("aria-expanded", open); b.setAttribute("aria-label", open?"關閉選單":"開啟選單"); }
   else if(ds.act==="avatar"){ changeAvatar(ds.id); }
   else if(ds.act==="ghlogin"){ loginBox(); }
