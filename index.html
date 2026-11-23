@@ -415,6 +415,8 @@ details.more > summary{padding:16px 28px}
 
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
+
+.ymtag{font-family:var(--latin);font-size:16px;font-weight:600;letter-spacing:.06em;color:var(--muted);align-self:center}
 </style>
 </head>
 <body>
@@ -717,7 +719,7 @@ function listView(){
 /* 角色頁 */
 function editBtn(c, sec, label){ return '<button class="edit needs-write" data-act="edit" data-id="'+esc(c.id)+'" data-sec="'+sec+'">'+(label||"編輯")+'</button>'; }
 function charView(c){
-  var facts = [[(catObj(c.cat)&&catObj(c.cat).sub)||L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role],["創角年月",ym(c.created)]]
+  var facts = [[(catObj(c.cat)&&catObj(c.cat).sub)||L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
     .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
     .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
   var pal = (c.palette||[]).filter(function(p){ return p.k||p.color; });
@@ -726,7 +728,7 @@ function charView(c){
   var hero = '<section class="cbox file" style="--cc:'+color(c.color)+'"><div class="filehead"><span>Character file</span><b>'+fileNo(c)+'</b></div><div class="hero">'+
     '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
     '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+(isPublic(c)?'':'<span class="privbadge needs-write">不公開</span>')+'<button class="edit needs-write" data-act="vis" data-id="'+esc(c.id)+'">'+(isPublic(c)?"設為不公開":"設為公開")+'</button>'+editBtn(c,"basic","編輯資料")+'</div>'+
-    (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
+    (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(ym(c.created)?'<span class="ymtag">'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
     (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
   var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
     .map(function(x){ return '<div class="sec"><h3>'+esc(L(x[0]))+'</h3><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
