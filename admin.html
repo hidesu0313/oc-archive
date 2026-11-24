@@ -377,6 +377,14 @@ details.more > summary{padding:16px 28px}
 .ph.noav{outline:2px dashed var(--accent);outline-offset:3px}
 .hidden-note{position:absolute;left:6px;right:6px;top:50%;transform:translateY(-50%);text-align:center;font-size:11px;line-height:1.4;color:var(--accent);background:rgba(255,253,246,.9);padding:4px 2px}
 .rlist{margin-top:16px}
+/* [樣式] 角色頭像統一正方形 */
+.avbox img{width:200px;height:200px;border-radius:0}
+.hero{grid-template-columns:212px minmax(0,1fr)}
+.who img{width:32px;height:32px;border-radius:0}
+.rel-card img,.chip img,.th-sm,.pickc img,.ccard .av{border-radius:0}
+.rel-card img{width:44px;height:44px}
+.chip img{width:22px;height:22px}
+@media (max-width:640px){.hero{grid-template-columns:1fr}.avbox img{width:180px;height:180px}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
