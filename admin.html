@@ -385,6 +385,14 @@ details.more > summary{padding:16px 28px}
 .rel-card img{width:44px;height:44px}
 .chip img{width:22px;height:22px}
 @media (max-width:640px){.hero{grid-template-columns:1fr}.avbox img{width:180px;height:180px}}
+/* [樣式] 基本資料一行一項、多企劃 */
+.facts{grid-template-columns:1fr;gap:0}
+.facts div{display:grid;grid-template-columns:7em minmax(0,1fr);gap:12px;align-items:baseline}
+.facts dt{white-space:nowrap}
+.facts dd{word-break:normal;overflow-wrap:anywhere}
+.period{display:inline-block;margin-left:10px;font-family:var(--latin);font-size:14px;color:var(--muted);letter-spacing:.04em}
+.projrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:6px}
+@media (max-width:520px){.projrow{grid-template-columns:1fr auto}.projrow input:nth-child(2){grid-column:1}.facts div{grid-template-columns:5.5em minmax(0,1fr)}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -464,12 +472,14 @@ function normalize(){
     ["cat_企劃","cat_TRPG","cat_無","pick_plan","pick_trpg"].forEach(function(k){ delete lb0[k]; });
     state.chars.forEach(function(c){ if(c.cat==="無") c.cat = ""; });
   }
-  state.chars.forEach(function(c){ c.stories = c.stories || []; });
+  state.chars.forEach(function(c){ c.stories = c.stories || []; if(!Array.isArray(c.projects)) c.projects = c.project ? [{name:c.project, period:""}] : []; });
 }
 normalize();
 var CLIP = '<svg class="clip" viewBox="0 0 24 60" aria-hidden="true"><path d="M8 50V12a6 6 0 0 1 12 0v40a9 9 0 0 1-18 0V18" fill="none" stroke-width="2.5" stroke-linecap="round"/></svg>';
 var ALLCHARS = null;
 function isPublic(c){ return !c.hidden; }
+function projs(c){ var l = (c.projects||[]).filter(function(p){ return p && p.name; }); if(!l.length && c.project) l = [{name:c.project, period:""}]; return l; }
+function projNames(c){ return projs(c).map(function(p){ return p.name; }); }
 function fileNo(c){ var i = (ALLCHARS||state.chars).indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function uid(p){ return (p||"x") + Math.random().toString(36).slice(2,8); }
@@ -668,7 +678,7 @@ function filtered(cat){
   return state.chars.filter(function(c){
     if(cat==="__none"){ if(catObj(c.cat)) return false; } else if(cat!=="全部" && c.cat!==cat) return false;
     if(ui.gender!=="全部" && c.gender!==ui.gender) return false;
-    if(q){ var hay = [c.name,c.alias,c.project,c.role,c.species,(c.tags||[]).join(" ")].join(" ").toLowerCase(); if(hay.indexOf(q)<0) return false; }
+    if(q){ var hay = [c.name,c.alias,projNames(c).join(" "),c.role,c.species,(c.tags||[]).join(" ")].join(" ").toLowerCase(); if(hay.indexOf(q)<0) return false; }
     return true;
   });
 }
@@ -681,9 +691,9 @@ function sortChars(arr){
 }
 function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? o.name : "未分類"; }
 function card(c){
-  return '<button class="pcard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(c.project?'（'+esc(c.project)+'）':'')+'">'+
+  return '<button class="pcard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(projNames(c).length?'（'+esc(projNames(c).join("、"))+'）':'')+'">'+
     '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+'</span>'+
-    '<span class="slip"><b>'+esc(c.name)+'</b>'+(c.project?'<small>'+esc(c.project)+'</small>':'')+
+    '<span class="slip"><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+
     '<small class="sm2">'+esc(catName(c.cat))+(ym(c.created)?'・'+esc(ym(c.created)):'')+'</small></span></button>';
 }
 function listView(){
@@ -708,7 +718,9 @@ function listView(){
 /* 角色頁 */
 function editBtn(c, sec, label){ return '<button class="edit needs-write" data-act="edit" data-id="'+esc(c.id)+'" data-sec="'+sec+'">'+(label||"編輯")+'</button>'; }
 function charView(c){
-  var facts = [[(catObj(c.cat)&&catObj(c.cat).sub)||L("f_project"),c.project],[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
+  var plabel = (catObj(c.cat)&&catObj(c.cat).sub)||L("f_project");
+  var projRows = projs(c).map(function(p){ return '<div><dt>'+esc(plabel)+'</dt><dd>'+esc(p.name)+(p.period?'<span class="period">'+esc(p.period)+'</span>':'')+'</dd></div>'; }).join("");
+  var facts = [[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
     .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
     .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
   var pal = (c.palette||[]).filter(function(p){ return p.k||p.color; });
@@ -718,7 +730,7 @@ function charView(c){
     '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
     '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+(isPublic(c)?'':'<span class="privbadge needs-write">不公開</span>')+'<button class="edit needs-write" data-act="vis" data-id="'+esc(c.id)+'">'+(isPublic(c)?"設為不公開":"設為公開")+'</button>'+editBtn(c,"basic","編輯資料")+'</div>'+
     (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(ym(c.created)?'<span class="ymtag">'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
-    (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
+    ((projRows||facts)?'<dl class="facts">'+projRows+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
   var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
     .map(function(x){ return '<div class="sec"><h3>'+esc(L(x[0]))+'</h3><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
   var introBox = (intro || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>介紹'+editBtn(c,"story")+'</h2>'+(intro||'<div class="muted">還沒有介紹。</div>')+'</section>' : '';
@@ -782,18 +794,18 @@ function relView(){
   var RID = relatedIds();
   var ego = ui.relEgo && byId(ui.relEgo) && RID[ui.relEgo] ? ui.relEgo : "";
   var rc = ui.relCat || "全部", rp = ui.relProj || "";
-  if(ego){ var ec = byId(ego); rc = ec.cat; rp = ec.project || "__none"; }
+  if(ego){ var ec = byId(ego); rc = ec.cat; rp = projNames(ec)[0] || "__none"; }
   var NONE = "__none";
-  function projOf(c){ return c.project ? c.project : NONE; }
+  function projOfs(c){ var n = projNames(c); return n.length ? n : [NONE]; }
   var selCat = '<select id="relcat2" class="inp selx sm2" aria-label="分類"><option value="全部">全部分類</option>'+catIds().filter(function(k){ return state.chars.some(function(c){ return c.cat===k && RID[c.id]; }); }).map(function(k){ return '<option value="'+esc(k)+'"'+(rc===k?" selected":"")+'>'+esc(catName(k))+'</option>'; }).join("")+'</select>';
   var selProj = "";
   if(hasSub(rc)){
-    var projs = []; state.chars.forEach(function(c){ if(RID[c.id] && c.cat===rc && projs.indexOf(projOf(c))<0) projs.push(projOf(c)); });
-    projs.sort(function(a,b){ return a===NONE?1:b===NONE?-1:a.localeCompare(b,"zh-Hant"); });
+    var plist = []; state.chars.forEach(function(c){ if(RID[c.id] && c.cat===rc) projOfs(c).forEach(function(x){ if(plist.indexOf(x)<0) plist.push(x); }); });
+    plist.sort(function(a,b){ return a===NONE?1:b===NONE?-1:a.localeCompare(b,"zh-Hant"); });
     var pl = catObj(rc).sub;
-    selProj = '<span class="arrow-sep">›</span><select id="relproj" class="inp selx" aria-label="'+esc(pl)+'"><option value="">全部'+esc(pl)+'</option>'+projs.map(function(x){ return '<option value="'+esc(x)+'"'+(rp===x?" selected":"")+'>'+esc(x===NONE?"未填"+pl:x)+'</option>'; }).join("")+'</select>';
+    selProj = '<span class="arrow-sep">›</span><select id="relproj" class="inp selx" aria-label="'+esc(pl)+'"><option value="">全部'+esc(pl)+'</option>'+plist.map(function(x){ return '<option value="'+esc(x)+'"'+(rp===x?" selected":"")+'>'+esc(x===NONE?"未填"+pl:x)+'</option>'; }).join("")+'</select>';
   }
-  var pool = state.chars.filter(function(c){ return RID[c.id] && (rc==="全部" || c.cat===rc) && (!rp || !hasSub(rc) || projOf(c)===rp); });
+  var pool = state.chars.filter(function(c){ return RID[c.id] && (rc==="全部" || c.cat===rc) && (!rp || !hasSub(rc) || projOfs(c).indexOf(rp)>=0); });
   var selChar = '<span class="arrow-sep">›</span><select id="relego" class="inp selx" aria-label="角色"><option value="">全部角色</option>'+pool.map(function(c){ return '<option value="'+esc(c.id)+'"'+(ego===c.id?" selected":"")+'>'+esc(c.name)+'</option>'; }).join("")+'</select>';
   var pick = selCat + selProj + selChar;
   var list = ego ? relsOf(ego) : state.relations;
@@ -934,7 +946,7 @@ function tlView(){
   var years = [], by = {};
   withDate.forEach(function(c){ var d = ym(c.created), y = d.slice(0,4), m = d.slice(5,7) || "";
     if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(c); });
-  function who(c){ return '<a class="who" href="#c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""><span class="whon">'+esc(c.name)+(c.project?'<small>'+esc(c.project)+'</small>':'')+'</span></a>'; }
+  function who(c){ return '<a class="who" href="#c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""><span class="whon">'+esc(c.name)+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+'</span></a>'; }
   var body = years.map(function(y){
     var months = Object.keys(by[y]).sort();
     return '<div class="yr"><h2>'+esc(y)+'</h2><div class="months">'+months.map(function(m){ return '<div class="mrow"><span class="m">'+(m?(+m)+' 月':'')+'</span><div class="who-list">'+by[y][m].map(who).join("")+'</div></div>'; }).join("")+'</div></div>';
@@ -1035,7 +1047,7 @@ function editChar(id, only){
   function show(k){ return !only || only===k || (Array.isArray(only) && only.indexOf(k)>=0); }
   var orig = id ? byId(id) : null;
   var d = orig ? JSON.parse(JSON.stringify(orig)) : {id:uid("c"), name:"", alias:"", cat:catObj(ui.cat)?ui.cat:(catIds()[0]||""), stories:[], project:"", gender:"女", created:new Date().toISOString().slice(0,7), age:"", birthday:"", height:"", species:"", role:"", tags:[], palette:[], color:"#5b7fb5", personality:"", appearance:"", background:"", fields:[], mainImages:[], outfitsEnabled:false, outfits:[], gallery:[]};
-  ["fields","mainImages","outfits","gallery","tags","palette","stories"].forEach(function(k){ d[k] = d[k]||[]; });
+  ["fields","mainImages","outfits","gallery","tags","palette","stories","projects"].forEach(function(k){ d[k] = d[k]||[]; });
   d.created = ym(d.created);
   if(only==="outfits" && !d.outfitsEnabled) d.outfitsEnabled = true;
   function f(label, key, type, wide){
@@ -1045,9 +1057,14 @@ function editChar(id, only){
   }
   function projField(){
     var o = catObj(d.cat); if(!o || !o.sub) return '';
-    var list = []; state.chars.forEach(function(c){ if(c.cat===d.cat && c.project && list.indexOf(c.project)<0) list.push(c.project); });
-    return '<div class="field"><label for="f-project">'+esc(o.name)+' › '+esc(o.sub)+'</label><input id="f-project" data-f="project" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(d.project||"")+'">'+
-      '<datalist id="projlist">'+list.map(function(x){ return '<option value="'+esc(x)+'"></option>'; }).join("")+'</datalist></div>';
+    var list = []; state.chars.forEach(function(c){ if(c.cat===d.cat) projNames(c).forEach(function(x){ if(list.indexOf(x)<0) list.push(x); }); });
+    if(!d.projects.length) d.projects.push({name:"", period:""});
+    return '<div class="field wide"><label>'+esc(o.name)+' › '+esc(o.sub)+'（可以填多個，第一個會當作主要的）</label>'+
+      d.projects.map(function(x,i){ return '<div class="projrow"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
+        '<input aria-label="時間" data-list="projects" data-i="'+i+'" data-k="period" placeholder="時間，例如 2021-07～2022-03" value="'+esc(x.period||"")+'">'+
+        '<button class="btn sm ghost" type="button" data-rm="projects" data-i="'+i+'">移除</button></div>'; }).join("")+
+      '<datalist id="projlist">'+list.map(function(x){ return '<option value="'+esc(x)+'"></option>'; }).join("")+'</datalist>'+
+      '<button class="btn sm" type="button" data-add="projects" style="margin-top:6px;align-self:flex-start">＋ 新增'+esc(o.sub)+'</button></div>';
   }
   function catSel(){ return '<div class="field"><label for="f-cat">分類</label><select id="f-cat" data-f="cat">'+cats().map(function(x){ return '<option value="'+esc(x.id)+'"'+(d.cat===x.id?" selected":"")+'>'+esc(x.name)+'</option>'; }).join("")+'<option value=""'+(!catObj(d.cat)?" selected":"")+'>未分類</option></select></div>'; }
   function sel(label, key, opts){ return '<div class="field"><label for="f-'+key+'">'+label+'</label><select id="f-'+key+'" data-f="'+key+'">'+opts.map(function(o){return '<option'+(d[key]===o?" selected":"")+'>'+o+'</option>';}).join("")+'</select></div>'; }
@@ -1124,12 +1141,14 @@ function editChar(id, only){
   m.addEventListener("click", function(e){
     var t = e.target.closest("button"); if(!t) return;
     if(t.hasAttribute("data-x")) m.remove();
-    else if(t.dataset.add){ d[t.dataset.add].push(t.dataset.add==="fields"?{k:"",v:""}:t.dataset.add==="palette"?{k:"",color:"#7a6a5a"}:t.dataset.add==="stories"?{id:uid("s"),title:"",date:"",when:"",content:"",public:true}:{src:"",name:"",note:"",author:""}); paint(); }
+    else if(t.dataset.add){ d[t.dataset.add].push(t.dataset.add==="projects"?{name:"",period:""}:t.dataset.add==="fields"?{k:"",v:""}:t.dataset.add==="palette"?{k:"",color:"#7a6a5a"}:t.dataset.add==="stories"?{id:uid("s"),title:"",date:"",when:"",content:"",public:true}:{src:"",name:"",note:"",author:""}); paint(); }
     else if(t.dataset.mv){ var arr = d[t.dataset.mv], i0 = +t.dataset.i, i1 = i0 + (+t.dataset.dir); var tmp = arr[i0]; arr[i0] = arr[i1]; arr[i1] = tmp; paint(); }
     else if(t.dataset.rm){ d[t.dataset.rm].splice(+t.dataset.i,1); paint(); }
     else if(t.hasAttribute("data-save")){
       if(!String(d.name).trim()){ toast("請先填角色名字"); var n = m.querySelector("#f-name"); if(n) n.focus(); return; }
       delete d.example; d.updatedAt = new Date().toISOString();
+      d.projects = (d.projects||[]).map(function(x){ return {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; }).filter(function(x){ return x.name || x.period; });
+      d.project = d.projects.length ? d.projects[0].name : "";
       if(orig){ var idx = state.chars.indexOf(orig); state.chars[idx] = d; } else state.chars.push(d);
       m.remove(); save(); go("c-"+d.id); toast("角色已儲存");
     }
@@ -1309,10 +1328,10 @@ root.addEventListener("click", function(e){
   else if(ds.sort){ ui.sort = ds.sort; keepUI(); render(); }
   else if(ds.tab){ ui.tab = ds.tab; keepUI(); render(); }
   else if(ds.relcat){ ui.relCat = ds.relcat; ui.focus = null; render(); }
-  else if(ds.node){ if(ui.relEgo){ ui.relEgo = ds.node; var nc = byId(ds.node); if(nc){ ui.relCat = nc.cat; ui.relProj = nc.project || "__none"; } } else { ui.focus = ui.focus===ds.node ? null : ds.node; } keepUI(); render(); }
+  else if(ds.node){ if(ui.relEgo){ ui.relEgo = ds.node; var nc = byId(ds.node); if(nc){ ui.relCat = nc.cat; ui.relProj = projNames(nc)[0] || "__none"; } } else { ui.focus = ui.focus===ds.node ? null : ds.node; } keepUI(); render(); }
   else if(b.hasAttribute("data-relreset")){ ui.relCat = "全部"; ui.relProj = ""; ui.relEgo = ""; ui.focus = null; keepUI(); render(); }
   else if(ds.relego!==undefined){ ui.relEgo = ds.relego; ui.focus = null; keepUI(); render(); }
-  else if(ds.relgo){ ui.relEgo = ds.relgo; var gc = byId(ds.relgo); if(gc){ ui.relCat = gc.cat; ui.relProj = gc.project || "__none"; } keepUI(); go("relations"); }
+  else if(ds.relgo){ ui.relEgo = ds.relgo; var gc = byId(ds.relgo); if(gc){ ui.relCat = gc.cat; ui.relProj = projNames(gc)[0] || "__none"; } keepUI(); go("relations"); }
   else if(ds.fold){ ui[ds.fold] = ui[ds.fold]===false; keepUI(); render(); }
   else if(ds.redit){ editRel(ds.redit); }
   else if(ds.zoom==="notes"){ lightbox({name:"", notes:[{src:state.settings.notesImg, note:state.settings.notesCaption}]}, "notes", 0); }
@@ -1359,7 +1378,7 @@ root.addEventListener("input", function(e){
 root.addEventListener("toggle", function(e){ if(e.target.matches && e.target.matches("details.more")){ ui.moreOpen = e.target.open; keepUI(); } }, true);
 root.addEventListener("change", function(e){
   var t = e.target;
-  if(t.id==="relego"){ ui.relEgo = t.value; ui.focus = null; if(t.value){ var ec = byId(t.value); ui.relCat = ec.cat; ui.relProj = ec.project || "__none"; } keepUI(); render(); }
+  if(t.id==="relego"){ ui.relEgo = t.value; ui.focus = null; if(t.value){ var ec = byId(t.value); ui.relCat = ec.cat; ui.relProj = projNames(ec)[0] || "__none"; } keepUI(); render(); }
   else if(t.id==="relcat2"){ ui.relCat = t.value; ui.relProj = ""; ui.relEgo = ""; ui.focus = null; keepUI(); render(); }
   else if(t.id==="relproj"){ ui.relProj = t.value; ui.relEgo = ""; ui.focus = null; keepUI(); render(); }
   else if(t.id==="showc"){ ui.showCreated = t.checked; keepUI(); render(); }
