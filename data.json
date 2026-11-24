@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:57:51.521Z",
+  "updatedAt": "2026-11-24T16:59:19.014Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -831,6 +831,14 @@
     "owner": "晚煙",
     "img": ""
    }
+  },
+  {
+   "id": "refajza",
+   "a": "crzll9w",
+   "b": "cv9wp1p",
+   "label": "麻煩",
+   "mutual": false,
+   "note": ""
   }
  ],
  "timeline": []
