@@ -526,6 +526,16 @@ details.more > summary{padding:16px 28px}
 .rarrow.two .rline + .sr + .rline{margin-top:5px}
 .relpick{display:flex;flex-direction:column;gap:8px;margin:8px 0 4px}
 .relpick .btn{justify-content:flex-start;text-align:left}
+/* [樣式] 關係表分組 */
+.rgroup + .rgroup{margin-top:22px}
+.rgh{display:flex;align-items:center;gap:10px;padding:0 0 8px;margin-bottom:10px;border-bottom:1px solid var(--line);color:inherit;text-decoration:none}
+.rgh img{width:40px;height:40px;object-fit:cover;border-radius:2px;border:1px solid var(--line)}
+.rgh b{font-family:var(--display);font-size:18px}
+.rgh small{color:var(--muted);font-size:12.5px}
+.rgh .rgn{margin-left:auto;font-size:12px;color:var(--muted)}
+.rgh:hover b{text-decoration:underline}
+.rgroup .rel-list{padding-left:12px}
+@media (max-width:520px){.rgroup .rel-list{padding-left:0}.rgh small{display:none}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -984,26 +994,25 @@ function relView(){
   var selChar = '<span class="arrow-sep">›</span><select id="relego" class="inp selx" aria-label="角色"><option value="">全部角色</option>'+pool.map(function(c){ return '<option value="'+esc(c.id)+'"'+(ego===c.id?" selected":"")+'>'+esc(c.name)+'</option>'; }).join("")+'</select>';
   var pick = selCat + selProj + selChar;
   var list = ego ? relsOf(ego) : state.relations;
-  var rows = pairUp(list, ego ? function(){ return ego; } : null).map(function(r){
-    if(r.pair){ var f = r.pair[0], bk = r.pair[1], fa = byId(f.a), fo = byId(f.b); if(!fa || !fo) return "";
-      var ns = [f.note, bk.note].filter(Boolean);
-      return '<tr><td><a href="#c-'+esc(fa.id)+'">'+esc(fa.name)+'</a></td><td class="rcell">'+relArrow2(f.label, bk.label)+'</td>'+
-        '<td><a href="#c-'+esc(fo.id)+'">'+esc(fo.name)+'</a></td>'+
-        '<td>'+ns.map(function(n){ return '<div class="rel-note" style="margin:0">'+esc(n)+'</div>'; }).join("")+'</td>'+
-        '<td class="needs-write" style="white-space:nowrap"><button class="btn sm ghost" data-redit="'+esc(f.id+","+bk.id)+'">編輯</button><button class="btn sm ghost" data-rdel="'+esc(f.id+","+bk.id)+'">刪除</button></td></tr>'; }
-    var a = byId(r.a); if(!a) return "";
-    var o = relOther(r, r.a); if(!o) return "";
-    return '<tr><td><a href="#c-'+esc(a.id)+'">'+esc(a.name)+'</a></td><td class="rcell">'+relArrow(r.label, r.mutual?"both":"right")+'</td>'+
-      '<td>'+(o.ext?esc(o.name)+(o.owner?'<div class="owner">'+esc(o.owner)+'</div>':''):'<a href="#c-'+esc(o.id)+'">'+esc(o.name)+'</a>')+'</td>'+
-      '<td>'+(r.note?'<div class="rel-note" style="margin:0">'+esc(r.note)+'</div>':'')+'</td>'+
-      '<td class="needs-write" style="white-space:nowrap"><button class="btn sm ghost" data-redit="'+esc(r.id)+'">編輯</button><button class="btn sm ghost" data-rdel="'+esc(r.id)+'">刪除</button></td></tr>';
+  var groups = {}, order = [];
+  function addG(cid, item){ if(!groups[cid]){ groups[cid] = []; order.push(cid); } groups[cid].push(item); }
+  if(ego){ pairUp(relsOf(ego), function(){ return ego; }).forEach(function(r){ addG(ego, r); }); }
+  else {
+    pairUp(state.relations.filter(function(r){ return byId(r.a) && (r.ext || byId(r.b)); }), null).forEach(function(r){ addG(r.pair ? r.pair[0].a : r.a, r); });
+    order = sortChars(order.map(byId)).map(function(c){ return c.id; });
+  }
+  var rows = order.map(function(cid){
+    var c = byId(cid), items = groups[cid].map(function(r){ return relRow(r, cid); }).join("");
+    if(!items) return "";
+    var n = groups[cid].reduce(function(t, r){ return t + (r.pair ? 2 : 1); }, 0);
+    return '<section class="rgroup" style="--cc:'+color(c.color)+'"><a class="rgh" href="#c-'+esc(c.id)+'"><img src="'+cover(c)+'" alt=""><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+'<span class="rgn">'+n+' 段關係</span></a><div class="rel-list">'+items+'</div></section>';
   }).join("");
   var egoC = ego ? byId(ego) : null;
   return '<div class="head"><div><h1 style="font-size:32px">'+esc(L("nav_rel"))+'</h1><div class="muted">'+(egoC?'正在看「'+esc(egoC.name)+'」的關係，再點一次頭像可以看全部。':'點頭像可以只看那位角色的關係。')+'</div></div>'+
     '<button class="btn primary sm needs-write" data-act="newrel">新增關係</button></div>'+
     '<div class="whobar"><button class="wb all'+(!ego?' on':'')+'" data-relego=""><span class="wball">全部</span></button>'+
       sortChars(state.chars.filter(function(c){ return RID[c.id]; })).map(function(c){ return '<button class="wb'+(ego===c.id?' on':'')+'" data-relego="'+esc(c.id)+'" style="--cc:'+color(c.color)+'" aria-pressed="'+(ego===c.id)+'"><img src="'+cover(c)+'" alt=""><span>'+esc(c.name)+'</span></button>'; }).join("")+'</div>'+
-    '<div class="panel rlist">'+(rows?'<div style="overflow-x:auto"><table class="rt"><thead><tr><th>角色</th><th>關係</th><th>對象</th><th>備註</th><th class="needs-write"></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="muted">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div>')+'</div>';
+    '<div class="panel rlist">'+(rows?rows:'<div class="muted">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div>')+'</div>';
 }
 function foldHead(key, title, open){
   return '<div class="panel fold'+(open?" open":"")+'"><button class="foldbtn" data-fold="'+key+'" aria-expanded="'+open+'"><span class="chev" aria-hidden="true">'+(open?"▾":"▸")+'</span>'+esc(title)+'<span class="foldhint">'+(open?"收起":"展開")+'</span></button>';
