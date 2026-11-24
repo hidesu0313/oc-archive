@@ -537,6 +537,29 @@ details.more > summary{padding:16px 28px}
 .rgh:hover b{text-decoration:underline}
 .rgroup .rel-list{padding-left:12px}
 @media (max-width:520px){.rgroup .rel-list{padding-left:0}.rgh small{display:none}}
+/* [樣式] 關係卡片 */
+.rcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:18px;align-items:start}
+.rcard{display:flex;flex-direction:column;gap:10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:10px;cursor:pointer;color:inherit;font:inherit;transition:transform .25s,opacity .25s,filter .25s,box-shadow .25s;position:relative}
+.rcard:hover{border-color:var(--cc)}
+.rc-top{display:flex;align-items:center;gap:9px;min-width:0}
+.rc-top img{width:44px;height:44px;object-fit:cover;border-radius:2px;border:1px solid var(--line);flex:none}
+.rc-nm{display:flex;flex-direction:column;min-width:0}
+.rc-nm b{font-family:var(--display);font-size:15px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-nm small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-avs{display:flex;gap:4px;align-items:center;padding-top:8px;border-top:1px dashed var(--line);min-height:30px}
+.rc-avs img{width:26px;height:26px;object-fit:cover;border-radius:2px;border:1px solid var(--line)}
+.rc-more{font-size:11px;color:var(--muted);margin-left:2px}
+.rcards.rc-focus .rcard:not(.active):not(.mate){opacity:.35;filter:grayscale(.6)}
+.rcard.active{transform:scale(1.06);border-color:var(--cc);box-shadow:0 6px 16px rgba(90,70,40,.16);z-index:2}
+.rcard.mate{border-color:var(--cc)}
+.rdetail{grid-column:1/-1;background:var(--paper2);border:1px solid var(--line);border-top:3px solid var(--accent);padding:14px 16px;animation:rdin .25s ease}
+@keyframes rdin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.rd-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rd-head a{color:inherit;text-decoration:none;font-size:15px}
+.rd-head a b{font-family:var(--display);font-size:18px;text-decoration:underline}
+.rd-act{margin-left:auto;display:flex;gap:6px}
+@media (max-width:520px){.rcards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rc-top img{width:36px;height:36px}.rc-avs img{width:22px;height:22px}.rdetail{padding:12px 10px}}
+@media (prefers-reduced-motion:reduce){.rcard,.rdetail{transition:none;animation:none}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -819,7 +842,7 @@ function render0(){
   else html = listView();
   if(r.view!=="list" && r.view!=="char") html = '<div class="sheet">'+html+'</div>';
   root.innerHTML = shell(html, r);
-  if(r.view==="relations") bindGraph();
+  if(r.view==="relations"){ bindGraph(); if(ui.relEgo) relOpen(ui.relEgo); }
 }
 
 /* 列表 */
@@ -978,42 +1001,39 @@ function relRow(r, cid){
 function relatedIds(){ var ids = {}; state.relations.forEach(function(r){ if(byId(r.a)){ if(r.ext){ ids[r.a] = 1; } else if(byId(r.b) && r.a!==r.b){ ids[r.a] = 1; ids[r.b] = 1; } } }); return ids; }
 function relView(){
   var RID = relatedIds();
-  var ego = ui.relEgo && byId(ui.relEgo) && RID[ui.relEgo] ? ui.relEgo : "";
-  var rc = ui.relCat || "全部", rp = ui.relProj || "";
-  if(ego){ var ec = byId(ego); rc = ec.cat; rp = projNames(ec)[0] || "__none"; }
-  var NONE = "__none";
-  function projOfs(c){ var n = projNames(c); return n.length ? n : [NONE]; }
-  var selCat = '<select id="relcat2" class="inp selx sm2" aria-label="分類"><option value="全部">全部分類</option>'+catIds().filter(function(k){ return state.chars.some(function(c){ return c.cat===k && RID[c.id]; }); }).map(function(k){ return '<option value="'+esc(k)+'"'+(rc===k?" selected":"")+'>'+esc(catName(k))+'</option>'; }).join("")+'</select>';
-  var selProj = "";
-  if(hasSub(rc)){
-    var plist = []; state.chars.forEach(function(c){ if(RID[c.id] && c.cat===rc) projOfs(c).forEach(function(x){ if(plist.indexOf(x)<0) plist.push(x); }); });
-    plist.sort(function(a,b){ return a===NONE?1:b===NONE?-1:a.localeCompare(b,"zh-Hant"); });
-    var pl = catObj(rc).sub;
-    selProj = '<span class="arrow-sep">›</span><select id="relproj" class="inp selx" aria-label="'+esc(pl)+'"><option value="">全部'+esc(pl)+'</option>'+plist.map(function(x){ return '<option value="'+esc(x)+'"'+(rp===x?" selected":"")+'>'+esc(x===NONE?"未填"+pl:x)+'</option>'; }).join("")+'</select>';
-  }
-  var pool = state.chars.filter(function(c){ return RID[c.id] && (rc==="全部" || c.cat===rc) && (!rp || !hasSub(rc) || projOfs(c).indexOf(rp)>=0); });
-  var selChar = '<span class="arrow-sep">›</span><select id="relego" class="inp selx" aria-label="角色"><option value="">全部角色</option>'+pool.map(function(c){ return '<option value="'+esc(c.id)+'"'+(ego===c.id?" selected":"")+'>'+esc(c.name)+'</option>'; }).join("")+'</select>';
-  var pick = selCat + selProj + selChar;
-  var list = ego ? relsOf(ego) : state.relations;
-  var groups = {}, order = [];
-  function addG(cid, item){ if(!groups[cid]){ groups[cid] = []; order.push(cid); } groups[cid].push(item); }
-  if(ego){ pairUp(relsOf(ego), function(){ return ego; }).forEach(function(r){ addG(ego, r); }); }
-  else {
-    pairUp(state.relations.filter(function(r){ return byId(r.a) && (r.ext || byId(r.b)); }), null).forEach(function(r){ addG(r.pair ? r.pair[0].a : r.a, r); });
-    order = sortChars(order.map(byId)).map(function(c){ return c.id; });
-  }
-  var rows = order.map(function(cid){
-    var c = byId(cid), items = groups[cid].map(function(r){ return relRow(r, cid); }).join("");
-    if(!items) return "";
-    var n = groups[cid].reduce(function(t, r){ return t + (r.pair ? 2 : 1); }, 0);
-    return '<section class="rgroup" style="--cc:'+color(c.color)+'"><a class="rgh" href="#c-'+esc(c.id)+'"><img src="'+cover(c)+'" alt=""><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+'<span class="rgn">'+n+' 段關係</span></a><div class="rel-list">'+items+'</div></section>';
+  var list = sortChars(state.chars.filter(function(c){ return RID[c.id]; }));
+  var cards = list.map(function(c){
+    var seen = {}, avs = [];
+    relsOf(c.id).forEach(function(r){ var o = relOther(r, c.id); if(o && !seen[o.id]){ seen[o.id] = 1; avs.push(o); } });
+    var max = 5, more = avs.length - max;
+    return '<button class="rcard" type="button" data-rcard="'+esc(c.id)+'" data-mates="'+esc(avs.map(function(o){ return o.id; }).join(" "))+'" style="--cc:'+color(c.color)+'" aria-expanded="false">'+
+      '<span class="rc-top"><img src="'+cover(c)+'" alt=""><span class="rc-nm"><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c)[0])+'</small>':'')+'</span></span>'+
+      '<span class="rc-avs">'+avs.slice(0, max).map(function(o){ return '<img src="'+o.img+'" alt="" title="'+esc(o.name)+'">'; }).join("")+(more>0?'<span class="rc-more">+'+more+'</span>':'')+'</span></button>';
   }).join("");
-  var egoC = ego ? byId(ego) : null;
-  return '<div class="head"><div><h1 style="font-size:32px">'+esc(L("nav_rel"))+'</h1><div class="muted">'+(egoC?'正在看「'+esc(egoC.name)+'」的關係，再點一次頭像可以看全部。':'點頭像可以只看那位角色的關係。')+'</div></div>'+
+  var details = list.map(function(c){
+    var items = pairUp(relsOf(c.id), function(){ return c.id; }).map(function(r){ return relRow(r, c.id); }).join("");
+    return '<div class="rdetail" data-for="'+esc(c.id)+'" hidden><div class="rd-head"><a href="#c-'+esc(c.id)+'"><b>'+esc(c.name)+'</b> 的關係</a><span class="rd-act"><button class="btn sm needs-write" data-act="newrel" data-id="'+esc(c.id)+'">新增</button><button class="btn sm ghost" type="button" data-rclose aria-label="收起">收起</button></span></div><div class="rel-list">'+items+'</div></div>';
+  }).join("");
+  return '<div class="head"><div><h1 style="font-size:32px">'+esc(L("nav_rel"))+'</h1><div class="muted">點卡片可以看那位角色的詳細關係。</div></div>'+
     '<button class="btn primary sm needs-write" data-act="newrel">新增關係</button></div>'+
-    '<div class="whobar"><button class="wb all'+(!ego?' on':'')+'" data-relego=""><span class="wball">全部</span></button>'+
-      sortChars(state.chars.filter(function(c){ return RID[c.id]; })).map(function(c){ return '<button class="wb'+(ego===c.id?' on':'')+'" data-relego="'+esc(c.id)+'" style="--cc:'+color(c.color)+'" aria-pressed="'+(ego===c.id)+'"><img src="'+cover(c)+'" alt=""><span>'+esc(c.name)+'</span></button>'; }).join("")+'</div>'+
-    '<div class="panel rlist">'+(rows?rows:'<div class="muted">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div>')+'</div>';
+    (list.length ? '<div class="rcards">'+cards+'</div><div class="rdstore" hidden>'+details+'</div>' : '<div class="panel rlist"><div class="muted">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div></div>');
+}
+function relOpen(cid){
+  var grid = root.querySelector(".rcards"); if(!grid) return;
+  var store = root.querySelector(".rdstore");
+  grid.querySelectorAll(".rdetail").forEach(function(d){ d.hidden = true; store.appendChild(d); });
+  grid.querySelectorAll(".rcard").forEach(function(x){ x.classList.remove("active","mate"); x.setAttribute("aria-expanded","false"); });
+  grid.classList.remove("rc-focus");
+  var card = cid && grid.querySelector('.rcard[data-rcard="'+cid+'"]');
+  if(!card){ if(ui.relEgo){ ui.relEgo = ""; keepUI(); } return; }
+  ui.relEgo = cid; keepUI();
+  card.classList.add("active"); card.setAttribute("aria-expanded","true"); grid.classList.add("rc-focus");
+  var mates = (card.getAttribute("data-mates")||"").split(" ");
+  grid.querySelectorAll(".rcard").forEach(function(x){ if(mates.indexOf(x.getAttribute("data-rcard"))>=0) x.classList.add("mate"); });
+  var cs = [].slice.call(grid.querySelectorAll(".rcard")), top = card.offsetTop, last = card;
+  cs.forEach(function(x){ if(x.offsetTop===top) last = x; });
+  var d = store.querySelector('.rdetail[data-for="'+cid+'"]'); if(!d) return;
+  last.insertAdjacentElement("afterend", d); d.hidden = false;
 }
 function foldHead(key, title, open){
   return '<div class="panel fold'+(open?" open":"")+'"><button class="foldbtn" data-fold="'+key+'" aria-expanded="'+open+'"><span class="chev" aria-hidden="true">'+(open?"▾":"▸")+'</span>'+esc(title)+'<span class="foldhint">'+(open?"收起":"展開")+'</span></button>';
@@ -1601,6 +1621,10 @@ function settings(){
 var TOUCH = window.matchMedia && matchMedia("(hover: none)").matches;
 root.addEventListener("click", function(e){
   var t = e.target;
+  var rcd = t.closest && t.closest(".rcard");
+  if(rcd){ e.preventDefault(); relOpen(rcd.classList.contains("active") ? "" : rcd.getAttribute("data-rcard")); return; }
+  if(t.closest && t.closest("[data-rclose]")){ relOpen(""); return; }
+  if(root.querySelector(".rcards.rc-focus") && !t.closest(".rdetail") && !t.closest(".fmenu") && !t.closest("[data-act]")){ relOpen(""); }
   var pc = t.closest && t.closest(".pcard");
   if(pc && !pc.classList.contains("active")){
     e.preventDefault();
