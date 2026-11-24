@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:30:49.605Z",
+  "updatedAt": "2026-11-24T17:32:33.837Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -843,6 +843,39 @@
     }
    ],
    "updatedAt": "2026-11-24T17:25:22.818Z"
+  },
+  {
+   "id": "c3xnrov",
+   "name": "八嶋木綿香",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "",
+   "gender": "女",
+   "created": "2026-10",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "",
+     "period": "2026-11"
+    }
+   ],
+   "updatedAt": "2026-11-24T17:32:33.837Z"
   }
  ],
  "relations": [
