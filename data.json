@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:43:02.728Z",
+  "updatedAt": "2026-11-24T16:44:51.543Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -494,6 +494,47 @@
     }
    ],
    "updatedAt": "2026-11-24T16:43:02.727Z"
+  },
+  {
+   "id": "c16rrk3",
+   "name": "小瀬村藍",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "雪山密室",
+   "gender": "女",
+   "created": "2023-10",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "雪山密室",
+     "period": "2023-10"
+    },
+    {
+     "name": "常闇の箱",
+     "period": "2026-10"
+    },
+    {
+     "name": "深夜便利商店",
+     "period": "2026-10"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:44:51.542Z"
   }
  ],
  "relations": [
