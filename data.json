@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T15:56:49.717Z",
+  "updatedAt": "2026-11-24T15:57:19.993Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -244,11 +244,15 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:42:13.005Z",
+   "updatedAt": "2026-11-24T15:57:19.992Z",
    "projects": [
     {
      "name": "西奧多魔法學院",
      "period": ""
+    },
+    {
+     "name": "聖路恩學院",
+     "period": "2022-07"
     }
    ]
   },
