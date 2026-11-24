@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:07:21.441Z",
+  "updatedAt": "2026-11-24T16:10:35.161Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -316,6 +316,39 @@
    "gallery": [],
    "projects": [],
    "updatedAt": "2026-11-24T16:07:21.440Z"
+  },
+  {
+   "id": "cf206vi",
+   "name": "多加",
+   "alias": "",
+   "cat": "",
+   "stories": [],
+   "project": "",
+   "gender": "女",
+   "created": "2026-11",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "",
+     "period": "2026-11"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:10:35.161Z"
   }
  ],
  "relations": [
