@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:10:04.042Z",
+  "updatedAt": "2026-11-24T17:12:59.889Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -887,6 +887,14 @@
     "owner": "喜久",
     "img": ""
    }
+  },
+  {
+   "id": "rofysr0",
+   "a": "cv9wp1p",
+   "b": "c4q1pld",
+   "label": "同事",
+   "mutual": true,
+   "note": ""
   }
  ],
  "timeline": []
