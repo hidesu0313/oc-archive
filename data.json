@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:59:19.014Z",
+  "updatedAt": "2026-11-24T17:05:16.303Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -839,6 +839,18 @@
    "label": "麻煩",
    "mutual": false,
    "note": ""
+  },
+  {
+   "id": "r8i9we7",
+   "a": "cp3v0dd",
+   "label": "同母異父的兄妹",
+   "mutual": true,
+   "note": "",
+   "ext": {
+    "name": "雷西特．夏爾尼",
+    "owner": "喜久",
+    "img": ""
+   }
   }
  ],
  "timeline": []
