@@ -426,6 +426,23 @@ details.more > summary{padding:16px 28px}
 .pgroup.solo{border-left:0;background:none}
 .pgname{display:flex;align-items:center;gap:6px;color:var(--pc,var(--muted));border-bottom-color:color-mix(in srgb,var(--pc,var(--line)) 30%,var(--line))}
 .pgcat{font-size:10.5px;letter-spacing:.04em;color:#fff;background:var(--pc);padding:0 6px;border-radius:2px;line-height:1.6}
+/* [樣式] 精簡時間軸 */
+.tflow{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:12px 10px}
+.mtag{font-size:12px;color:var(--accent);padding:0 2px 0 8px;border-left:1px solid var(--line);margin-left:4px;align-self:center}
+.mtag:first-child{border-left:0;margin-left:0;padding-left:0}
+.pcard.tsm,.pcard.tsm .ph{width:58px;height:58px}
+.pcard.tsm .ph{padding:3px}
+.pcard.tsm .ph::after{left:3px;right:3px;height:4px}
+.pcard.tsm .slip,.pcard.tsm.flip .slip{top:calc(100% + 4px);left:0;right:auto;transform:none;width:190px;min-height:0;padding:6px 10px;clip-path:inset(0 0 100% 0);z-index:8}
+.pcard.tsm.active .slip,.pcard.tsm.flip.active .slip{clip-path:inset(0 0 0 0)}
+.pcard.tsm.flip .slip{left:auto;right:0}
+#root.pc-focus .pcard.mate{opacity:1;filter:none}
+.pcard.mate .ph{box-shadow:0 0 0 2px var(--cc),0 2px 6px rgba(90,60,20,.2)}
+.yr{align-items:center}
+.legend{display:flex;gap:14px;align-items:center;font-size:12px;color:var(--muted)}
+.lg{display:inline-flex;align-items:center;gap:5px}
+.lg i{width:16px;height:4px;display:inline-block}
+@media (max-width:520px){.pcard.tsm,.pcard.tsm .ph{width:52px;height:52px}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -993,20 +1010,20 @@ function tlView(){
   var years = [], by = {};
   dated.forEach(function(e){ var y = e.date.slice(0,4), m = e.date.slice(5,7) || "";
     if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(e); });
-  function who(e){ return '<a class="who" href="#c-'+esc(e.c.id)+'" style="--cc:'+color(e.c.color)+'"><img src="'+e.img+'" alt=""><span class="whon">'+esc(e.c.name)+'</span></a>'; }
-  function groups(list){
-    var order = [], g = {};
-    list.forEach(function(e){ var k = e.proj ? (e.cat+"\u0001"+e.proj) : ("\u0000"+e.c.id); if(!g[k]){ g[k] = []; order.push(k); } g[k].push(e); });
-    return order.map(function(k){ var es = g[k];
-      return es[0].proj ? '<div class="pgroup" style="--pc:'+catColor(es[0].cat)+'"><span class="pgname"><span class="pgcat">'+esc(catName(es[0].cat))+'</span>'+esc(es[0].proj)+'</span><div class="who-list">'+es.map(who).join("")+'</div></div>' : '<div class="pgroup solo"><div class="who-list">'+es.map(who).join("")+'</div></div>';
-    }).join("");
+  function tcard(e){
+    var k = e.proj ? (e.cat+"|"+e.proj+"|"+e.date) : "";
+    return '<button class="pcard tsm" style="--cc:'+(e.proj?catColor(e.cat):"#c9c2b4")+'" data-go="c-'+esc(e.c.id)+'" data-k="'+esc(k)+'" aria-label="'+esc(e.c.name+(e.proj?"（"+e.proj+"）":""))+'">'+
+      '<span class="ph"><img src="'+e.img+'" alt=""></span><span class="slip"><b>'+esc(e.c.name)+'</b>'+
+      (e.proj?'<small><span class="pgcat" style="--pc:'+catColor(e.cat)+'">'+esc(catName(e.cat))+'</span> '+esc(e.proj)+'</small>':'')+
+      (e.date?'<small class="sm2">'+esc(e.date)+'</small>':'')+'</span></button>';
   }
   var body = years.map(function(y){
     var months = Object.keys(by[y]).sort();
-    return '<div class="yr"><h2>'+esc(y)+'</h2><div class="months">'+months.map(function(m){ return '<div class="mrow"><span class="m">'+(m?(+m)+' 月':'')+'</span><div class="pgroups">'+groups(by[y][m])+'</div></div>'; }).join("")+'</div></div>';
+    return '<div class="yr"><h2>'+esc(y)+'</h2><div class="tflow">'+months.map(function(m){ return '<span class="mtag">'+(m?(+m)+'月':'')+'</span>'+by[y][m].map(tcard).join(""); }).join("")+'</div></div>';
   }).join("");
-  if(undated.length) body += '<div class="yr"><h2 class="muted" style="font-size:18px">未填年月</h2><div class="months"><div class="mrow"><span class="m"></span><div class="pgroups">'+groups(undated)+'</div></div></div></div>';
-  return '<div class="head" style="margin-bottom:18px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1></div>'+(body || '<div class="empty">還沒有填寫創角年月的角色。</div>');
+  if(undated.length) body += '<div class="yr"><h2 class="muted" style="font-size:18px">未填年月</h2><div class="tflow">'+undated.map(tcard).join("")+'</div></div>';
+  var legend = cats().map(function(x){ return '<span class="lg"><i style="background:'+color(x.color)+'"></i>'+esc(x.name)+'</span>'; }).join("");
+  return '<div class="head" style="margin-bottom:10px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1><div class="legend">'+legend+'</div></div>'+(body || '<div class="empty">還沒有填寫創角年月的角色。</div>');
 }
 function tlList(ids, compact){
   var has = function(list){ if(!ids) return true; return (list||[]).some(function(id){ return ids.indexOf(id)>=0; }); };
@@ -1373,12 +1390,13 @@ root.addEventListener("click", function(e){
   var pc = t.closest && t.closest(".pcard");
   if(pc && !pc.classList.contains("active")){
     e.preventDefault();
-    root.querySelectorAll(".pcard.active").forEach(function(x){ x.classList.remove("active"); });
+    root.querySelectorAll(".pcard.active,.pcard.mate").forEach(function(x){ x.classList.remove("active"); x.classList.remove("mate"); });
     var r0 = pc.getBoundingClientRect(); pc.classList.toggle("flip", r0.right + 190 > (document.documentElement.clientWidth||innerWidth));
-    pc.classList.add("active"); root.querySelector(".grid.photos") && root.classList.add("pc-focus");
+    pc.classList.add("active"); root.classList.add("pc-focus");
+    var mk = pc.getAttribute("data-k"); if(mk) root.querySelectorAll(".pcard").forEach(function(x){ if(x!==pc && x.getAttribute("data-k")===mk) x.classList.add("mate"); });
     return;
   }
-  if(!pc){ var act = root.querySelector(".pcard.active"); if(act && !t.closest(".fmenu")){ act.classList.remove("active"); root.classList.remove("pc-focus"); } }
+  if(!pc){ var act = root.querySelector(".pcard.active"); if(act && !t.closest(".fmenu")){ act.classList.remove("active"); root.querySelectorAll(".pcard.mate").forEach(function(x){ x.classList.remove("mate"); }); root.classList.remove("pc-focus"); } }
   var g = t.closest("[data-go]"); if(g){ go(g.getAttribute("data-go")); return; }
   var b = t.closest("button,[data-node],[data-zoom]"); if(!b) return;
   var ds = b.dataset;
