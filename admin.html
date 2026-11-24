@@ -493,6 +493,11 @@ details.more > summary{padding:16px 28px}
 .rcell{width:170px;min-width:110px}
 .rcell .rarrow{width:100%}
 @media (max-width:520px){.rel-card2{grid-template-columns:auto 40px minmax(0,1fr)}.rel-card2 > .btn{grid-column:1/-1;justify-self:end}.rarrow{min-width:70px}}
+/* [樣式] 箭頭頭部固定大小 */
+.rline{display:flex;align-items:center;height:8px}
+.rline i{flex:1;height:0;border-top:1.4px solid var(--muted)}
+.rline .ah{width:7px;height:7px;flex:none;fill:var(--muted)}
+.rline svg.ah{display:block}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -886,11 +891,10 @@ function relOther(r, cid){
 function relsOf(cid){ return state.relations.filter(function(r){ return r.a===cid || (!r.ext && r.b===cid); }); }
 function dirText(r, cid){ return r.mutual ? "互相" : (r.a===cid ? "單向（我→對方）" : "單向（對方→我）"); }
 function relArrow(label, dir){
-  var head = '<path d="M0 0 L7 4 L0 8 z"/>';
-  var svg = '<svg viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><line x1="'+(dir!=="right"?7:1)+'" y1="4" x2="'+(dir!=="left"?93:99)+'" y2="4"/>'+
-    (dir!=="left"?'<g transform="translate(93 0)">'+head+'</g>':'')+(dir!=="right"?'<g transform="translate(7 8) rotate(180)">'+head+'</g>':'')+'</svg>';
+  var hR = '<svg class="ah" viewBox="0 0 8 8" aria-hidden="true"><path d="M0 0.8 L7.5 4 L0 7.2 z"/></svg>';
+  var hL = '<svg class="ah" viewBox="0 0 8 8" aria-hidden="true"><path d="M8 0.8 L0.5 4 L8 7.2 z"/></svg>';
   var aria = dir==="both" ? "互相" : (dir==="right" ? "指向對方" : "對方指向這邊");
-  return '<span class="rarrow" title="'+aria+'"><span class="ral">'+esc(label||"—")+'</span><span class="rline">'+svg+'</span><span class="sr">（'+aria+'）</span></span>';
+  return '<span class="rarrow" title="'+aria+'"><span class="ral">'+esc(label||"—")+'</span><span class="rline">'+(dir!=="right"?hL:'')+'<i></i>'+(dir!=="left"?hR:'')+'</span><span class="sr">（'+aria+'）</span></span>';
 }
 function relRow(r, cid){
   var o = relOther(r, cid); if(!o) return "";
