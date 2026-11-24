@@ -563,6 +563,18 @@ details.more > summary{padding:16px 28px}
 /* [樣式] 照片牆置中 */
 #root .grid.photos{display:grid;grid-template-columns:repeat(auto-fill,104px);justify-content:center;gap:22px 24px}
 @media (max-width:520px){#root .grid.photos{grid-template-columns:repeat(auto-fill,92px);gap:18px 16px}}
+/* [樣式] 篩選列平均 */
+#root .filters{justify-content:center;gap:10px 14px}
+#root .filters .chips{justify-content:center}
+#root .filters .chips button{min-width:4.6em;text-align:center;justify-content:center}
+#root .grid.photos{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));justify-items:center;justify-content:stretch;gap:22px 12px;padding-left:0;padding-right:0}
+@media (max-width:520px){
+#root .grid.photos{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:18px 8px}
+#root .filters{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:8px}
+#root .filters .fsep{display:none !important}
+#root .filters .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));grid-auto-rows:auto;align-content:start;align-items:start;gap:6px;flex:none;height:auto}
+#root .filters .chips button{min-width:0;padding:4px 6px}
+.search{width:100%}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
