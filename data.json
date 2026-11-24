@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:15:24.392Z",
+  "updatedAt": "2026-11-24T16:22:31.181Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -386,6 +386,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:14:00.136Z"
+  },
+  {
+   "id": "csrwoc5",
+   "name": "五ノ井桃実",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "大妖怪補習班",
+   "gender": "女",
+   "created": "2024-01",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "大妖怪補習班",
+     "period": ""
+    }
+   ],
+   "updatedAt": "2026-11-24T16:22:31.181Z"
   }
  ],
  "relations": [
