@@ -459,6 +459,10 @@ details.more > summary{padding:16px 28px}
 .pcard.tsm.active .ph,.pcard.tsm.flip.active .ph{transform:scale(1.14)}
 .pcard.tsm .slip,.pcard.tsm.flip .slip{left:50%;right:auto;transform:translateX(-50%);top:calc(100% + 8px);text-align:center;align-items:center}
 .pcard.tsm .slip small{display:flex;justify-content:center;align-items:center;gap:4px}
+/* [樣式] 同月多劇本合併 */
+.ph .mcount{position:absolute;z-index:3;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--black);color:#fffaf0;font-size:11px;line-height:18px;text-align:center}
+.pcard.tsm .slip small + small{margin-top:1px}
+.tlmain{font-size:12px;color:var(--accent);margin-left:auto}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1018,7 +1022,7 @@ function tlEntries(){
   state.chars.forEach(function(c){
     var pl = (catObj(c.cat) && catObj(c.cat).sub) ? projs(c) : [];
     if(!pl.length){ out.push({c:c, date:ym(c.created), proj:"", img:cover(c)}); return; }
-    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, cat:c.cat, img:safeSrc(p.img) || cover(c)}); });
+    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, cat:c.cat, main:!!p.tlMain, img:safeSrc(p.img) || cover(c)}); });
   });
   return out;
 }
@@ -1028,6 +1032,14 @@ function tlView(){
   var hasNone = all.some(function(e){ return !e.proj; });
   var tc = ui.tlCat || "全部"; if(tc!=="全部" && tc!=="__none" && catKeys.indexOf(tc)<0) tc = "全部"; if(tc==="__none" && !hasNone) tc = "全部";
   var list = all.filter(function(e){ return tc==="全部" || (tc==="__none" ? !e.proj : (e.proj && e.cat===tc)); });
+  var merged = [], mkey = {};
+  list.forEach(function(e){
+    if(!e.proj || !e.date){ merged.push(Object.assign({}, e, {ps: e.proj ? [e] : []})); return; }
+    var key = e.c.id + "|" + e.date;
+    if(mkey[key]) mkey[key].ps.push(e); else { var m = Object.assign({}, e, {ps:[e]}); mkey[key] = m; merged.push(m); }
+  });
+  merged.forEach(function(m){ if(m.ps.length > 1){ var pick = m.ps.filter(function(x){ return x.main; })[0] || m.ps[0]; m.img = pick.img; m.cat = pick.cat; m.proj = pick.proj; } });
+  list = merged;
   var dated = list.filter(function(e){ return e.date; }), undated = list.filter(function(e){ return !e.date; });
   dated.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
   var years = [], by = {};
@@ -1036,12 +1048,15 @@ function tlView(){
   var recent = years.slice(-2), open = ui.tlOpen || {};
   function isOpen(y){ return open[y]!==undefined ? open[y] : recent.indexOf(y)>=0; }
   function tcard(e){
-    var k = e.proj ? (e.cat+"|"+e.proj+"|"+e.date) : "";
-    return '<button class="pcard tsm" style="--cc:'+(e.proj?catColor(e.cat):"#c9c2b4")+'" data-go="c-'+esc(e.c.id)+'" data-k="'+esc(k)+'" aria-label="'+esc(e.c.name+(e.proj?"（"+e.proj+"）":""))+'">'+
-      '<span class="ph"><img src="'+e.img+'" alt=""></span><span class="slip"><b>'+esc(e.c.name)+'</b>'+
-      (e.proj?'<small><span class="pgcat" style="--pc:'+catColor(e.cat)+'">'+esc(catName(e.cat))+'</span> '+esc(e.proj)+'</small>':'')+
+    var ps = e.ps || [];
+    var k = ps.map(function(x){ return x.cat+"|"+x.proj+"|"+x.date; }).join(" ");
+    var names = ps.map(function(x){ return x.proj; }).join("、");
+    return '<button class="pcard tsm'+(ps.length>1?' multi':'')+'" style="--cc:'+(e.proj?catColor(e.cat):"#c9c2b4")+'" data-go="c-'+esc(e.c.id)+'" data-k="'+esc(k)+'" aria-label="'+esc(e.c.name+(names?"（"+names+"）":""))+'">'+
+      '<span class="ph"><img src="'+e.img+'" alt="">'+(ps.length>1?'<span class="mcount">'+ps.length+'</span>':'')+'</span><span class="slip"><b>'+esc(e.c.name)+'</b>'+
+      ps.map(function(x){ return '<small><span class="pgcat" style="--pc:'+catColor(x.cat)+'">'+esc(catName(x.cat))+'</span> '+esc(x.proj)+'</small>'; }).join("")+
       (e.date?'<small class="sm2">'+esc(e.date)+'</small>':'')+'</span></button>';
   }
+
   function yearRow(y, label, entriesHTML, n, small){
     var o = isOpen(y);
     return '<div class="yr'+(o?'':' closed')+'"><button class="yh" data-tlyear="'+esc(y)+'" aria-expanded="'+o+'"><h2'+(small?' class="muted" style="font-size:18px"':'')+'>'+esc(label)+'</h2><span class="ytog">'+(o?'▾':'▸')+'</span></button>'+
@@ -1166,10 +1181,15 @@ function editChar(id, only){
     if(!d.projects.length) d.projects.push({name:"", period:""});
     if(!d.projects[0].period && ym(d.created)) d.projects[0].period = ym(d.created);
     return '<div class="field wide"><label>'+esc(o.name)+' › '+esc(o.sub)+'（可以填多個，第一個會當作主要的；第一個的時間預設為創角年月，可以修改）</label>'+
-      d.projects.map(function(x,i){ return '<div class="projrow"><img class="th-sm" src="'+(safeSrc(x.img)||cover(d))+'" alt="" title="時間軸頭像"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
+      (function(){ var groups = {}; d.projects.forEach(function(x,i){ var st = periodStart(x.period) || (i===0 ? ym(d.created) : ""); if(st && x.name){ (groups[st] = groups[st] || []).push(i); } }); window.__pgroups = groups; return ''; })()+
+      d.projects.map(function(x,i){
+        var st = periodStart(x.period) || (i===0 ? ym(d.created) : ""), grp = (window.__pgroups||{})[st] || [];
+        var multi = grp.length > 1 && grp.indexOf(i) >= 0, chosen = multi && (x.tlMain || (!grp.some(function(j){ return d.projects[j].tlMain; }) && grp[0]===i));
+        var pick = multi ? '<label class="check tlmain"><input type="radio" name="tlmain-'+esc(st)+'" data-tlmain="'+i+'" '+(chosen?"checked":"")+'>'+esc(st)+' 同月份有多個，合併顯示時用這張頭像</label>' : '';
+        return '<div class="projrow"><img class="th-sm" src="'+(safeSrc(x.img)||cover(d))+'" alt="" title="時間軸頭像"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
         '<input aria-label="時間" data-list="projects" data-i="'+i+'" data-k="period" placeholder="時間，例如 2021-07～2022-03" value="'+esc(x.period||"")+'">'+
         '<button class="btn sm ghost" type="button" data-rm="projects" data-i="'+i+'">移除</button>'+
-        '<div class="projimg"><label class="hint" for="pimg'+i+'">時間軸頭像（選填，沒放就用角色頭貼）</label><input id="pimg'+i+'" type="file" accept="image/*" data-pimg="'+i+'">'+(safeSrc(x.img)?'<button class="btn sm ghost" type="button" data-pimgrm="'+i+'">改回角色頭貼</button>':'')+'</div></div>'; }).join("")+
+        '<div class="projimg"><label class="hint" for="pimg'+i+'">時間軸頭像（選填，沒放就用角色頭貼）</label><input id="pimg'+i+'" type="file" accept="image/*" data-pimg="'+i+'">'+(safeSrc(x.img)?'<button class="btn sm ghost" type="button" data-pimgrm="'+i+'">改回角色頭貼</button>':'')+pick+'</div></div>'; }).join("")+
       '<datalist id="projlist">'+list.map(function(x){ return '<option value="'+esc(x)+'"></option>'; }).join("")+'</datalist>'+
       '<button class="btn sm" type="button" data-add="projects" style="margin-top:6px;align-self:flex-start">＋ 新增'+esc(o.sub)+'</button></div>';
   }
@@ -1236,6 +1256,8 @@ function editChar(id, only){
   });
   m.addEventListener("change", function(e){
     var t = e.target;
+    if(t.dataset.tlmain!==undefined){ var ti = +t.dataset.tlmain, tst = t.name.replace("tlmain-",""); ((window.__pgroups||{})[tst]||[]).forEach(function(j){ delete d.projects[j].tlMain; }); d.projects[ti].tlMain = true; paint(); return; }
+    if(t.dataset.list==="projects" && t.dataset.k==="period"){ paint(); return; }
     if(t.dataset.pimg!==undefined && t.files && t.files[0]){ var pi = +t.dataset.pimg; t.disabled = true; readImage(t.files[0]).then(function(src){ d.projects[pi].img = src; paint(); }).catch(function(){ toast("這張圖片讀不出來，請換一張"); t.disabled = false; }); return; }
     if(t.hasAttribute("data-pub")){ if(t.checked) delete d.hidden; else d.hidden = true; return; }
     if(t.id==="f-cat"){ d.cat = t.value; paint(); var pf = m.querySelector("#f-project"); if(pf) pf.focus(); return; }
@@ -1257,7 +1279,7 @@ function editChar(id, only){
     else if(t.hasAttribute("data-save")){
       if(!String(d.name).trim()){ toast("請先填角色名字"); var n = m.querySelector("#f-name"); if(n) n.focus(); return; }
       delete d.example; d.updatedAt = new Date().toISOString();
-      d.projects = (d.projects||[]).map(function(x){ var o2 = {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; if(x.img) o2.img = x.img; return o2; }).filter(function(x){ return x.name || x.period; });
+      d.projects = (d.projects||[]).map(function(x){ var o2 = {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; if(x.img) o2.img = x.img; if(x.tlMain) o2.tlMain = true; return o2; }).filter(function(x){ return x.name || x.period; });
       d.project = d.projects.length ? d.projects[0].name : "";
       if(orig){ var idx = state.chars.indexOf(orig); state.chars[idx] = d; } else state.chars.push(d);
       m.remove(); save(); go("c-"+d.id); toast("角色已儲存");
@@ -1427,7 +1449,7 @@ root.addEventListener("click", function(e){
     root.querySelectorAll(".pcard.active,.pcard.mate").forEach(function(x){ x.classList.remove("active"); x.classList.remove("mate"); });
     var r0 = pc.getBoundingClientRect(); pc.classList.toggle("flip", r0.right + 190 > (document.documentElement.clientWidth||innerWidth));
     pc.classList.add("active"); root.classList.add("pc-focus");
-    var mk = pc.getAttribute("data-k"); if(mk) root.querySelectorAll(".pcard").forEach(function(x){ if(x!==pc && x.getAttribute("data-k")===mk) x.classList.add("mate"); });
+    var mk = (pc.getAttribute("data-k")||"").split(" ").filter(Boolean); if(mk.length) root.querySelectorAll(".pcard").forEach(function(x){ if(x===pc) return; var xk = (x.getAttribute("data-k")||"").split(" "); if(mk.some(function(k){ return xk.indexOf(k)>=0; })) x.classList.add("mate"); });
     return;
   }
   if(!pc){ var act = root.querySelector(".pcard.active"); if(act && !t.closest(".fmenu")){ act.classList.remove("active"); root.querySelectorAll(".pcard.mate").forEach(function(x){ x.classList.remove("mate"); }); root.classList.remove("pc-focus"); } }
