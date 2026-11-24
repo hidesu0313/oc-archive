@@ -559,6 +559,9 @@ details.more > summary{padding:16px 28px}
 .rd-act{margin-left:auto;display:flex;gap:6px}
 @media (max-width:520px){.rcards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.rc-top img{width:54px;height:54px}.rc-avs img{width:22px;height:22px}.rdetail{padding:12px 10px}}
 @media (prefers-reduced-motion:reduce){.rcard,.rdetail{transition:none;animation:none}}
+/* [樣式] 照片牆置中 */
+#root .grid.photos{display:grid;grid-template-columns:repeat(auto-fill,104px);justify-content:center;gap:22px 24px}
+@media (max-width:520px){#root .grid.photos{grid-template-columns:repeat(auto-fill,92px);gap:18px 16px}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
