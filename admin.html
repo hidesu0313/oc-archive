@@ -393,6 +393,13 @@ details.more > summary{padding:16px 28px}
 .period{display:inline-block;margin-left:10px;font-family:var(--latin);font-size:14px;color:var(--muted);letter-spacing:.04em}
 .projrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:6px}
 @media (max-width:520px){.projrow{grid-template-columns:1fr auto}.projrow input:nth-child(2){grid-column:1}.facts div{grid-template-columns:5.5em minmax(0,1fr)}}
+/* [樣式] 企劃紀錄區塊 */
+.projlist{list-style:none;margin:0;padding:0}
+.projlist li{display:grid;grid-template-columns:11em minmax(0,1fr);gap:16px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line)}
+.projlist li:last-child{border-bottom:0}
+.projlist .pp{font-family:var(--latin);font-size:15px;color:var(--accent);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.projlist .pn{font-family:var(--display);font-size:16px;overflow-wrap:anywhere}
+@media (max-width:520px){.projlist li{grid-template-columns:1fr;gap:0}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -479,6 +486,7 @@ var CLIP = '<svg class="clip" viewBox="0 0 24 60" aria-hidden="true"><path d="M8
 var ALLCHARS = null;
 function isPublic(c){ return !c.hidden; }
 function projs(c){ var l = (c.projects||[]).filter(function(p){ return p && p.name; }); if(!l.length && c.project) l = [{name:c.project, period:""}]; return l; }
+function projTitle(c){ var o = catObj(c.cat); return (o ? o.name : "企劃") + "紀錄"; }
 function projNames(c){ return projs(c).map(function(p){ return p.name; }); }
 function fileNo(c){ var i = (ALLCHARS||state.chars).indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
@@ -719,7 +727,9 @@ function listView(){
 function editBtn(c, sec, label){ return '<button class="edit needs-write" data-act="edit" data-id="'+esc(c.id)+'" data-sec="'+sec+'">'+(label||"編輯")+'</button>'; }
 function charView(c){
   var plabel = (catObj(c.cat)&&catObj(c.cat).sub)||L("f_project");
-  var projRows = projs(c).map(function(p){ return '<div><dt>'+esc(plabel)+'</dt><dd>'+esc(p.name)+(p.period?'<span class="period">'+esc(p.period)+'</span>':'')+'</dd></div>'; }).join("");
+  var pl = projs(c), hasSubCat = catObj(c.cat) && catObj(c.cat).sub;
+  var projBox = ((pl.length || !ro()) && hasSubCat) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>'+esc(projTitle(c))+editBtn(c,"projects")+'</h2>'+
+    (pl.length ? '<ol class="projlist">'+pl.map(function(p){ return '<li><span class="pp">'+esc(p.period||"—")+'</span><span class="pn">'+esc(p.name)+'</span></li>'; }).join("")+'</ol>' : '<div class="muted">還沒有'+esc(plabel)+'。</div>')+'</section>' : '';
   var facts = [[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
     .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
     .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
@@ -730,7 +740,7 @@ function charView(c){
     '<div class="avbox">'+CLIP+'<img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><button class="avbtn needs-write" data-act="avatar" data-id="'+esc(c.id)+'">更換頭貼</button></div>'+
     '<div><div style="display:flex;gap:8px;align-items:flex-start"><h1 style="flex:1">'+esc(c.name)+'</h1>'+(isPublic(c)?'':'<span class="privbadge needs-write">不公開</span>')+'<button class="edit needs-write" data-act="vis" data-id="'+esc(c.id)+'">'+(isPublic(c)?"設為不公開":"設為公開")+'</button>'+editBtn(c,"basic","編輯資料")+'</div>'+
     (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(ym(c.created)?'<span class="ymtag">'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
-    ((projRows||facts)?'<dl class="facts">'+projRows+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
+    (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
   var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
     .map(function(x){ return '<div class="sec"><h3>'+esc(L(x[0]))+'</h3><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
   var introBox = (intro || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>介紹'+editBtn(c,"story")+'</h2>'+(intro||'<div class="muted">還沒有介紹。</div>')+'</section>' : '';
@@ -747,7 +757,7 @@ function charView(c){
     }).join("")+'</div>':'<div class="muted">還沒有故事。</div>')+'</div>');
   if(outfits.length || !ro()) moreParts.push('<div><h3>'+esc(L("tab_outfits"))+editBtn(c,"outfits")+'</h3>'+(outfits.length?galleryHTML(c, c.outfits, "outfits", true):'<div class="muted">還沒有衣服。</div>')+'</div>');
   var more = moreParts.length ? '<details class="more"'+(ui.moreOpen?" open":"")+'><summary>更多：'+esc(L("tab_stories"))+'・'+esc(L("tab_outfits"))+'</summary><div class="inner">'+moreParts.join("")+'</div></details>' : '';
-  return '<a class="back" href="#">← 回到角色列表</a><div class="cpage">'+hero+introBox+imgBox+relBox+more+
+  return '<a class="back" href="#">← 回到角色列表</a><div class="cpage">'+hero+projBox+introBox+imgBox+relBox+more+
     '<div class="needs-write" style="text-align:right"><button class="btn sm danger" data-act="del" data-id="'+esc(c.id)+'">刪除這位角色</button></div></div>';
 }
 function galleryHTML(c, items, key, named){
@@ -1040,7 +1050,7 @@ function lightbox(c, key, i){
 }
 
 /* 角色編輯器 */
-var SECNAME = {basic:"基本資料", story:"個性・背景故事", stories:"故事", art:"角色圖", outfits:"衣服", gallery:"寫真"};
+var SECNAME = {basic:"基本資料", projects:"企劃紀錄", story:"個性・背景故事", stories:"故事", art:"角色圖", outfits:"衣服", gallery:"寫真"};
 function editChar(id, only){
   if(!id) only = null;
   if(typeof only==="string" && only.indexOf(",")>=0) only = only.split(",");
@@ -1104,12 +1114,13 @@ function editChar(id, only){
   function paint(){
     var scroll = m ? m.scrollTop : 0;
     var html = '<h2>'+(orig?(only?"編輯："+(Array.isArray(only)?only.map(function(k){ return SECNAME[k]; }).join("・"):SECNAME[only]):"編輯角色"):"新增角色")+'</h2>'+(only?'<p class="hint" style="margin-top:-6px">'+esc(d.name)+'</p>':'')+
-      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+'<div class="field wide"><label class="check"><input type="checkbox" data-pub '+(d.hidden?'':'checked')+'>公開這位角色（取消勾選後，只有登入的你看得到）</label></div>'+''+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+projField()+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
+      (show("basic")?'<fieldset><legend>基本資料</legend><div class="fgrid">'+'<div class="field wide"><label class="check"><input type="checkbox" data-pub '+(d.hidden?'':'checked')+'>公開這位角色（取消勾選後，只有登入的你看得到）</label></div>'+''+f("名字（必填）","name")+f("別名／外文名","alias")+catSel()+sel("性別","gender",GENDERS)+f("創角年月","created","month")+
       f("年齡","age")+f("生日","birthday")+f("身高","height")+f("種族","species")+f("身分／職業","role")+
       '<div class="field"><label for="f-tags">標籤（用逗號分隔）</label><input id="f-tags" data-tags value="'+esc(d.tags.join("、"))+'"></div>'+
       '<div class="field"><label for="f-color">代表色</label><input id="f-color" type="color" data-f="color" value="'+color(d.color)+'"></div></div>'+
       '<div style="margin-top:14px"><div class="hint" style="margin-bottom:4px">配色（顯示在檔案的外觀欄，例如髮色、瞳色；沒填會顯示代表色）</div>'+palList()+'</div>'+
       '<div style="margin-top:14px"><div class="hint" style="margin-bottom:4px">自訂欄位（口頭禪、技能、PL 等）</div>'+fieldsList()+'</div></fieldset>':'')+
+      (show("projects")?'<fieldset><legend>'+esc(projTitle(d))+'</legend>'+(projField()||'<p class="hint" style="margin:0">這個分類沒有設定第二層名稱，所以不用填。可以到「管理分類」設定。</p>')+'</fieldset>':'')+
       (show("story")?'<fieldset><legend>個性・背景故事</legend><div class="fgrid">'+f("個性","personality","textarea",true)+f("背景故事","background","textarea",true)+'</div></fieldset>':'')+
       (show("stories")?'<fieldset><legend>故事</legend><p class="hint" style="margin-top:0">有填日期的故事會依日期排列，也會出現在時間軸上。取消勾選「公開」的故事，只有你自己看得到。</p>'+storyList()+'</fieldset>':'')+
       (show("art")?'<fieldset><legend>角色圖</legend><div class="hint" style="margin-top:0">第一張會當作頭貼。</div>'+imgList("mainImages",false)+'</fieldset>':'')+
