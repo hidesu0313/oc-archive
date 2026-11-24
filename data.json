@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:55:27.949Z",
+  "updatedAt": "2026-11-24T16:56:24.592Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -21,6 +21,12 @@
     "name": "TRPG",
     "sub": "劇本名稱",
     "color": "#61805a"
+   },
+   {
+    "id": "kaf7vko",
+    "name": "晚午茶會",
+    "sub": "",
+    "color": "#8c6d9e"
    }
   ],
   "notesImg": ""
