@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:50:26.354Z",
+  "updatedAt": "2026-11-24T16:51:26.752Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -605,6 +605,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:50:26.354Z"
+  },
+  {
+   "id": "cg81ort",
+   "name": "新道桃奈",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "紅薔薇之館",
+   "gender": "女",
+   "created": "2024-06",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "紅薔薇之館",
+     "period": ""
+    }
+   ],
+   "updatedAt": "2026-11-24T16:51:26.752Z"
   }
  ],
  "relations": [
