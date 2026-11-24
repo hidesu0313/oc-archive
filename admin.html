@@ -450,7 +450,7 @@ details.more > summary{padding:16px 28px}
 .ytog{font-size:12px;color:var(--muted)}
 .yr.closed{padding:8px 0}
 .yr.closed .yh h2{font-size:20px;color:var(--muted)}
-.ysum{border:0;background:none;cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0;text-decoration:underline;text-decoration-style:dotted}
+.ysum{border:0;background:none;cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0}
 .ysum:hover{color:var(--ink)}
 .tlcats button{display:inline-flex;align-items:center;gap:6px}
 .tlcats i{width:14px;height:4px;display:inline-block;background:var(--pc,var(--muted))}
@@ -1046,7 +1046,7 @@ function tlView(){
   function yearRow(y, label, entriesHTML, n, small){
     var o = isOpen(y);
     return '<div class="yr'+(o?'':' closed')+'"><button class="yh" data-tlyear="'+esc(y)+'" aria-expanded="'+o+'"><h2'+(small?' class="muted" style="font-size:18px"':'')+'>'+esc(label)+'</h2><span class="ytog">'+(o?'▾':'▸')+'</span></button>'+
-      (o ? '<div class="tflow">'+entriesHTML+'</div>' : '<button class="ysum" data-tlyear="'+esc(y)+'">'+n+' 位　展開</button>')+'</div>';
+      (o ? '<div class="tflow">'+entriesHTML+'</div>' : '<button class="ysum" data-tlyear="'+esc(y)+'" aria-label="展開 '+esc(label)+'，'+n+' 位">'+n+' 位</button>')+'</div>';
   }
   var body = years.slice().reverse().map(function(y){
     var months = Object.keys(by[y]).sort(), n = 0;
