@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:12:59.889Z",
+  "updatedAt": "2026-11-24T17:13:17.220Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -893,6 +893,14 @@
    "a": "cv9wp1p",
    "b": "c4q1pld",
    "label": "同事",
+   "mutual": true,
+   "note": ""
+  },
+  {
+   "id": "raicwge",
+   "a": "cv9wp1p",
+   "b": "crzll9w",
+   "label": "好玩",
    "mutual": true,
    "note": ""
   }
