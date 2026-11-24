@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:14:47.026Z",
+  "updatedAt": "2026-11-24T17:17:00.094Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -904,6 +904,18 @@
    "label": "好玩",
    "mutual": false,
    "note": ""
+  },
+  {
+   "id": "rkn7wwg",
+   "a": "c787w9q",
+   "label": "好友",
+   "mutual": true,
+   "note": "HO1",
+   "ext": {
+    "name": "鶴見寅",
+    "owner": "晚煙",
+    "img": ""
+   }
   }
  ],
  "timeline": []
