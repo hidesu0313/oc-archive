@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:14:00.137Z",
+  "updatedAt": "2026-11-24T16:15:24.392Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -284,10 +284,14 @@
    "projects": [
     {
      "name": "聖路恩學院",
-     "period": ""
+     "period": "2022-07"
+    },
+    {
+     "name": "泰里亞特學園",
+     "period": "2024-11"
     }
    ],
-   "updatedAt": "2026-11-24T15:56:49.717Z"
+   "updatedAt": "2026-11-24T16:15:24.391Z"
   },
   {
    "id": "cslu79w",
