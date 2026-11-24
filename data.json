@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T15:38:32.550Z",
+  "updatedAt": "2026-11-24T15:39:17.989Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -133,6 +133,33 @@
    "outfits": [],
    "gallery": [],
    "updatedAt": "2026-11-24T15:38:32.549Z"
+  },
+  {
+   "id": "cqowc8w",
+   "name": "袖井莓",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "私立西城公学",
+   "gender": "女",
+   "created": "2026-11",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "updatedAt": "2026-11-24T15:39:17.989Z"
   }
  ],
  "relations": [],
