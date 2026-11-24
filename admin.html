@@ -717,7 +717,7 @@ function charView(c){
   var imgs = (art.length?'<div class="sec"><h3>'+esc(L("tab_art"))+'</h3>'+galleryHTML(c, c.mainImages, "mainImages", false)+'</div>':'')+(gal.length?'<div class="sec"><h3>'+esc(L("tab_gallery"))+'</h3>'+galleryHTML(c, c.gallery, "gallery", false)+'</div>':'');
   var imgBox = (imgs || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>圖片'+editBtn(c,"art,gallery")+'</h2>'+(imgs||'<div class="muted">還沒有圖片。</div>')+'</section>' : '';
   var rels = relsOf(c.id).map(function(r){ return relRow(r, c.id); }).join("");
-  var relBox = (rels || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>'+esc(L("sec_rel"))+'<span style="margin-left:auto;display:flex;gap:6px"><button class="edit" data-relgo="'+esc(c.id)+'">看關係圖</button><button class="edit needs-write" data-act="newrel" data-id="'+esc(c.id)+'">新增</button></span></h2>'+(rels?'<div class="rel-list">'+rels+'</div>':'<div class="muted">還沒有關係。</div>')+'</section>' : '';
+  var relBox = (rels || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>'+esc(L("sec_rel"))+'<span style="margin-left:auto;display:flex;gap:6px">'+(rels?'<button class="edit" data-relgo="'+esc(c.id)+'">看關係圖</button>':'')+'<button class="edit needs-write" data-act="newrel" data-id="'+esc(c.id)+'">新增</button></span></h2>'+(rels?'<div class="rel-list">'+rels+'</div>':'<div class="muted">還沒有關係。</div>')+'</section>' : '';
   var st = sortStories(visibleStories(c)), outfits = (c.outfits||[]).filter(function(x){ return safeSrc(x.src) || x.name; });
   var moreParts = [];
   if(st.length || !ro()) moreParts.push('<div><h3>'+esc(L("tab_stories"))+editBtn(c,"stories")+'</h3>'+(st.length?'<div class="storylist">'+st.map(function(x){
@@ -768,21 +768,23 @@ function relRow(r, cid){
     (r.note?'<div class="rel-note">'+esc(r.note)+'</div>':'')+'</div>'+
     '<button class="btn sm ghost needs-write" data-redit="'+esc(r.id)+'">編輯</button></div>';
 }
+function relatedIds(){ var ids = {}; state.relations.forEach(function(r){ if(byId(r.a)){ if(r.ext){ ids[r.a] = 1; } else if(byId(r.b) && r.a!==r.b){ ids[r.a] = 1; ids[r.b] = 1; } } }); return ids; }
 function relView(){
-  var ego = ui.relEgo && byId(ui.relEgo) ? ui.relEgo : "";
+  var RID = relatedIds();
+  var ego = ui.relEgo && byId(ui.relEgo) && RID[ui.relEgo] ? ui.relEgo : "";
   var rc = ui.relCat || "全部", rp = ui.relProj || "";
   if(ego){ var ec = byId(ego); rc = ec.cat; rp = ec.project || "__none"; }
   var NONE = "__none";
   function projOf(c){ return c.project ? c.project : NONE; }
-  var selCat = '<select id="relcat2" class="inp selx sm2" aria-label="分類"><option value="全部">全部分類</option>'+catIds().map(function(k){ return '<option value="'+esc(k)+'"'+(rc===k?" selected":"")+'>'+esc(catName(k))+'</option>'; }).join("")+'</select>';
+  var selCat = '<select id="relcat2" class="inp selx sm2" aria-label="分類"><option value="全部">全部分類</option>'+catIds().filter(function(k){ return state.chars.some(function(c){ return c.cat===k && RID[c.id]; }); }).map(function(k){ return '<option value="'+esc(k)+'"'+(rc===k?" selected":"")+'>'+esc(catName(k))+'</option>'; }).join("")+'</select>';
   var selProj = "";
   if(hasSub(rc)){
-    var projs = []; state.chars.forEach(function(c){ if(c.cat===rc && projs.indexOf(projOf(c))<0) projs.push(projOf(c)); });
+    var projs = []; state.chars.forEach(function(c){ if(RID[c.id] && c.cat===rc && projs.indexOf(projOf(c))<0) projs.push(projOf(c)); });
     projs.sort(function(a,b){ return a===NONE?1:b===NONE?-1:a.localeCompare(b,"zh-Hant"); });
     var pl = catObj(rc).sub;
     selProj = '<span class="arrow-sep">›</span><select id="relproj" class="inp selx" aria-label="'+esc(pl)+'"><option value="">全部'+esc(pl)+'</option>'+projs.map(function(x){ return '<option value="'+esc(x)+'"'+(rp===x?" selected":"")+'>'+esc(x===NONE?"未填"+pl:x)+'</option>'; }).join("")+'</select>';
   }
-  var pool = state.chars.filter(function(c){ return (rc==="全部" || c.cat===rc) && (!rp || !hasSub(rc) || projOf(c)===rp); });
+  var pool = state.chars.filter(function(c){ return RID[c.id] && (rc==="全部" || c.cat===rc) && (!rp || !hasSub(rc) || projOf(c)===rp); });
   var selChar = '<span class="arrow-sep">›</span><select id="relego" class="inp selx" aria-label="角色"><option value="">全部角色</option>'+pool.map(function(c){ return '<option value="'+esc(c.id)+'"'+(ego===c.id?" selected":"")+'>'+esc(c.name)+'</option>'; }).join("")+'</select>';
   var pick = selCat + selProj + selChar;
   var list = ego ? relsOf(ego) : state.relations;
@@ -812,14 +814,15 @@ function graphSVG(ego){
     var me = byId(ego); addNode(charNode(me));
     relsOf(ego).forEach(function(r){ var o = relOther(r, ego); if(!o) return; addNode(o); edges.push({r:r, from: r.a===ego ? ego : o.id, to: r.a===ego ? o.id : ego}); });
   } else {
-    state.chars.filter(function(c){ var rc = ui.relCat||"全部"; if(rc!=="全部" && c.cat!==rc) return false; if(ui.relProj && hasSub(rc) && (c.project||"__none")!==ui.relProj) return false; return true; }).forEach(function(c){ addNode(charNode(c)); });
+    var RID2 = relatedIds();
+    state.chars.filter(function(c){ if(!RID2[c.id]) return false; var rc = ui.relCat||"全部"; if(rc!=="全部" && c.cat!==rc) return false; if(ui.relProj && hasSub(rc) && (c.project||"__none")!==ui.relProj) return false; return true; }).forEach(function(c){ addNode(charNode(c)); });
     state.relations.forEach(function(r){
       if(!ids[r.a] || ids[r.a].ext) return;
       if(r.ext){ var o = relOther(r, r.a); addNode(o); edges.push({r:r, from:r.a, to:o.id}); }
       else if(ids[r.b] && r.a!==r.b) edges.push({r:r, from:r.a, to:r.b});
     });
   }
-  if(!nodes.length) return '<div class="empty">這裡沒有角色。</div>';
+  if(!nodes.length) return '<div class="empty">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div>';
   var pos = {}, n = nodes.length, W, H, cx, cy, R;
   if(ego){
     var k = n-1; R = k<=1 ? 190 : Math.max(220, k*42); W = R*2+240; H = R*2+190; cx = W/2; cy = H/2;
