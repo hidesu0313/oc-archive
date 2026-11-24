@@ -455,6 +455,10 @@ details.more > summary{padding:16px 28px}
 .tlcats i{width:14px;height:4px;display:inline-block;background:var(--pc,var(--muted))}
 .tlcats button.on i{background:#fffaf0}
 @media (max-width:520px){.yh{width:auto}}
+/* [樣式] 時間軸點選：不歪斜、放大、字條置中 */
+.pcard.tsm.active .ph,.pcard.tsm.flip.active .ph{transform:scale(1.14)}
+.pcard.tsm .slip,.pcard.tsm.flip .slip{left:50%;right:auto;transform:translateX(-50%);top:calc(100% + 8px);text-align:center;align-items:center}
+.pcard.tsm .slip small{display:flex;justify-content:center;align-items:center;gap:4px}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -528,12 +532,14 @@ function normalize(){
   if(!Array.isArray(state.settings.cats)){
     var lb0 = state.settings.labels;
     state.settings.cats = [
-      {id:"企劃", name:lb0["cat_企劃"]||"企劃", sub:lb0.pick_plan||"企劃名稱", color:"#2e4d86"},
-      {id:"TRPG", name:lb0["cat_TRPG"]||"TRPG", sub:lb0.pick_trpg||"劇本名稱", color:"#2b6a52"}
+      {id:"企劃", name:lb0["cat_企劃"]||"企劃", sub:lb0.pick_plan||"企劃名稱", color:"#a85f52"},
+      {id:"TRPG", name:lb0["cat_TRPG"]||"TRPG", sub:lb0.pick_trpg||"劇本名稱", color:"#61805a"}
     ];
     ["cat_企劃","cat_TRPG","cat_無","pick_plan","pick_trpg"].forEach(function(k){ delete lb0[k]; });
     state.chars.forEach(function(c){ if(c.cat==="無") c.cat = ""; });
-  }
+  }  var OLDC = {"#2e4d86":"#a85f52", "#2b6a52":"#61805a"};
+  state.settings.cats.forEach(function(x){ if(OLDC[String(x.color).toLowerCase()]) x.color = OLDC[String(x.color).toLowerCase()]; });
+
   state.chars.forEach(function(c){ c.stories = c.stories || []; if(!Array.isArray(c.projects)) c.projects = c.project ? [{name:c.project, period:""}] : []; });
 }
 normalize();
@@ -1348,7 +1354,7 @@ function manageCats(){
   m.addEventListener("click", function(e){
     var t = e.target.closest("button"); if(!t) return;
     if(t.hasAttribute("data-x")) m.remove();
-    else if(t.hasAttribute("data-cadd")){ cd.push({id:uid("k"), name:"新分類", sub:"", color:"#7a5a3a"}); paint(); var ins = m.querySelectorAll('[data-ck="name"]'); ins[ins.length-1].select(); }
+    else if(t.hasAttribute("data-cadd")){ cd.push({id:uid("k"), name:"新分類", sub:"", color:"#8c6d9e"}); paint(); var ins = m.querySelectorAll('[data-ck="name"]'); ins[ins.length-1].select(); }
     else if(t.dataset.cmv!==undefined){ var i0 = +t.dataset.cmv, i1 = i0 + (+t.dataset.dir), tmp = cd[i0]; cd[i0] = cd[i1]; cd[i1] = tmp; paint(); }
     else if(t.dataset.cdel!==undefined){ var x = cd[+t.dataset.cdel], n = count(x.id);
       if(n){ confirmBox("「"+x.name+"」裡有 "+n+" 位角色，刪除後他們會變成未分類。確定要刪除嗎？", function(){ cd.splice(+t.dataset.cdel,1); paint(); }); }
