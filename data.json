@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:22:31.181Z",
+  "updatedAt": "2026-11-24T16:23:03.760Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -429,6 +429,18 @@
    "label": "姊妹",
    "mutual": true,
    "note": ""
+  },
+  {
+   "id": "rsce2uk",
+   "a": "csrwoc5",
+   "label": "姊妹",
+   "mutual": true,
+   "note": "",
+   "ext": {
+    "name": "五ノ井未春",
+    "owner": "晚煙",
+    "img": ""
+   }
   }
  ],
  "timeline": []
