@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:13:17.220Z",
+  "updatedAt": "2026-11-24T17:13:20.653Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -901,7 +901,7 @@
    "a": "cv9wp1p",
    "b": "crzll9w",
    "label": "好玩",
-   "mutual": true,
+   "mutual": false,
    "note": ""
   }
  ],
