@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:12:03.726Z",
+  "updatedAt": "2026-11-24T16:13:45.205Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -349,6 +349,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:12:03.725Z"
+  },
+  {
+   "id": "c32tlti",
+   "name": "粥川知己",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "百鬼高校",
+   "gender": "女",
+   "created": "2026-06",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "百鬼高校",
+     "period": "2026-11"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:13:45.205Z"
   }
  ],
  "relations": [
