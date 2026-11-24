@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:51:26.752Z",
+  "updatedAt": "2026-11-24T16:52:47.226Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -638,6 +638,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:51:26.752Z"
+  },
+  {
+   "id": "chcow9x",
+   "name": "五味田景子",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "つまさき奇談",
+   "gender": "女",
+   "created": "2024-01",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "つまさき奇談",
+     "period": ""
+    }
+   ],
+   "updatedAt": "2026-11-24T16:52:47.225Z"
   }
  ],
  "relations": [
