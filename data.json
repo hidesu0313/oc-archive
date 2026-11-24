@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T15:42:13.006Z",
+  "updatedAt": "2026-11-24T15:56:25.825Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -51,7 +51,13 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-23T14:41:18.884Z"
+   "updatedAt": "2026-11-23T14:41:18.884Z",
+   "projects": [
+    {
+     "name": "蓮英超能企劃",
+     "period": ""
+    }
+   ]
   },
   {
    "id": "ckc0c0v",
@@ -78,7 +84,13 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-23T14:50:54.037Z"
+   "updatedAt": "2026-11-23T14:50:54.037Z",
+   "projects": [
+    {
+     "name": "薪御能",
+     "period": ""
+    }
+   ]
   },
   {
    "id": "ce9ix9f",
@@ -105,7 +117,13 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:37:37.059Z"
+   "updatedAt": "2026-11-24T15:37:37.059Z",
+   "projects": [
+    {
+     "name": "超能大學",
+     "period": ""
+    }
+   ]
   },
   {
    "id": "cfxcj67",
@@ -132,7 +150,8 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:38:32.549Z"
+   "updatedAt": "2026-11-24T15:38:32.549Z",
+   "projects": []
   },
   {
    "id": "cqowc8w",
@@ -159,7 +178,13 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:39:50.751Z"
+   "updatedAt": "2026-11-24T15:39:50.751Z",
+   "projects": [
+    {
+     "name": "私立西城公学",
+     "period": ""
+    }
+   ]
   },
   {
    "id": "ctj2idi",
@@ -186,7 +211,13 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:39:41.443Z"
+   "updatedAt": "2026-11-24T15:39:41.443Z",
+   "projects": [
+    {
+     "name": "私立西城公学",
+     "period": ""
+    }
+   ]
   },
   {
    "id": "cgegb1w",
@@ -213,7 +244,46 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:42:13.005Z"
+   "updatedAt": "2026-11-24T15:42:13.005Z",
+   "projects": [
+    {
+     "name": "西奧多魔法學院",
+     "period": ""
+    }
+   ]
+  },
+  {
+   "id": "cr8su04",
+   "name": "潔弭",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "聖路恩學院",
+   "gender": "女",
+   "created": "2026-11",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "聖路恩學院",
+     "period": "2022/07"
+    }
+   ],
+   "updatedAt": "2026-11-24T15:56:25.824Z"
   }
  ],
  "relations": [],
