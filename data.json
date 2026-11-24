@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:44:51.543Z",
+  "updatedAt": "2026-11-24T16:46:45.212Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -535,6 +535,43 @@
     }
    ],
    "updatedAt": "2026-11-24T16:44:51.542Z"
+  },
+  {
+   "id": "c787w9q",
+   "name": "夏村理志",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "大正グロテスキズム",
+   "gender": "男",
+   "created": "2023-12",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "大正グロテスキズム",
+     "period": "2023-12"
+    },
+    {
+     "name": "異説・狂人日記",
+     "period": "2024-03"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:46:45.211Z"
   }
  ],
  "relations": [
