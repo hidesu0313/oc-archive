@@ -383,7 +383,7 @@ details.more > summary{padding:16px 28px}
 /* [樣式] 照片牆：正方形頭貼與小字條 */
 .grid.photos{display:flex;flex-wrap:wrap;gap:22px 24px;padding:8px 4px 20px}
 .pcard{position:relative;width:104px;height:104px;border:0;background:none;padding:0;cursor:pointer;font:inherit;color:inherit;text-align:left;transition:opacity .25s,filter .25s}
-.pcard .ph{position:relative;display:block;width:104px;height:104px;background:#fff;padding:5px;box-shadow:0 2px 6px rgba(90,60,20,.2);transform-origin:50% 60%;transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.pcard .ph{position:relative;z-index:1;display:block;width:104px;height:104px;background:#fff;padding:5px;box-shadow:0 2px 6px rgba(90,60,20,.2);transform-origin:50% 60%;transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
 .pcard .ph::after{content:"";position:absolute;left:5px;right:5px;bottom:0;height:3px;background:var(--cc);z-index:2}
 .pcard img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;background:var(--paper2)}
 .pcard:hover .ph{box-shadow:0 4px 12px rgba(90,60,20,.26)}
@@ -672,9 +672,9 @@ function sortChars(arr){
 function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? o.name : "未分類"; }
 function card(c){
   return '<button class="pcard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(c.project?'（'+esc(c.project)+'）':'')+'">'+
-    '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+
+    '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+'</span>'+
     '<span class="slip"><b>'+esc(c.name)+'</b>'+(c.project?'<small>'+esc(c.project)+'</small>':'')+
-    '<small class="sm2">'+esc(catName(c.cat))+(ym(c.created)?'・'+esc(ym(c.created)):'')+'</small></span></span></button>';
+    '<small class="sm2">'+esc(catName(c.cat))+(ym(c.created)?'・'+esc(ym(c.created)):'')+'</small></span></button>';
 }
 function listView(){
   var keys = ["全部"].concat(catIds()); if(state.chars.some(function(c){ return !catObj(c.cat); })) keys.push("__none");
