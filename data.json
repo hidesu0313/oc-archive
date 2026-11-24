@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:17:20.927Z",
+  "updatedAt": "2026-11-24T17:25:22.818Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -810,6 +810,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:57:51.521Z"
+  },
+  {
+   "id": "cs0drjq",
+   "name": "日比野桐樺",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "尋星學園",
+   "gender": "男",
+   "created": "2022-01",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "尋星學園",
+     "period": "2022-01"
+    }
+   ],
+   "updatedAt": "2026-11-24T17:25:22.818Z"
   }
  ],
  "relations": [
