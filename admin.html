@@ -508,6 +508,21 @@ details.more > summary{padding:16px 28px}
 .cpcount{margin-left:8px;color:var(--accent);font-weight:700}
 .cpick.multi .cpi{position:relative}
 .cpick.multi .cpi.on::after{content:"✓";position:absolute;top:4px;right:4px;width:18px;height:18px;line-height:18px;font-size:12px;text-align:center;background:var(--cc,#5b7bb0);color:#fff;border-radius:2px}
+/* [樣式] HO */
+.projrow.hasho{grid-template-columns:44px minmax(0,1.2fr) 6.5em minmax(0,1fr) auto}
+.hotag{display:inline-block;margin-left:8px;padding:0 6px;font-family:var(--latin);font-size:12px;letter-spacing:.04em;color:var(--accent);border:1px solid currentColor;border-radius:2px;vertical-align:2px;line-height:1.5}
+.slip .hotag{margin-left:4px;font-size:10.5px;padding:0 4px;vertical-align:1px}
+@media (max-width:520px){
+.projrow{grid-template-columns:44px minmax(0,1fr) auto}
+.projrow .th-sm{grid-column:1;grid-row:1}
+.projrow input[data-k=name]{grid-column:2/-1;grid-row:1}
+.projrow input[data-k=period]{grid-column:2;grid-row:2}
+.projrow > .btn{grid-column:3;grid-row:2}
+.projrow.hasho{grid-template-columns:44px 4.5em minmax(0,1fr) auto}
+.projrow.hasho input[data-k=ho]{grid-column:2;grid-row:2}
+.projrow.hasho input[data-k=period]{grid-column:3;grid-row:2}
+.projrow.hasho > .btn{grid-column:4;grid-row:2}
+.projimg{grid-column:1/-1}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -597,6 +612,9 @@ var ALLCHARS = null;
 function isPublic(c){ return !c.hidden; }
 function projs(c){ var l = (c.projects||[]).filter(function(p){ return p && p.name; }); if(!l.length && c.project) l = [{name:c.project, period:""}]; return l; }
 function projTitle(c){ var o = catObj(c.cat); return (o ? o.name : "企劃") + "紀錄"; }
+function hoText(p){ var v = String((p&&p.ho)||"").trim(); return /^\d+$/.test(v) ? "HO"+v : v; }
+function hasHO(cat){ var o = catObj(cat); return !!o && (/trpg/i.test(o.name) || /劇本/.test(o.sub||"")); }
+function projLabel(p){ var h = hoText(p); return p.name + (h ? "（"+h+"）" : ""); }
 function projNames(c){ return projs(c).map(function(p){ return p.name; }); }
 function fileNo(c){ var i = (ALLCHARS||state.chars).indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
@@ -811,7 +829,7 @@ function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "
 function card(c){
   return '<button class="pcard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(projNames(c).length?'（'+esc(projNames(c).join("、"))+'）':'')+'">'+
     '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+'</span>'+
-    '<span class="slip"><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+
+    '<span class="slip"><b>'+esc(c.name)+'</b>'+(projs(c).length?'<small>'+esc(projs(c).map(projLabel).join("、"))+'</small>':'')+
     (function(){ var parts = []; if(catObj(c.cat)) parts.push(catName(c.cat)); if(ym(c.created)) parts.push(ym(c.created)); return parts.length ? '<small class="sm2">'+esc(parts.join("・"))+'</small>' : ''; })()+'</span></button>';
 }
 function listView(){
@@ -839,7 +857,7 @@ function charView(c){
   var plabel = (catObj(c.cat)&&catObj(c.cat).sub)||L("f_project");
   var pl = projs(c), hasSubCat = catObj(c.cat) && catObj(c.cat).sub;
   var projBox = ((pl.length || !ro()) && hasSubCat) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>'+esc(projTitle(c))+editBtn(c,"projects")+'</h2>'+
-    (pl.length ? '<ol class="projlist">'+pl.map(function(p,i){ return '<li><span class="pp">'+esc(p.period||(i===0?ym(c.created):"")||"—")+'</span><span class="pn">'+esc(p.name)+'</span></li>'; }).join("")+'</ol>' : '<div class="muted">還沒有'+esc(plabel)+'。</div>')+'</section>' : '';
+    (pl.length ? '<ol class="projlist">'+pl.map(function(p,i){ return '<li><span class="pp">'+esc(p.period||(i===0?ym(c.created):"")||"—")+'</span><span class="pn">'+esc(p.name)+(hoText(p)?'<span class="hotag">'+esc(hoText(p))+'</span>':'')+'</span></li>'; }).join("")+'</ol>' : '<div class="muted">還沒有'+esc(plabel)+'。</div>')+'</section>' : '';
   var facts = [[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
     .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
     .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
@@ -1100,7 +1118,7 @@ function tlEntries(){
   state.chars.forEach(function(c){
     var pl = (catObj(c.cat) && catObj(c.cat).sub) ? projs(c) : [];
     if(!pl.length){ out.push({c:c, date:ym(c.created), proj:"", img:cover(c)}); return; }
-    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, cat:c.cat, main:!!p.tlMain, img:safeSrc(p.img) || cover(c)}); });
+    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, ho:hoText(p), cat:c.cat, main:!!p.tlMain, img:safeSrc(p.img) || cover(c)}); });
   });
   return out;
 }
@@ -1131,7 +1149,7 @@ function tlView(){
     var names = ps.map(function(x){ return x.proj; }).join("、");
     return '<button class="pcard tsm'+(ps.length>1?' multi':'')+'" style="--cc:'+(e.proj?catColor(e.cat):"#c9c2b4")+'" data-go="c-'+esc(e.c.id)+'" data-k="'+esc(k)+'" aria-label="'+esc(e.c.name+(names?"（"+names+"）":""))+'">'+
       '<span class="ph"><img src="'+e.img+'" alt="">'+(ps.length>1?'<span class="mcount">'+ps.length+'</span>':'')+'</span><span class="slip"><b>'+esc(e.c.name)+'</b>'+
-      ps.map(function(x){ return '<small><span class="pgcat" style="--pc:'+catColor(x.cat)+'">'+esc(catName(x.cat))+'</span> '+esc(x.proj)+'</small>'; }).join("")+
+      ps.map(function(x){ return '<small><span class="pgcat" style="--pc:'+catColor(x.cat)+'">'+esc(catName(x.cat))+'</span> '+esc(x.proj)+(x.ho?'<span class="hotag">'+esc(x.ho)+'</span>':'')+'</small>'; }).join("")+
       (e.date?'<small class="sm2">'+esc(e.date)+'</small>':'')+'</span></button>';
   }
 
@@ -1254,7 +1272,7 @@ function editChar(id, only){
     return '<div class="field'+(wide?" wide":"")+'"><label for="f-'+key+'">'+label+'</label>'+inner+'</div>';
   }
   function projField(){
-    var o = catObj(d.cat); if(!o || !o.sub) return '';
+    var o = catObj(d.cat); if(!o || !o.sub) return ''; var ho = hasHO(d.cat);
     var list = []; state.chars.forEach(function(c){ if(c.cat===d.cat) projNames(c).forEach(function(x){ if(list.indexOf(x)<0) list.push(x); }); });
     if(!d.projects.length) d.projects.push({name:"", period:""});
     if(!d.projects[0].period && ym(d.created)) d.projects[0].period = ym(d.created);
@@ -1264,7 +1282,8 @@ function editChar(id, only){
         var st = periodStart(x.period) || (i===0 ? ym(d.created) : ""), grp = (window.__pgroups||{})[st] || [];
         var multi = grp.length > 1 && grp.indexOf(i) >= 0, chosen = multi && (x.tlMain || (!grp.some(function(j){ return d.projects[j].tlMain; }) && grp[0]===i));
         var pick = multi ? '<label class="check tlmain"><input type="radio" name="tlmain-'+esc(st)+'" data-tlmain="'+i+'" '+(chosen?"checked":"")+'>'+esc(st)+' 同月份有多個，合併顯示時用這張頭像</label>' : '';
-        return '<div class="projrow"><img class="th-sm" src="'+(safeSrc(x.img)||cover(d))+'" alt="" title="時間軸頭像"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
+        return '<div class="projrow'+(ho?' hasho':'')+'"><img class="th-sm" src="'+(safeSrc(x.img)||cover(d))+'" alt="" title="時間軸頭像"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
+        (ho ? '<input class="hoin" aria-label="HO" data-list="projects" data-i="'+i+'" data-k="ho" placeholder="HO（選填）" value="'+esc(x.ho||"")+'">' : '')+
         '<input aria-label="時間" data-list="projects" data-i="'+i+'" data-k="period" placeholder="時間，例如 2021-07～2022-03" value="'+esc(x.period||"")+'">'+
         '<button class="btn sm ghost" type="button" data-rm="projects" data-i="'+i+'">移除</button>'+
         '<div class="projimg"><label class="hint" for="pimg'+i+'">時間軸頭像（選填，沒放就用角色頭貼）</label><input id="pimg'+i+'" type="file" accept="image/*" data-pimg="'+i+'">'+(safeSrc(x.img)?'<button class="btn sm ghost" type="button" data-pimgrm="'+i+'">改回角色頭貼</button>':'')+pick+'</div></div>'; }).join("")+
@@ -1357,7 +1376,7 @@ function editChar(id, only){
     else if(t.hasAttribute("data-save")){
       if(!String(d.name).trim()){ toast("請先填角色名字"); var n = m.querySelector("#f-name"); if(n) n.focus(); return; }
       delete d.example; d.updatedAt = new Date().toISOString();
-      d.projects = (d.projects||[]).map(function(x){ var o2 = {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; if(x.img) o2.img = x.img; if(x.tlMain) o2.tlMain = true; return o2; }).filter(function(x){ return x.name || x.period; });
+      d.projects = (d.projects||[]).map(function(x){ var o2 = {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; if(String(x.ho||"").trim()) o2.ho = String(x.ho).trim(); if(x.img) o2.img = x.img; if(x.tlMain) o2.tlMain = true; return o2; }).filter(function(x){ return x.name || x.period; });
       d.project = d.projects.length ? d.projects[0].name : "";
       if(orig){ var idx = state.chars.indexOf(orig); state.chars[idx] = d; } else state.chars.push(d);
       m.remove(); save(); go("c-"+d.id); toast("角色已儲存");
