@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:05:16.303Z",
+  "updatedAt": "2026-11-24T17:06:52.691Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -849,6 +849,18 @@
    "ext": {
     "name": "雷西特．夏爾尼",
     "owner": "喜久",
+    "img": ""
+   }
+  },
+  {
+   "id": "r0x1ldt",
+   "a": "cka5mxi",
+   "label": "家人？",
+   "mutual": false,
+   "note": "",
+   "ext": {
+    "name": "陸觀潮",
+    "owner": "晚煙",
     "img": ""
    }
   }
