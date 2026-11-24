@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:00:52.126Z",
+  "updatedAt": "2026-11-24T16:02:52.947Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -318,6 +318,15 @@
    "updatedAt": "2026-11-24T16:00:52.125Z"
   }
  ],
- "relations": [],
+ "relations": [
+  {
+   "id": "roqop29",
+   "a": "cslu79w",
+   "b": "ce9ix9f",
+   "label": "姊妹",
+   "mutual": true,
+   "note": ""
+  }
+ ],
  "timeline": []
 }
