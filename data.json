@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T15:57:19.993Z",
+  "updatedAt": "2026-11-24T16:00:21.609Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -288,6 +288,34 @@
     }
    ],
    "updatedAt": "2026-11-24T15:56:49.717Z"
+  },
+  {
+   "id": "cslu79w",
+   "name": "瀨田沁朝",
+   "alias": "",
+   "cat": "",
+   "stories": [],
+   "project": "",
+   "gender": "女",
+   "created": "2026-11",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [],
+   "updatedAt": "2026-11-24T16:00:21.609Z"
   }
  ],
  "relations": [],
