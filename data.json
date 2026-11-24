@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:54:39.816Z",
+  "updatedAt": "2026-11-24T16:55:27.949Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -678,7 +678,7 @@
    "alias": "",
    "cat": "TRPG",
    "stories": [],
-   "project": "",
+   "project": "怪傑俱樂部義勇奇譚",
    "gender": "男",
    "created": "2025-07",
    "age": "",
@@ -699,11 +699,11 @@
    "gallery": [],
    "projects": [
     {
-     "name": "",
+     "name": "怪傑俱樂部義勇奇譚",
      "period": "？"
     }
    ],
-   "updatedAt": "2026-11-24T16:54:39.816Z"
+   "updatedAt": "2026-11-24T16:55:27.948Z"
   }
  ],
  "relations": [
