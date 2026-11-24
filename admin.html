@@ -504,6 +504,10 @@ details.more > summary{padding:16px 28px}
 .eimg-r{flex:1;min-width:0}
 .eimg-r input{max-width:100%}
 .eimg-r .imghint{margin-top:5px}
+/* [樣式] 多選對象 */
+.cpcount{margin-left:8px;color:var(--accent);font-weight:700}
+.cpick.multi .cpi{position:relative}
+.cpick.multi .cpi.on::after{content:"✓";position:absolute;top:4px;right:4px;width:18px;height:18px;line-height:18px;font-size:12px;text-align:center;background:var(--cc,#5b7bb0);color:#fff;border-radius:2px}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1018,14 +1022,17 @@ function editRel(id, presetA){
   var aFixed = !!(orig || (presetA && byId(presetA)));
   var d = orig ? JSON.parse(JSON.stringify(orig)) : {id:uid("r"), a:(presetA && byId(presetA)) ? presetA : "", b:"", label:"", mutual:true, note:""};
   var extOn = !!d.ext; d.ext = d.ext || {name:"", owner:"", img:""};
+  var multi = !orig; d.bs = [];
   var m;
   function picker(field, sel, skip){
     var list = sortChars(state.chars.filter(function(c){ return c.id!==skip; }));
-    var si = list.findIndex(function(c){ return c.id===sel; }); if(si>0) list.unshift(list.splice(si,1)[0]);
-    return '<div class="cpick"><input class="inp cpsearch" type="search" data-cps placeholder="搜尋名字或企劃" aria-label="搜尋角色"><div class="cpgrid">'+
-      list.map(function(c){ return '<button type="button" class="cpi'+(c.id===sel?" on":"")+'" data-cpick="'+field+'" data-id="'+esc(c.id)+'" data-q="'+esc((c.name+" "+(c.alias||"")+" "+projNames(c).join(" ")).toLowerCase())+'" style="--cc:'+color(c.color)+'" aria-pressed="'+(c.id===sel)+'"><img src="'+cover(c)+'" alt=""><span>'+esc(c.name)+'</span>'+(projNames(c).length?'<small>'+esc(projNames(c)[0])+'</small>':'')+'</button>'; }).join("")+
+    var isSel = function(id){ return Array.isArray(sel) ? sel.indexOf(id)>=0 : id===sel; };
+    if(!Array.isArray(sel)){ var si = list.findIndex(function(c){ return c.id===sel; }); if(si>0) list.unshift(list.splice(si,1)[0]); }
+    return '<div class="cpick'+(Array.isArray(sel)?' multi':'')+'"><input class="inp cpsearch" type="search" data-cps placeholder="搜尋名字或企劃" aria-label="搜尋角色"><div class="cpgrid">'+
+      list.map(function(c){ return '<button type="button" class="cpi'+(isSel(c.id)?" on":"")+'" data-cpick="'+field+'" data-id="'+esc(c.id)+'" data-q="'+esc((c.name+" "+(c.alias||"")+" "+projNames(c).join(" ")).toLowerCase())+'" style="--cc:'+color(c.color)+'" aria-pressed="'+isSel(c.id)+'"><img src="'+cover(c)+'" alt=""><span>'+esc(c.name)+'</span>'+(projNames(c).length?'<small>'+esc(projNames(c)[0])+'</small>':'')+'</button>'; }).join("")+
       '</div><p class="hint cpnone" hidden>找不到符合的角色。</p></div>';
   }
+  function cnt(){ return d.bs.length ? '已選 '+d.bs.length+' 位' : ''; }
   function me(){ var c = byId(d.a); return c ? '<div class="fixedme" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""><div><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+'</div></div>' : ''; }
   function opts(sel, skip){ return state.chars.filter(function(c){ return c.id!==skip; }).map(function(c){ return '<option value="'+esc(c.id)+'"'+(c.id===sel?" selected":"")+'>'+esc(c.name)+'</option>'; }).join(""); }
   function paint(){
@@ -1035,7 +1042,7 @@ function editRel(id, presetA){
       (extOn ? '<div class="fgrid"><div class="field"><label for="r-en">對方角色名字</label><input id="r-en" data-e="name" value="'+esc(d.ext.name)+'"></div>'+
         '<div class="field"><label for="r-eo">這是誰的角色</label><input id="r-eo" data-e="owner" placeholder="例如：朋友的暱稱或帳號" value="'+esc(d.ext.owner)+'"></div>'+
         '<div class="field wide"><label for="r-ei">對方角色圖片（選填）</label><div class="eimg"><img class="th-sm" src="'+(safeSrc(d.ext.img)||placeholder({name:d.ext.name,color:"#8a7d68"}))+'" alt=""><div class="eimg-r"><input id="r-ei" type="file" accept="image/*" data-eimg>'+IMG_HINT+'</div></div></div></div>'
-      : '<div class="field"><label>對方角色</label>'+picker("b", d.b, d.a)+'</div>')+
+      : (multi ? '<div class="field"><label>對方角色（可多選）<span class="cpcount">'+cnt()+'</span></label>'+picker("b", d.bs, d.a)+'</div>' : '<div class="field"><label>對方角色</label>'+picker("b", d.b, d.a)+'</div>'))+
       '<div class="fgrid" style="margin-top:12px"><div class="field"><label for="r-l">關係（簡短）</label><input id="r-l" data-r="label" placeholder="例如：搭檔、宿敵、暗戀" value="'+esc(d.label)+'"></div>'+
       '<div class="field"><label>方向</label><label class="check" style="padding-top:6px"><input type="checkbox" id="r-m" data-rm '+(d.mutual?"checked":"")+'>雙向關係</label></div>'+
       '<div class="field wide"><label for="r-n">關係備註（兩人是怎樣的關係，選填）</label><textarea id="r-n" data-r="note" style="min-height:90px">'+esc(d.note||"")+'</textarea></div></div>'+
@@ -1056,6 +1063,11 @@ function editRel(id, presetA){
   });
   m.addEventListener("click", function(e){
     var t = e.target.closest("button"); if(!t) return;
+    if(t.dataset.cpick==="b" && multi){ var id = t.dataset.id, i = d.bs.indexOf(id);
+      if(i>=0) d.bs.splice(i,1); else d.bs.push(id);
+      t.classList.toggle("on", i<0); t.setAttribute("aria-pressed", String(i<0));
+      var cc = m.querySelector(".cpcount"); if(cc) cc.textContent = cnt(); return; }
+    if(t.dataset.cpick==="a" && multi){ d.a = t.dataset.id; d.bs = d.bs.filter(function(x){ return x!==d.a; }); paint(); return; }
     if(t.dataset.cpick){ d[t.dataset.cpick] = t.dataset.id; if(t.dataset.cpick==="a" && d.b===d.a) d.b = ""; paint(); return; }
     if(t.dataset.ext!==undefined){ extOn = t.dataset.ext==="1"; paint(); }
     else if(t.hasAttribute("data-x")) m.remove();
@@ -1063,10 +1075,14 @@ function editRel(id, presetA){
     else if(t.hasAttribute("data-s")){
       if(!byId(d.a)){ toast("請先選擇你的角色"); return; }
       if(extOn){ if(!d.ext.name.trim()){ toast("請填對方角色的名字"); return; } delete d.b; d.ext.name = d.ext.name.trim(); d.ext.owner = d.ext.owner.trim(); }
+      else if(multi){ d.bs = d.bs.filter(function(x){ return x!==d.a && byId(x); }); if(!d.bs.length){ toast("請選擇對方角色（可以選很多位）"); return; } delete d.ext; }
       else { if(!d.b || d.b===d.a){ toast("請選擇對方角色"); return; } delete d.ext; }
       if(!String(d.label).trim()){ toast("請填寫關係，例如「搭檔」"); return; }
       d.label = d.label.trim();
-      if(orig) state.relations[state.relations.indexOf(orig)] = d; else state.relations.push(d);
+      var bs = d.bs; delete d.bs;
+      if(orig) state.relations[state.relations.indexOf(orig)] = d;
+      else if(!extOn){ bs.forEach(function(b, i){ var r = JSON.parse(JSON.stringify(d)); r.b = b; if(i>0) r.id = uid("r"); state.relations.push(r); }); }
+      else state.relations.push(d);
       m.remove(); save(); render(); toast("關係已儲存");
     }
   });
