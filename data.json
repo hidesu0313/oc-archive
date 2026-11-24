@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:56:24.592Z",
+  "updatedAt": "2026-11-24T16:57:07.047Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -710,6 +710,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:55:27.948Z"
+  },
+  {
+   "id": "crzll9w",
+   "name": "松鼠",
+   "alias": "",
+   "cat": "kaf7vko",
+   "stories": [],
+   "project": "",
+   "gender": "男",
+   "created": "2025-08",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "",
+     "period": "2026-11"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:57:07.047Z"
   }
  ],
  "relations": [
