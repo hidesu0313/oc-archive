@@ -386,13 +386,14 @@ details.more > summary{padding:16px 28px}
 .pcard .ph::after{content:"";position:absolute;left:5px;right:5px;bottom:0;height:3px;background:var(--cc);z-index:2}
 .pcard img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;background:var(--paper2)}
 .pcard:hover .ph{box-shadow:0 4px 12px rgba(90,60,20,.26)}
-.slip{position:absolute;z-index:0;top:50%;left:calc(100% - 3px);width:170px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--cc);box-shadow:0 3px 10px rgba(90,60,20,.16);padding:6px 10px 6px 11px;display:flex;flex-direction:column;gap:1px;line-height:1.35;clip-path:inset(0 100% 0 0);transition:clip-path .3s ease .08s;pointer-events:none}
+.slip{position:absolute;z-index:0;top:50%;left:calc(100% - 3px);width:170px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line);box-shadow:0 3px 10px rgba(90,60,20,.16);padding:6px 10px 6px 12px;display:flex;flex-direction:column;gap:1px;line-height:1.35;clip-path:inset(0 100% 0 0);transition:clip-path .3s ease .08s;pointer-events:none}
 .slip b{font-family:var(--display);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .slip small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pcard.active{z-index:6}
 .pcard.active .ph{transform:rotate(-7deg)}
 .pcard.active .slip{clip-path:inset(0 0 0 0)}
-.pcard.flip .slip{left:auto;right:calc(100% - 3px);border-left:1px solid var(--line);border-right:3px solid var(--cc);clip-path:inset(0 0 0 100%)}
+.pcard.flip .slip{left:auto;right:calc(100% - 3px);padding:6px 12px 6px 10px;clip-path:inset(0 0 0 100%)}
+.pcard.flip.active .ph{transform:rotate(7deg)}
 .pcard.flip.active .slip{clip-path:inset(0 0 0 0)}
 .pc-focus .pcard:not(.active){opacity:.3;filter:grayscale(.6)}
 .hidden-note{position:absolute;z-index:3;left:5px;right:5px;bottom:8px;top:auto;transform:none;padding:1px 0;text-align:center;font-size:11px;color:var(--accent);background:rgba(255,253,246,.92)}
