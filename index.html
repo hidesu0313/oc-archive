@@ -522,6 +522,10 @@ details.more > summary{padding:16px 28px}
 .projrow.hasho input[data-k=period]{grid-column:3;grid-row:2}
 .projrow.hasho > .btn{grid-column:4;grid-row:2}
 .projimg{grid-column:1/-1}}
+/* [樣式] 雙條單向 */
+.rarrow.two .rline + .sr + .rline{margin-top:5px}
+.relpick{display:flex;flex-direction:column;gap:8px;margin:8px 0 4px}
+.relpick .btn{justify-content:flex-start;text-align:left}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -874,7 +878,7 @@ function charView(c){
   var art = (c.mainImages||[]).filter(function(x){ return safeSrc(x.src); }), gal = (c.gallery||[]).filter(function(x){ return safeSrc(x.src); });
   var imgs = (art.length?'<div class="sec"><h3>'+esc(L("tab_art"))+'</h3>'+galleryHTML(c, c.mainImages, "mainImages", false)+'</div>':'')+(gal.length?'<div class="sec"><h3>'+esc(L("tab_gallery"))+'</h3>'+galleryHTML(c, c.gallery, "gallery", false)+'</div>':'');
   var imgBox = (imgs || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>圖片'+editBtn(c,"art,gallery")+'</h2>'+(imgs||'<div class="muted">還沒有圖片。</div>')+'</section>' : '';
-  var rels = relsOf(c.id).map(function(r){ return relRow(r, c.id); }).join("");
+  var rels = pairUp(relsOf(c.id), function(){ return c.id; }).map(function(r){ return relRow(r, c.id); }).join("");
   var relBox = (rels || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>'+esc(L("sec_rel"))+'<span style="margin-left:auto;display:flex;gap:6px">'+(rels?'<button class="edit" data-relgo="'+esc(c.id)+'">在關係表查看</button>':'')+'<button class="edit needs-write" data-act="newrel" data-id="'+esc(c.id)+'">新增</button></span></h2>'+(rels?'<div class="rel-list">'+rels+'</div>':'<div class="muted">還沒有關係。</div>')+'</section>' : '';
   var st = sortStories(visibleStories(c)), outfits = (c.outfits||[]).filter(function(x){ return safeSrc(x.src) || x.name; });
   var moreParts = [];
@@ -923,7 +927,35 @@ function relArrow(label, dir){
   var aria = dir==="both" ? "互相" : (dir==="right" ? "指向對方" : "對方指向這邊");
   return '<span class="rarrow" title="'+aria+'"><span class="ral">'+esc(label||"—")+'</span><span class="rline">'+(dir!=="right"?hL:'')+'<i></i>'+(dir!=="left"?hR:'')+'</span><span class="sr">（'+aria+'）</span></span>';
 }
+function relArrow2(outL, inL){
+  var hR = '<svg class="ah" viewBox="0 0 8 8" aria-hidden="true"><path d="M0 0.8 L7.5 4 L0 7.2 z"/></svg>';
+  var hL = '<svg class="ah" viewBox="0 0 8 8" aria-hidden="true"><path d="M8 0.8 L0.5 4 L8 7.2 z"/></svg>';
+  return '<span class="rarrow two"><span class="ral">'+esc(outL||"—")+'</span><span class="rline"><i></i>'+hR+'</span><span class="sr">（指向對方）</span>'+
+    '<span class="rline">'+hL+'<i></i></span><span class="ral">'+esc(inL||"—")+'</span><span class="sr">（對方指向這邊）</span></span>';
+}
+function pairUp(list, cidOf){
+  var used = {}, out = [];
+  list.forEach(function(r){
+    if(used[r.id]) return; used[r.id] = 1;
+    if(!r.mutual && !r.ext){
+      var me = cidOf ? cidOf(r) : r.a;
+      var back = list.filter(function(x){ return !used[x.id] && !x.mutual && !x.ext && x.a===r.b && x.b===r.a; })[0];
+      if(back){ used[back.id] = 1; var fwd = r.a===me ? r : back, rev = r.a===me ? back : r; out.push({pair:[fwd, rev]}); return; }
+    }
+    out.push(r);
+  });
+  return out;
+}
+function relRowPair(p, cid){
+  var f = p.pair[0], b = p.pair[1], o = relOther(f, cid); if(!o) return "";
+  var notes = [f.note, b.note].filter(Boolean);
+  return '<div class="rel-card2 pair">'+relArrow2(f.label, b.label)+'<img src="'+o.img+'" alt="">'+
+    '<div class="rel-main"><div class="rel-line"><a href="#c-'+esc(o.id)+'"><b>'+esc(o.name)+'</b></a></div>'+
+    notes.map(function(n){ return '<div class="rel-note">'+esc(n)+'</div>'; }).join("")+'</div>'+
+    '<button class="btn sm ghost needs-write" data-redit="'+esc(f.id+","+b.id)+'">編輯</button></div>';
+}
 function relRow(r, cid){
+  if(r.pair) return relRowPair(r, cid);
   var o = relOther(r, cid); if(!o) return "";
   var name = o.ext ? '<b>'+esc(o.name)+'</b>' : '<a href="#c-'+esc(o.id)+'"><b>'+esc(o.name)+'</b></a>';
   var dir = r.mutual ? "both" : (r.a===cid ? "right" : "left");
@@ -952,7 +984,13 @@ function relView(){
   var selChar = '<span class="arrow-sep">›</span><select id="relego" class="inp selx" aria-label="角色"><option value="">全部角色</option>'+pool.map(function(c){ return '<option value="'+esc(c.id)+'"'+(ego===c.id?" selected":"")+'>'+esc(c.name)+'</option>'; }).join("")+'</select>';
   var pick = selCat + selProj + selChar;
   var list = ego ? relsOf(ego) : state.relations;
-  var rows = list.map(function(r){
+  var rows = pairUp(list, ego ? function(){ return ego; } : null).map(function(r){
+    if(r.pair){ var f = r.pair[0], bk = r.pair[1], fa = byId(f.a), fo = byId(f.b); if(!fa || !fo) return "";
+      var ns = [f.note, bk.note].filter(Boolean);
+      return '<tr><td><a href="#c-'+esc(fa.id)+'">'+esc(fa.name)+'</a></td><td class="rcell">'+relArrow2(f.label, bk.label)+'</td>'+
+        '<td><a href="#c-'+esc(fo.id)+'">'+esc(fo.name)+'</a></td>'+
+        '<td>'+ns.map(function(n){ return '<div class="rel-note" style="margin:0">'+esc(n)+'</div>'; }).join("")+'</td>'+
+        '<td class="needs-write" style="white-space:nowrap"><button class="btn sm ghost" data-redit="'+esc(f.id+","+bk.id)+'">編輯</button><button class="btn sm ghost" data-rdel="'+esc(f.id+","+bk.id)+'">刪除</button></td></tr>'; }
     var a = byId(r.a); if(!a) return "";
     var o = relOther(r, r.a); if(!o) return "";
     return '<tr><td><a href="#c-'+esc(a.id)+'">'+esc(a.name)+'</a></td><td class="rcell">'+relArrow(r.label, r.mutual?"both":"right")+'</td>'+
@@ -1230,6 +1268,20 @@ function editNotes(){
 function chip(c){ return '<span class="chip" data-go="c-'+esc(c.id)+'"><img src="'+cover(c)+'" alt="">'+esc(c.name)+'</span>'; }
 
 /* ---------- 對話框 ---------- */
+function pickRel(ids, mode){
+  var rs = ids.map(function(id){ return state.relations.filter(function(r){ return r.id===id; })[0]; }).filter(Boolean);
+  function nm(id){ var c = byId(id); return c ? c.name : "?"; }
+  var m = modal('<h2>'+(mode==="del"?"要刪除哪一條？":"要編輯哪一條？")+'</h2><div class="relpick">'+
+    rs.map(function(r){ return '<button class="btn" type="button" data-pk="'+esc(r.id)+'">'+esc(nm(r.a))+' → '+esc(nm(r.b))+'：<b>'+esc(r.label)+'</b></button>'; }).join("")+
+    (mode==="del"?'<button class="btn danger" type="button" data-pk="__all">兩條都刪除</button>':'')+
+    '</div><div class="mfoot"><button class="btn" type="button" data-x>取消</button></div>', "small");
+  m.addEventListener("click", function(e){ var t = e.target.closest("button"); if(!t) return;
+    if(t.hasAttribute("data-x")){ m.remove(); return; }
+    var k = t.dataset.pk; if(!k) return; m.remove();
+    if(mode==="edit"){ editRel(k); return; }
+    var del = k==="__all" ? ids : [k];
+    state.relations = state.relations.filter(function(r){ return del.indexOf(r.id)<0; }); save(); render(); });
+}
 function modal(html, cls){
   var bg = document.createElement("div"); bg.className = "modal-bg";
   bg.innerHTML = '<div class="modal '+(cls||"")+'" role="dialog" aria-modal="true">'+html+'</div>';
@@ -1564,9 +1616,11 @@ root.addEventListener("click", function(e){
   else if(ds.tlyear){ ui.tlOpen = ui.tlOpen || {}; var yb = b.getAttribute("aria-expanded"); var curOpen = root.querySelector('.yh[data-tlyear="'+ds.tlyear+'"]').getAttribute("aria-expanded")==="true"; ui.tlOpen[ds.tlyear] = !curOpen; keepUI(); render(); }
   else if(ds.tlcat){ ui.tlCat = ds.tlcat; keepUI(); render(); }
   else if(ds.fold){ ui[ds.fold] = ui[ds.fold]===false; keepUI(); render(); }
+  else if(ds.redit && ds.redit.indexOf(",")>0){ pickRel(ds.redit.split(","), "edit"); }
   else if(ds.redit){ editRel(ds.redit); }
   else if(ds.zoom==="notes"){ lightbox({name:"", notes:[{src:state.settings.notesImg, note:state.settings.notesCaption}]}, "notes", 0); }
   else if(ds.zoom){ var c = byId(route().id); if(c) lightbox(c, ds.zoom, +ds.i); }
+  else if(ds.rdel && ds.rdel.indexOf(",")>0){ pickRel(ds.rdel.split(","), "del"); }
   else if(ds.rdel){ state.relations = state.relations.filter(function(r){return r.id!==ds.rdel;}); save(); render(); }
   else if(ds.ev!==undefined){ editEvent(ds.ev, (ds.pre||"").split(",").filter(Boolean)); }
   else if(ds.tlmode){
