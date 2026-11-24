@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:23:03.760Z",
+  "updatedAt": "2026-11-24T16:29:28.102Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -419,6 +419,43 @@
     }
    ],
    "updatedAt": "2026-11-24T16:22:31.181Z"
+  },
+  {
+   "id": "c7w88fz",
+   "name": "姜澪",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "毒入りスープ",
+   "gender": "男",
+   "created": "2023-10",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "毒入りスープ",
+     "period": "2023-10"
+    },
+    {
+     "name": "常闇の箱",
+     "period": "2023-12"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:29:28.101Z"
   }
  ],
  "relations": [
