@@ -701,7 +701,7 @@ function card(c){
   return '<button class="pcard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(projNames(c).length?'（'+esc(projNames(c).join("、"))+'）':'')+'">'+
     '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+'</span>'+
     '<span class="slip"><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+
-    '<small class="sm2">'+esc(catName(c.cat))+(ym(c.created)?'・'+esc(ym(c.created)):'')+'</small></span></button>';
+    (function(){ var parts = []; if(catObj(c.cat)) parts.push(catName(c.cat)); if(ym(c.created)) parts.push(ym(c.created)); return parts.length ? '<small class="sm2">'+esc(parts.join("・"))+'</small>' : ''; })()+'</span></button>';
 }
 function listView(){
   var keys = ["全部"].concat(catIds()); if(state.chars.some(function(c){ return !catObj(c.cat); })) keys.push("__none");
