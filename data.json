@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T15:37:37.059Z",
+  "updatedAt": "2026-11-24T15:38:32.550Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -106,6 +106,33 @@
    "outfits": [],
    "gallery": [],
    "updatedAt": "2026-11-24T15:37:37.059Z"
+  },
+  {
+   "id": "cfxcj67",
+   "name": "小森薄荷",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "",
+   "gender": "女",
+   "created": "2021-06",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "updatedAt": "2026-11-24T15:38:32.549Z"
   }
  ],
  "relations": [],
