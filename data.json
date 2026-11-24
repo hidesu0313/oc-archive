@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:39:18.937Z",
+  "updatedAt": "2026-11-24T16:43:02.728Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -14,13 +14,13 @@
     "id": "企劃",
     "name": "企劃",
     "sub": "企劃名稱",
-    "color": "#2e4d86"
+    "color": "#a85f52"
    },
    {
     "id": "TRPG",
     "name": "TRPG",
     "sub": "劇本名稱",
-    "color": "#2b6a52"
+    "color": "#61805a"
    }
   ],
   "notesImg": ""
@@ -461,6 +461,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:29:28.101Z"
+  },
+  {
+   "id": "cka5mxi",
+   "name": "朝青禾",
+   "alias": "",
+   "cat": "企劃",
+   "stories": [],
+   "project": "聆劍",
+   "gender": "女",
+   "created": "2026-10",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "聆劍",
+     "period": "2027-01"
+    }
+   ],
+   "updatedAt": "2026-11-24T16:43:02.727Z"
   }
  ],
  "relations": [
