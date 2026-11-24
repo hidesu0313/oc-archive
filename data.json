@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:46:45.212Z",
+  "updatedAt": "2026-11-24T16:50:26.354Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -572,6 +572,39 @@
     }
    ],
    "updatedAt": "2026-11-24T16:46:45.211Z"
+  },
+  {
+   "id": "cft61tj",
+   "name": "瀧村光春",
+   "alias": "",
+   "cat": "TRPG",
+   "stories": [],
+   "project": "八俁遠呂智樣の嫁",
+   "gender": "男",
+   "created": "2023-12",
+   "age": "",
+   "birthday": "",
+   "height": "",
+   "species": "",
+   "role": "",
+   "tags": [],
+   "palette": [],
+   "color": "#5b7fb5",
+   "personality": "",
+   "appearance": "",
+   "background": "",
+   "fields": [],
+   "mainImages": [],
+   "outfitsEnabled": false,
+   "outfits": [],
+   "gallery": [],
+   "projects": [
+    {
+     "name": "八俁遠呂智樣の嫁",
+     "period": ""
+    }
+   ],
+   "updatedAt": "2026-11-24T16:50:26.354Z"
   }
  ],
  "relations": [
