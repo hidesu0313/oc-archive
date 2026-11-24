@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T15:56:25.825Z",
+  "updatedAt": "2026-11-24T15:56:49.717Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -260,7 +260,7 @@
    "stories": [],
    "project": "聖路恩學院",
    "gender": "女",
-   "created": "2026-11",
+   "created": "2022-07",
    "age": "",
    "birthday": "",
    "height": "",
@@ -280,10 +280,10 @@
    "projects": [
     {
      "name": "聖路恩學院",
-     "period": "2022/07"
+     "period": ""
     }
    ],
-   "updatedAt": "2026-11-24T15:56:25.824Z"
+   "updatedAt": "2026-11-24T15:56:49.717Z"
   }
  ],
  "relations": [],
