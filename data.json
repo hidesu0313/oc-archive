@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:13:20.653Z",
+  "updatedAt": "2026-11-24T17:14:47.026Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -570,14 +570,15 @@
    "projects": [
     {
      "name": "大正グロテスキズム",
-     "period": "2023-12"
+     "period": "2023-12",
+     "ho": "2"
     },
     {
      "name": "異説・狂人日記",
      "period": "2024-03"
     }
    ],
-   "updatedAt": "2026-11-24T16:46:45.211Z"
+   "updatedAt": "2026-11-24T17:14:47.025Z"
   },
   {
    "id": "cft61tj",
