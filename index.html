@@ -463,6 +463,21 @@ details.more > summary{padding:16px 28px}
 .ph .mcount{position:absolute;z-index:3;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--black);color:#fffaf0;font-size:11px;line-height:18px;text-align:center}
 .pcard.tsm .slip small + small{margin-top:1px}
 .tlmain{font-size:12px;color:var(--accent);margin-left:auto}
+/* [樣式] 關係視窗角色選擇 */
+.fixedme{display:flex;align-items:center;gap:12px;padding:8px 10px;background:var(--paper2);border:1px solid var(--line);border-left:3px solid var(--cc)}
+.fixedme img{width:48px;height:48px;object-fit:cover;border:2px solid #fff}
+.fixedme b{display:block;font-family:var(--display);font-size:16px}
+.fixedme small{font-size:12px;color:var(--muted)}
+.cpick{display:flex;flex-direction:column;gap:8px}
+.cpsearch{width:100%}
+.cpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;max-height:230px;overflow-y:auto;padding:2px}
+.cpi{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font:inherit;color:inherit;border-radius:2px}
+.cpi img{width:48px;height:48px;object-fit:cover}
+.cpi span{font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpi small{font-size:10.5px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpi:hover{border-color:var(--gold)}
+.cpi.on{border-color:var(--cc);box-shadow:inset 0 0 0 2px var(--cc);background:var(--paper2)}
+.cpi[hidden]{display:none}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -968,18 +983,27 @@ function bindGraph(){
 function editRel(id, presetA){
   var orig = null; state.relations.forEach(function(r){ if(r.id===id) orig = r; });
   if(!state.chars.length){ toast("請先新增角色"); return; }
-  var d = orig ? JSON.parse(JSON.stringify(orig)) : {id:uid("r"), a:presetA||state.chars[0].id, b:"", label:"", mutual:true, note:""};
+  var aFixed = !!(orig || (presetA && byId(presetA)));
+  var d = orig ? JSON.parse(JSON.stringify(orig)) : {id:uid("r"), a:(presetA && byId(presetA)) ? presetA : "", b:"", label:"", mutual:true, note:""};
   var extOn = !!d.ext; d.ext = d.ext || {name:"", owner:"", img:""};
   var m;
+  function picker(field, sel, skip){
+    var list = sortChars(state.chars.filter(function(c){ return c.id!==skip; }));
+    var si = list.findIndex(function(c){ return c.id===sel; }); if(si>0) list.unshift(list.splice(si,1)[0]);
+    return '<div class="cpick"><input class="inp cpsearch" type="search" data-cps placeholder="搜尋名字或企劃" aria-label="搜尋角色"><div class="cpgrid">'+
+      list.map(function(c){ return '<button type="button" class="cpi'+(c.id===sel?" on":"")+'" data-cpick="'+field+'" data-id="'+esc(c.id)+'" data-q="'+esc((c.name+" "+(c.alias||"")+" "+projNames(c).join(" ")).toLowerCase())+'" style="--cc:'+color(c.color)+'" aria-pressed="'+(c.id===sel)+'"><img src="'+cover(c)+'" alt=""><span>'+esc(c.name)+'</span>'+(projNames(c).length?'<small>'+esc(projNames(c)[0])+'</small>':'')+'</button>'; }).join("")+
+      '</div><p class="hint cpnone" hidden>找不到符合的角色。</p></div>';
+  }
+  function me(){ var c = byId(d.a); return c ? '<div class="fixedme" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""><div><b>'+esc(c.name)+'</b>'+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+'</div></div>' : ''; }
   function opts(sel, skip){ return state.chars.filter(function(c){ return c.id!==skip; }).map(function(c){ return '<option value="'+esc(c.id)+'"'+(c.id===sel?" selected":"")+'>'+esc(c.name)+'</option>'; }).join(""); }
   function paint(){
     var html = '<h2>'+(orig?"編輯關係":"新增關係")+'</h2>'+
-      '<div class="fgrid"><div class="field"><label for="r-a">我的角色</label><select id="r-a" data-r="a">'+opts(d.a)+'</select></div></div>'+
+      '<div class="field"><label>我的角色</label>'+(aFixed ? me() : picker("a", d.a, null))+'</div>'+
       '<div class="toggle-row"><span>對象是</span><span class="seg2"><button type="button" class="'+(!extOn?"on":"")+'" data-ext="0">網站裡的角色</button><button type="button" class="'+(extOn?"on":"")+'" data-ext="1">別人的原創角色</button></span></div>'+
       (extOn ? '<div class="fgrid"><div class="field"><label for="r-en">對方角色名字</label><input id="r-en" data-e="name" value="'+esc(d.ext.name)+'"></div>'+
         '<div class="field"><label for="r-eo">這是誰的角色</label><input id="r-eo" data-e="owner" placeholder="例如：朋友的暱稱或帳號" value="'+esc(d.ext.owner)+'"></div>'+
         '<div class="field"><label for="r-ei">對方角色圖片（選填）</label><div style="display:flex;gap:8px;align-items:center"><img class="th-sm" src="'+(safeSrc(d.ext.img)||placeholder({name:d.ext.name,color:"#8a7d68"}))+'" alt=""><input id="r-ei" type="file" accept="image/*" data-eimg>'+IMG_HINT+'</div></div></div>'
-      : '<div class="fgrid"><div class="field"><label for="r-b">對方角色</label><select id="r-b" data-r="b"><option value="">請選擇</option>'+opts(d.b, d.a)+'</select></div></div>')+
+      : '<div class="field"><label>對方角色</label>'+picker("b", d.b, d.a)+'</div>')+
       '<div class="fgrid" style="margin-top:12px"><div class="field"><label for="r-l">關係（簡短）</label><input id="r-l" data-r="label" placeholder="例如：搭檔、宿敵、暗戀" value="'+esc(d.label)+'"></div>'+
       '<div class="field"><label>方向</label><label class="check" style="padding-top:6px"><input type="checkbox" id="r-m" data-rm '+(d.mutual?"checked":"")+'>雙向關係</label></div>'+
       '<div class="field wide"><label for="r-n">關係備註（兩人是怎樣的關係，選填）</label><textarea id="r-n" data-r="note" style="min-height:90px">'+esc(d.note||"")+'</textarea></div></div>'+
@@ -987,7 +1011,11 @@ function editRel(id, presetA){
     if(!m) m = modal(html, "small"); else m.querySelector(".modal").innerHTML = html;
   }
   paint();
-  m.addEventListener("input", function(e){ var t = e.target; if(t.dataset.r) d[t.dataset.r] = t.value; else if(t.dataset.e) d.ext[t.dataset.e] = t.value; });
+  m.addEventListener("input", function(e){ var t = e.target;
+    if(t.hasAttribute("data-cps")){ var q = t.value.trim().toLowerCase(), box = t.closest(".cpick"), shown = 0;
+      box.querySelectorAll(".cpi").forEach(function(b2){ var ok = !q || b2.dataset.q.indexOf(q)>=0; b2.hidden = !ok; if(ok) shown++; });
+      box.querySelector(".cpnone").hidden = shown>0; return; }
+    if(t.dataset.r) d[t.dataset.r] = t.value; else if(t.dataset.e) d.ext[t.dataset.e] = t.value; });
   m.addEventListener("change", function(e){
     var t = e.target;
     if(t.dataset.r==="a"){ d.a = t.value; if(d.b===d.a) d.b = ""; paint(); }
@@ -996,10 +1024,12 @@ function editRel(id, presetA){
   });
   m.addEventListener("click", function(e){
     var t = e.target.closest("button"); if(!t) return;
+    if(t.dataset.cpick){ d[t.dataset.cpick] = t.dataset.id; if(t.dataset.cpick==="a" && d.b===d.a) d.b = ""; paint(); return; }
     if(t.dataset.ext!==undefined){ extOn = t.dataset.ext==="1"; paint(); }
     else if(t.hasAttribute("data-x")) m.remove();
     else if(t.hasAttribute("data-del")){ m.remove(); state.relations = state.relations.filter(function(r){ return r.id!==d.id; }); save(); render(); }
     else if(t.hasAttribute("data-s")){
+      if(!byId(d.a)){ toast("請先選擇你的角色"); return; }
       if(extOn){ if(!d.ext.name.trim()){ toast("請填對方角色的名字"); return; } delete d.b; d.ext.name = d.ext.name.trim(); d.ext.owner = d.ext.owner.trim(); }
       else { if(!d.b || d.b===d.a){ toast("請選擇對方角色"); return; } delete d.ext; }
       if(!String(d.label).trim()){ toast("請填寫關係，例如「搭檔」"); return; }
