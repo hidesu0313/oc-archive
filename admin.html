@@ -479,6 +479,20 @@ details.more > summary{padding:16px 28px}
 .cpi:hover{border-color:var(--gold)}
 .cpi.on{border-color:var(--cc);box-shadow:inset 0 0 0 2px var(--cc);background:var(--paper2)}
 .cpi[hidden]{display:none}
+/* [樣式] 箭頭上的關係 */
+.rarrow{display:inline-flex;flex-direction:column;align-items:center;gap:1px;min-width:92px}
+.ral{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent);line-height:1.3;padding:0 6px;white-space:nowrap}
+.rline{display:block;width:100%;height:9px}
+.rline svg{display:block;width:100%;height:9px;overflow:visible}
+.rline line{stroke:var(--muted);stroke-width:1.4;vector-effect:non-scaling-stroke}
+.rline path{fill:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rel-card2{display:grid;grid-template-columns:auto 44px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--paper2);border:1px solid var(--line);border-radius:2px;padding:10px 12px}
+.rel-card2.ext{border-style:dashed;background:transparent}
+.rel-card2 img{width:44px;height:44px;object-fit:cover;border:2px solid var(--surface)}
+.rcell{width:170px;min-width:110px}
+.rcell .rarrow{width:100%}
+@media (max-width:520px){.rel-card2{grid-template-columns:auto 40px minmax(0,1fr)}.rel-card2 > .btn{grid-column:1/-1;justify-self:end}.rarrow{min-width:70px}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -871,12 +885,19 @@ function relOther(r, cid){
 }
 function relsOf(cid){ return state.relations.filter(function(r){ return r.a===cid || (!r.ext && r.b===cid); }); }
 function dirText(r, cid){ return r.mutual ? "互相" : (r.a===cid ? "單向（我→對方）" : "單向（對方→我）"); }
+function relArrow(label, dir){
+  var head = '<path d="M0 0 L7 4 L0 8 z"/>';
+  var svg = '<svg viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><line x1="'+(dir!=="right"?7:1)+'" y1="4" x2="'+(dir!=="left"?93:99)+'" y2="4"/>'+
+    (dir!=="left"?'<g transform="translate(93 0)">'+head+'</g>':'')+(dir!=="right"?'<g transform="translate(7 8) rotate(180)">'+head+'</g>':'')+'</svg>';
+  var aria = dir==="both" ? "互相" : (dir==="right" ? "指向對方" : "對方指向這邊");
+  return '<span class="rarrow" title="'+aria+'"><span class="ral">'+esc(label||"—")+'</span><span class="rline">'+svg+'</span><span class="sr">（'+aria+'）</span></span>';
+}
 function relRow(r, cid){
   var o = relOther(r, cid); if(!o) return "";
   var name = o.ext ? '<b>'+esc(o.name)+'</b>' : '<a href="#c-'+esc(o.id)+'"><b>'+esc(o.name)+'</b></a>';
-  return '<div class="rel-card'+(o.ext?" ext":"")+'"><img src="'+o.img+'" alt="">'+
-    '<div class="rel-main"><div class="rel-line">'+name+(o.ext&&o.owner?'<span class="owner">'+esc(o.owner)+'</span>':'')+
-    '<span class="rel-label">'+esc(r.label||"—")+'</span><span class="muted" style="font-size:12px">'+dirText(r,cid)+'</span></div>'+
+  var dir = r.mutual ? "both" : (r.a===cid ? "right" : "left");
+  return '<div class="rel-card2'+(o.ext?" ext":"")+'">'+relArrow(r.label, dir)+'<img src="'+o.img+'" alt="">'+
+    '<div class="rel-main"><div class="rel-line">'+name+(o.ext&&o.owner?'<span class="owner">'+esc(o.owner)+'</span>':'')+'</div>'+
     (r.note?'<div class="rel-note">'+esc(r.note)+'</div>':'')+'</div>'+
     '<button class="btn sm ghost needs-write" data-redit="'+esc(r.id)+'">編輯</button></div>';
 }
@@ -903,9 +924,9 @@ function relView(){
   var rows = list.map(function(r){
     var a = byId(r.a); if(!a) return "";
     var o = relOther(r, r.a); if(!o) return "";
-    return '<tr><td><a href="#c-'+esc(a.id)+'">'+esc(a.name)+'</a></td><td class="muted">'+(r.mutual?"⇄":"→")+'</td>'+
+    return '<tr><td><a href="#c-'+esc(a.id)+'">'+esc(a.name)+'</a></td><td class="rcell">'+relArrow(r.label, r.mutual?"both":"right")+'</td>'+
       '<td>'+(o.ext?esc(o.name)+(o.owner?'<div class="owner">'+esc(o.owner)+'</div>':''):'<a href="#c-'+esc(o.id)+'">'+esc(o.name)+'</a>')+'</td>'+
-      '<td><b>'+esc(r.label||"—")+'</b>'+(r.note?'<div class="rel-note">'+esc(r.note)+'</div>':'')+'</td>'+
+      '<td>'+(r.note?'<div class="rel-note" style="margin:0">'+esc(r.note)+'</div>':'')+'</td>'+
       '<td class="needs-write" style="white-space:nowrap"><button class="btn sm ghost" data-redit="'+esc(r.id)+'">編輯</button><button class="btn sm ghost" data-rdel="'+esc(r.id)+'">刪除</button></td></tr>';
   }).join("");
   var egoC = ego ? byId(ego) : null;
@@ -913,7 +934,7 @@ function relView(){
     '<button class="btn primary sm needs-write" data-act="newrel">新增關係</button></div>'+
     '<div class="whobar"><button class="wb all'+(!ego?' on':'')+'" data-relego=""><span class="wball">全部</span></button>'+
       sortChars(state.chars.filter(function(c){ return RID[c.id]; })).map(function(c){ return '<button class="wb'+(ego===c.id?' on':'')+'" data-relego="'+esc(c.id)+'" style="--cc:'+color(c.color)+'" aria-pressed="'+(ego===c.id)+'"><img src="'+cover(c)+'" alt=""><span>'+esc(c.name)+'</span></button>'; }).join("")+'</div>'+
-    '<div class="panel rlist">'+(rows?'<div style="overflow-x:auto"><table class="rt"><thead><tr><th>角色</th><th></th><th>對象</th><th>關係</th><th class="needs-write"></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="muted">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div>')+'</div>';
+    '<div class="panel rlist">'+(rows?'<div style="overflow-x:auto"><table class="rt"><thead><tr><th>角色</th><th>關係</th><th>對象</th><th>備註</th><th class="needs-write"></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="muted">還沒有任何角色關係。'+(ro()?'':'到角色頁的「角色關係」按「新增」就能建立。')+'</div>')+'</div>';
 }
 function foldHead(key, title, open){
   return '<div class="panel fold'+(open?" open":"")+'"><button class="foldbtn" data-fold="'+key+'" aria-expanded="'+open+'"><span class="chev" aria-hidden="true">'+(open?"▾":"▸")+'</span>'+esc(title)+'<span class="foldhint">'+(open?"收起":"展開")+'</span></button>';
