@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:06:52.691Z",
+  "updatedAt": "2026-11-24T17:07:37.577Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -861,6 +861,18 @@
    "ext": {
     "name": "陸觀潮",
     "owner": "晚煙",
+    "img": ""
+   }
+  },
+  {
+   "id": "r9wxnu1",
+   "a": "cf206vi",
+   "label": "照顧者",
+   "mutual": false,
+   "note": "",
+   "ext": {
+    "name": "小祭品",
+    "owner": "靜",
     "img": ""
    }
   }
