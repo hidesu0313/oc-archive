@@ -421,6 +421,11 @@ details.more > summary{padding:16px 28px}
 .wb.on{color:var(--ink);font-weight:700}
 .wb.on img,.wb.on .wball{box-shadow:0 0 0 2px var(--cc,var(--black))}
 .whobar:has(.wb.on:not(.all)) .wb:not(.on){opacity:.45}
+/* [樣式] 時間軸分類顏色 */
+.pgroup{border-color:color-mix(in srgb,var(--pc,var(--line)) 35%,var(--line));border-left:3px solid var(--pc,var(--line));background:color-mix(in srgb,var(--pc,#fff) 6%,var(--paper2))}
+.pgroup.solo{border-left:0;background:none}
+.pgname{display:flex;align-items:center;gap:6px;color:var(--pc,var(--muted));border-bottom-color:color-mix(in srgb,var(--pc,var(--line)) 30%,var(--line))}
+.pgcat{font-size:10.5px;letter-spacing:.04em;color:#fff;background:var(--pc);padding:0 6px;border-radius:2px;line-height:1.6}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -978,7 +983,7 @@ function tlEntries(){
   state.chars.forEach(function(c){
     var pl = (catObj(c.cat) && catObj(c.cat).sub) ? projs(c) : [];
     if(!pl.length){ out.push({c:c, date:ym(c.created), proj:"", img:cover(c)}); return; }
-    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, img:safeSrc(p.img) || cover(c)}); });
+    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, cat:c.cat, img:safeSrc(p.img) || cover(c)}); });
   });
   return out;
 }
@@ -991,9 +996,9 @@ function tlView(){
   function who(e){ return '<a class="who" href="#c-'+esc(e.c.id)+'" style="--cc:'+color(e.c.color)+'"><img src="'+e.img+'" alt=""><span class="whon">'+esc(e.c.name)+'</span></a>'; }
   function groups(list){
     var order = [], g = {};
-    list.forEach(function(e){ var k = e.proj || ("\u0000"+e.c.id); if(!g[k]){ g[k] = []; order.push(k); } g[k].push(e); });
+    list.forEach(function(e){ var k = e.proj ? (e.cat+"\u0001"+e.proj) : ("\u0000"+e.c.id); if(!g[k]){ g[k] = []; order.push(k); } g[k].push(e); });
     return order.map(function(k){ var es = g[k];
-      return es[0].proj ? '<div class="pgroup"><span class="pgname">'+esc(es[0].proj)+'</span><div class="who-list">'+es.map(who).join("")+'</div></div>' : '<div class="pgroup solo"><div class="who-list">'+es.map(who).join("")+'</div></div>';
+      return es[0].proj ? '<div class="pgroup" style="--pc:'+catColor(es[0].cat)+'"><span class="pgname"><span class="pgcat">'+esc(catName(es[0].cat))+'</span>'+esc(es[0].proj)+'</span><div class="who-list">'+es.map(who).join("")+'</div></div>' : '<div class="pgroup solo"><div class="who-list">'+es.map(who).join("")+'</div></div>';
     }).join("");
   }
   var body = years.map(function(y){
