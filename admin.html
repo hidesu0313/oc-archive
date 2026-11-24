@@ -480,8 +480,8 @@ details.more > summary{padding:16px 28px}
 .cpi.on{border-color:var(--cc);box-shadow:inset 0 0 0 2px var(--cc);background:var(--paper2)}
 .cpi[hidden]{display:none}
 /* [樣式] 箭頭上的關係 */
-.rarrow{display:inline-flex;flex-direction:column;align-items:center;gap:1px;min-width:92px}
-.ral{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent);line-height:1.3;padding:0 6px;white-space:nowrap}
+.rarrow{display:inline-flex;flex-direction:column;align-items:stretch;text-align:center;gap:1px;min-width:92px}
+.ral{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent);line-height:1.3;padding:0 18px;white-space:nowrap}
 .rline{display:block;width:100%;height:9px}
 .rline svg{display:block;width:100%;height:9px;overflow:visible}
 .rline line{stroke:var(--muted);stroke-width:1.4;vector-effect:non-scaling-stroke}
@@ -498,6 +498,12 @@ details.more > summary{padding:16px 28px}
 .rline i{flex:1;height:0;border-top:1.4px solid var(--muted)}
 .rline .ah{width:7px;height:7px;flex:none;fill:var(--muted)}
 .rline svg.ah{display:block}
+/* [樣式] 對方圖片欄 */
+.eimg{display:flex;gap:10px;align-items:flex-start}
+.eimg .th-sm{flex:none}
+.eimg-r{flex:1;min-width:0}
+.eimg-r input{max-width:100%}
+.eimg-r .imghint{margin-top:5px}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1028,7 +1034,7 @@ function editRel(id, presetA){
       '<div class="toggle-row"><span>對象是</span><span class="seg2"><button type="button" class="'+(!extOn?"on":"")+'" data-ext="0">網站裡的角色</button><button type="button" class="'+(extOn?"on":"")+'" data-ext="1">別人的原創角色</button></span></div>'+
       (extOn ? '<div class="fgrid"><div class="field"><label for="r-en">對方角色名字</label><input id="r-en" data-e="name" value="'+esc(d.ext.name)+'"></div>'+
         '<div class="field"><label for="r-eo">這是誰的角色</label><input id="r-eo" data-e="owner" placeholder="例如：朋友的暱稱或帳號" value="'+esc(d.ext.owner)+'"></div>'+
-        '<div class="field"><label for="r-ei">對方角色圖片（選填）</label><div style="display:flex;gap:8px;align-items:center"><img class="th-sm" src="'+(safeSrc(d.ext.img)||placeholder({name:d.ext.name,color:"#8a7d68"}))+'" alt=""><input id="r-ei" type="file" accept="image/*" data-eimg>'+IMG_HINT+'</div></div></div>'
+        '<div class="field wide"><label for="r-ei">對方角色圖片（選填）</label><div class="eimg"><img class="th-sm" src="'+(safeSrc(d.ext.img)||placeholder({name:d.ext.name,color:"#8a7d68"}))+'" alt=""><div class="eimg-r"><input id="r-ei" type="file" accept="image/*" data-eimg>'+IMG_HINT+'</div></div></div></div>'
       : '<div class="field"><label>對方角色</label>'+picker("b", d.b, d.a)+'</div>')+
       '<div class="fgrid" style="margin-top:12px"><div class="field"><label for="r-l">關係（簡短）</label><input id="r-l" data-r="label" placeholder="例如：搭檔、宿敵、暗戀" value="'+esc(d.label)+'"></div>'+
       '<div class="field"><label>方向</label><label class="check" style="padding-top:6px"><input type="checkbox" id="r-m" data-rm '+(d.mutual?"checked":"")+'>雙向關係</label></div>'+
