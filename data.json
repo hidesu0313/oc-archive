@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:07:37.577Z",
+  "updatedAt": "2026-11-24T17:10:04.042Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -873,6 +873,18 @@
    "ext": {
     "name": "小祭品",
     "owner": "靜",
+    "img": ""
+   }
+  },
+  {
+   "id": "rpl320a",
+   "a": "cfxcj67",
+   "label": "死對頭",
+   "mutual": true,
+   "note": "",
+   "ext": {
+    "name": "小野瀨橆実",
+    "owner": "喜久",
     "img": ""
    }
   }
