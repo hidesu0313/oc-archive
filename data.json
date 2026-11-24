@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T16:29:28.102Z",
+  "updatedAt": "2026-11-24T16:39:18.937Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -131,7 +131,7 @@
    "alias": "",
    "cat": "企劃",
    "stories": [],
-   "project": "",
+   "project": "国立星峰院異能學校",
    "gender": "女",
    "created": "2021-06",
    "age": "",
@@ -150,8 +150,13 @@
    "outfitsEnabled": false,
    "outfits": [],
    "gallery": [],
-   "updatedAt": "2026-11-24T15:38:32.549Z",
-   "projects": []
+   "updatedAt": "2026-11-24T16:39:18.936Z",
+   "projects": [
+    {
+     "name": "国立星峰院異能學校",
+     "period": "2025-02"
+    }
+   ]
   },
   {
    "id": "cqowc8w",
