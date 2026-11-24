@@ -400,6 +400,18 @@ details.more > summary{padding:16px 28px}
 .projlist .pp{font-family:var(--latin);font-size:15px;color:var(--accent);letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .projlist .pn{font-family:var(--display);font-size:16px;overflow-wrap:anywhere}
 @media (max-width:520px){.projlist li{grid-template-columns:1fr;gap:0}}
+/* [樣式] 時間軸企劃分組 */
+.pgroups{display:flex;flex-wrap:wrap;gap:10px 14px;flex:1;min-width:0}
+.pgroup{border:1px solid var(--line);background:var(--paper2);padding:6px 12px 8px;border-radius:2px}
+.pgroup.solo{border-color:transparent;background:none;padding:6px 2px 8px}
+.pgname{display:block;font-size:11.5px;color:var(--muted);letter-spacing:.06em;margin-bottom:4px;border-bottom:1px dashed var(--line);padding-bottom:2px}
+.pgroup .who-list{gap:6px 16px}
+.projrow{grid-template-columns:44px minmax(0,1.2fr) minmax(0,1fr) auto}
+.projrow .th-sm{width:44px;height:44px;object-fit:cover}
+.projimg{grid-column:2/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-2px 0 8px}
+.projimg .hint{margin:0}
+.projimg input{font-size:12px;max-width:220px}
+@media (max-width:520px){.projrow{grid-template-columns:44px 1fr auto}.projrow input:nth-of-type(2){grid-column:2}.projimg{grid-column:1/-1}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -950,18 +962,35 @@ function tlPicked(){
   if(!ok.length && state.chars.length) ok = [state.chars[0].id];
   ui.tlChars = ok; return ok;
 }
+function periodStart(v){ var m = String(v||"").match(/(\d{4})\s*[-\/.年]\s*(\d{1,2})/); return m ? m[1]+"-"+("0"+m[2]).slice(-2) : (/^\d{4}$/.test(String(v||"").trim()) ? String(v).trim() : ""); }
+function tlEntries(){
+  var out = [];
+  state.chars.forEach(function(c){
+    var pl = (catObj(c.cat) && catObj(c.cat).sub) ? projs(c) : [];
+    if(!pl.length){ out.push({c:c, date:ym(c.created), proj:"", img:cover(c)}); return; }
+    pl.forEach(function(p,i){ out.push({c:c, date:periodStart(p.period) || (i===0 ? ym(c.created) : "") || ym(c.created), proj:p.name, img:safeSrc(p.img) || cover(c)}); });
+  });
+  return out;
+}
 function tlView(){
-  var withDate = state.chars.filter(function(c){ return ym(c.created); }).sort(function(a,b){ var x = ym(a.created), y = ym(b.created); return x<y?-1:x>y?1:0; });
-  var noDate = state.chars.filter(function(c){ return !ym(c.created); });
+  var all = tlEntries(), dated = all.filter(function(e){ return e.date; }), undated = all.filter(function(e){ return !e.date; });
+  dated.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
   var years = [], by = {};
-  withDate.forEach(function(c){ var d = ym(c.created), y = d.slice(0,4), m = d.slice(5,7) || "";
-    if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(c); });
-  function who(c){ return '<a class="who" href="#c-'+esc(c.id)+'" style="--cc:'+color(c.color)+'"><img src="'+cover(c)+'" alt=""><span class="whon">'+esc(c.name)+(projNames(c).length?'<small>'+esc(projNames(c).join("、"))+'</small>':'')+'</span></a>'; }
+  dated.forEach(function(e){ var y = e.date.slice(0,4), m = e.date.slice(5,7) || "";
+    if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(e); });
+  function who(e){ return '<a class="who" href="#c-'+esc(e.c.id)+'" style="--cc:'+color(e.c.color)+'"><img src="'+e.img+'" alt=""><span class="whon">'+esc(e.c.name)+'</span></a>'; }
+  function groups(list){
+    var order = [], g = {};
+    list.forEach(function(e){ var k = e.proj || ("\u0000"+e.c.id); if(!g[k]){ g[k] = []; order.push(k); } g[k].push(e); });
+    return order.map(function(k){ var es = g[k];
+      return es[0].proj ? '<div class="pgroup"><span class="pgname">'+esc(es[0].proj)+'</span><div class="who-list">'+es.map(who).join("")+'</div></div>' : '<div class="pgroup solo"><div class="who-list">'+es.map(who).join("")+'</div></div>';
+    }).join("");
+  }
   var body = years.map(function(y){
     var months = Object.keys(by[y]).sort();
-    return '<div class="yr"><h2>'+esc(y)+'</h2><div class="months">'+months.map(function(m){ return '<div class="mrow"><span class="m">'+(m?(+m)+' 月':'')+'</span><div class="who-list">'+by[y][m].map(who).join("")+'</div></div>'; }).join("")+'</div></div>';
+    return '<div class="yr"><h2>'+esc(y)+'</h2><div class="months">'+months.map(function(m){ return '<div class="mrow"><span class="m">'+(m?(+m)+' 月':'')+'</span><div class="pgroups">'+groups(by[y][m])+'</div></div>'; }).join("")+'</div></div>';
   }).join("");
-  if(noDate.length) body += '<div class="yr"><h2 class="muted" style="font-size:18px">未填年月</h2><div class="months"><div class="mrow"><span class="m"></span><div class="who-list">'+noDate.map(who).join("")+'</div></div></div></div>';
+  if(undated.length) body += '<div class="yr"><h2 class="muted" style="font-size:18px">未填年月</h2><div class="months"><div class="mrow"><span class="m"></span><div class="pgroups">'+groups(undated)+'</div></div></div></div>';
   return '<div class="head" style="margin-bottom:18px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1></div>'+(body || '<div class="empty">還沒有填寫創角年月的角色。</div>');
 }
 function tlList(ids, compact){
@@ -1071,9 +1100,10 @@ function editChar(id, only){
     if(!d.projects.length) d.projects.push({name:"", period:""});
     if(!d.projects[0].period && ym(d.created)) d.projects[0].period = ym(d.created);
     return '<div class="field wide"><label>'+esc(o.name)+' › '+esc(o.sub)+'（可以填多個，第一個會當作主要的；第一個的時間預設為創角年月，可以修改）</label>'+
-      d.projects.map(function(x,i){ return '<div class="projrow"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
+      d.projects.map(function(x,i){ return '<div class="projrow"><img class="th-sm" src="'+(safeSrc(x.img)||cover(d))+'" alt="" title="時間軸頭像"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
         '<input aria-label="時間" data-list="projects" data-i="'+i+'" data-k="period" placeholder="時間，例如 2021-07～2022-03" value="'+esc(x.period||"")+'">'+
-        '<button class="btn sm ghost" type="button" data-rm="projects" data-i="'+i+'">移除</button></div>'; }).join("")+
+        '<button class="btn sm ghost" type="button" data-rm="projects" data-i="'+i+'">移除</button>'+
+        '<div class="projimg"><label class="hint" for="pimg'+i+'">時間軸頭像（選填，沒放就用角色頭貼）</label><input id="pimg'+i+'" type="file" accept="image/*" data-pimg="'+i+'">'+(safeSrc(x.img)?'<button class="btn sm ghost" type="button" data-pimgrm="'+i+'">改回角色頭貼</button>':'')+'</div></div>'; }).join("")+
       '<datalist id="projlist">'+list.map(function(x){ return '<option value="'+esc(x)+'"></option>'; }).join("")+'</datalist>'+
       '<button class="btn sm" type="button" data-add="projects" style="margin-top:6px;align-self:flex-start">＋ 新增'+esc(o.sub)+'</button></div>';
   }
@@ -1140,6 +1170,7 @@ function editChar(id, only){
   });
   m.addEventListener("change", function(e){
     var t = e.target;
+    if(t.dataset.pimg!==undefined && t.files && t.files[0]){ var pi = +t.dataset.pimg; t.disabled = true; readImage(t.files[0]).then(function(src){ d.projects[pi].img = src; paint(); }).catch(function(){ toast("這張圖片讀不出來，請換一張"); t.disabled = false; }); return; }
     if(t.hasAttribute("data-pub")){ if(t.checked) delete d.hidden; else d.hidden = true; return; }
     if(t.id==="f-cat"){ d.cat = t.value; paint(); var pf = m.querySelector("#f-project"); if(pf) pf.focus(); return; }
     if(t.dataset.pola){ d.polaroidSrc = d[t.dataset.pola][+t.dataset.i].src; paint(); }
@@ -1153,13 +1184,14 @@ function editChar(id, only){
   m.addEventListener("click", function(e){
     var t = e.target.closest("button"); if(!t) return;
     if(t.hasAttribute("data-x")) m.remove();
+    else if(t.dataset.pimgrm!==undefined){ delete d.projects[+t.dataset.pimgrm].img; paint(); }
     else if(t.dataset.add){ d[t.dataset.add].push(t.dataset.add==="projects"?{name:"",period:""}:t.dataset.add==="fields"?{k:"",v:""}:t.dataset.add==="palette"?{k:"",color:"#7a6a5a"}:t.dataset.add==="stories"?{id:uid("s"),title:"",date:"",when:"",content:"",public:true}:{src:"",name:"",note:"",author:""}); paint(); }
     else if(t.dataset.mv){ var arr = d[t.dataset.mv], i0 = +t.dataset.i, i1 = i0 + (+t.dataset.dir); var tmp = arr[i0]; arr[i0] = arr[i1]; arr[i1] = tmp; paint(); }
     else if(t.dataset.rm){ d[t.dataset.rm].splice(+t.dataset.i,1); paint(); }
     else if(t.hasAttribute("data-save")){
       if(!String(d.name).trim()){ toast("請先填角色名字"); var n = m.querySelector("#f-name"); if(n) n.focus(); return; }
       delete d.example; d.updatedAt = new Date().toISOString();
-      d.projects = (d.projects||[]).map(function(x){ return {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; }).filter(function(x){ return x.name || x.period; });
+      d.projects = (d.projects||[]).map(function(x){ var o2 = {name:String(x.name||"").trim(), period:String(x.period||"").trim()}; if(x.img) o2.img = x.img; return o2; }).filter(function(x){ return x.name || x.period; });
       d.project = d.projects.length ? d.projects[0].name : "";
       if(orig){ var idx = state.chars.indexOf(orig); state.chars[idx] = d; } else state.chars.push(d);
       m.remove(); save(); go("c-"+d.id); toast("角色已儲存");
