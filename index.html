@@ -443,6 +443,18 @@ details.more > summary{padding:16px 28px}
 .lg{display:inline-flex;align-items:center;gap:5px}
 .lg i{width:16px;height:4px;display:inline-block}
 @media (max-width:520px){.pcard.tsm,.pcard.tsm .ph{width:52px;height:52px}}
+/* [樣式] 年份收合與分類篩選 */
+.yh{display:flex;align-items:center;gap:8px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink);flex:none;width:118px;text-align:left}
+.yh h2{width:auto}
+.ytog{font-size:12px;color:var(--muted)}
+.yr.closed{padding:8px 0}
+.yr.closed .yh h2{font-size:20px;color:var(--muted)}
+.ysum{border:0;background:none;cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0;text-decoration:underline;text-decoration-style:dotted}
+.ysum:hover{color:var(--ink)}
+.tlcats button{display:inline-flex;align-items:center;gap:6px}
+.tlcats i{width:14px;height:4px;display:inline-block;background:var(--pc,var(--muted))}
+.tlcats button.on i{background:#fffaf0}
+@media (max-width:520px){.yh{width:auto}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1005,11 +1017,18 @@ function tlEntries(){
   return out;
 }
 function tlView(){
-  var all = tlEntries(), dated = all.filter(function(e){ return e.date; }), undated = all.filter(function(e){ return !e.date; });
+  var all = tlEntries();
+  var catKeys = catIds().filter(function(k){ return all.some(function(e){ return e.proj && e.cat===k; }); });
+  var hasNone = all.some(function(e){ return !e.proj; });
+  var tc = ui.tlCat || "全部"; if(tc!=="全部" && tc!=="__none" && catKeys.indexOf(tc)<0) tc = "全部"; if(tc==="__none" && !hasNone) tc = "全部";
+  var list = all.filter(function(e){ return tc==="全部" || (tc==="__none" ? !e.proj : (e.proj && e.cat===tc)); });
+  var dated = list.filter(function(e){ return e.date; }), undated = list.filter(function(e){ return !e.date; });
   dated.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
   var years = [], by = {};
   dated.forEach(function(e){ var y = e.date.slice(0,4), m = e.date.slice(5,7) || "";
     if(!by[y]){ by[y] = {}; years.push(y); } (by[y][m] = by[y][m] || []).push(e); });
+  var recent = years.slice(-2), open = ui.tlOpen || {};
+  function isOpen(y){ return open[y]!==undefined ? open[y] : recent.indexOf(y)>=0; }
   function tcard(e){
     var k = e.proj ? (e.cat+"|"+e.proj+"|"+e.date) : "";
     return '<button class="pcard tsm" style="--cc:'+(e.proj?catColor(e.cat):"#c9c2b4")+'" data-go="c-'+esc(e.c.id)+'" data-k="'+esc(k)+'" aria-label="'+esc(e.c.name+(e.proj?"（"+e.proj+"）":""))+'">'+
@@ -1017,13 +1036,22 @@ function tlView(){
       (e.proj?'<small><span class="pgcat" style="--pc:'+catColor(e.cat)+'">'+esc(catName(e.cat))+'</span> '+esc(e.proj)+'</small>':'')+
       (e.date?'<small class="sm2">'+esc(e.date)+'</small>':'')+'</span></button>';
   }
-  var body = years.map(function(y){
-    var months = Object.keys(by[y]).sort();
-    return '<div class="yr"><h2>'+esc(y)+'</h2><div class="tflow">'+months.map(function(m){ return '<span class="mtag">'+(m?(+m)+'月':'')+'</span>'+by[y][m].map(tcard).join(""); }).join("")+'</div></div>';
+  function yearRow(y, label, entriesHTML, n, small){
+    var o = isOpen(y);
+    return '<div class="yr'+(o?'':' closed')+'"><button class="yh" data-tlyear="'+esc(y)+'" aria-expanded="'+o+'"><h2'+(small?' class="muted" style="font-size:18px"':'')+'>'+esc(label)+'</h2><span class="ytog">'+(o?'▾':'▸')+'</span></button>'+
+      (o ? '<div class="tflow">'+entriesHTML+'</div>' : '<button class="ysum" data-tlyear="'+esc(y)+'">'+n+' 位　展開</button>')+'</div>';
+  }
+  var body = years.slice().reverse().map(function(y){
+    var months = Object.keys(by[y]).sort(), n = 0;
+    var html = months.map(function(m){ n += by[y][m].length; return '<span class="mtag">'+(m?(+m)+'月':'')+'</span>'+by[y][m].map(tcard).join(""); }).join("");
+    return yearRow(y, y, html, n);
   }).join("");
-  if(undated.length) body += '<div class="yr"><h2 class="muted" style="font-size:18px">未填年月</h2><div class="tflow">'+undated.map(tcard).join("")+'</div></div>';
-  var legend = cats().map(function(x){ return '<span class="lg"><i style="background:'+color(x.color)+'"></i>'+esc(x.name)+'</span>'; }).join("");
-  return '<div class="head" style="margin-bottom:10px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1><div class="legend">'+legend+'</div></div>'+(body || '<div class="empty">還沒有填寫創角年月的角色。</div>');
+  if(undated.length) body += yearRow("__nodate", "未填年月", undated.map(tcard).join(""), undated.length, true);
+  var chips = '<div class="chips tlcats"><button class="'+(tc==="全部"?"on":"")+'" data-tlcat="全部">全部</button>'+
+    catKeys.map(function(k){ return '<button class="'+(tc===k?"on":"")+'" data-tlcat="'+esc(k)+'" style="--pc:'+catColor(k)+'"><i></i>'+esc(catName(k))+'</button>'; }).join("")+
+    (hasNone?'<button class="'+(tc==="__none"?"on":"")+'" data-tlcat="__none"><i style="background:#c9c2b4"></i>其他</button>':'')+'</div>';
+  return '<div class="head" style="margin-bottom:12px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1>'+chips+'</div>'+
+    (body || '<div class="empty">這個分類還沒有角色。</div>');
 }
 function tlList(ids, compact){
   var has = function(list){ if(!ids) return true; return (list||[]).some(function(id){ return ids.indexOf(id)>=0; }); };
@@ -1409,6 +1437,8 @@ root.addEventListener("click", function(e){
   else if(b.hasAttribute("data-relreset")){ ui.relCat = "全部"; ui.relProj = ""; ui.relEgo = ""; ui.focus = null; keepUI(); render(); }
   else if(ds.relego!==undefined){ ui.relEgo = (ui.relEgo===ds.relego) ? "" : ds.relego; ui.relCat = "全部"; ui.relProj = ""; ui.focus = null; keepUI(); render(); }
   else if(ds.relgo){ ui.relEgo = ds.relgo; var gc = byId(ds.relgo); if(gc){ ui.relCat = gc.cat; ui.relProj = projNames(gc)[0] || "__none"; } keepUI(); go("relations"); }
+  else if(ds.tlyear){ ui.tlOpen = ui.tlOpen || {}; var yb = b.getAttribute("aria-expanded"); var curOpen = root.querySelector('.yh[data-tlyear="'+ds.tlyear+'"]').getAttribute("aria-expanded")==="true"; ui.tlOpen[ds.tlyear] = !curOpen; keepUI(); render(); }
+  else if(ds.tlcat){ ui.tlCat = ds.tlcat; keepUI(); render(); }
   else if(ds.fold){ ui[ds.fold] = ui[ds.fold]===false; keepUI(); render(); }
   else if(ds.redit){ editRel(ds.redit); }
   else if(ds.zoom==="notes"){ lightbox({name:"", notes:[{src:state.settings.notesImg, note:state.settings.notesCaption}]}, "notes", 0); }
