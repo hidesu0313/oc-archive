@@ -3,7 +3,7 @@
   "siteTitle": "原創角色檔案館",
   "notes": "－",
   "protectImages": true,
-  "updatedAt": "2026-11-24T17:25:22.818Z",
+  "updatedAt": "2026-11-24T17:30:39.232Z",
   "labels": {
    "nav_notes": "－"
   },
@@ -949,6 +949,22 @@
     "owner": "晚煙",
     "img": ""
    }
+  },
+  {
+   "id": "r2b3qrh",
+   "a": "c4q1pld",
+   "b": "cv9wp1p",
+   "label": "同事",
+   "mutual": true,
+   "note": ""
+  },
+  {
+   "id": "rm33oam",
+   "a": "c4q1pld",
+   "b": "crzll9w",
+   "label": "同事",
+   "mutual": true,
+   "note": ""
   }
  ],
  "timeline": []
