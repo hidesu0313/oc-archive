@@ -729,7 +729,7 @@ function charView(c){
   var plabel = (catObj(c.cat)&&catObj(c.cat).sub)||L("f_project");
   var pl = projs(c), hasSubCat = catObj(c.cat) && catObj(c.cat).sub;
   var projBox = ((pl.length || !ro()) && hasSubCat) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>'+esc(projTitle(c))+editBtn(c,"projects")+'</h2>'+
-    (pl.length ? '<ol class="projlist">'+pl.map(function(p){ return '<li><span class="pp">'+esc(p.period||"—")+'</span><span class="pn">'+esc(p.name)+'</span></li>'; }).join("")+'</ol>' : '<div class="muted">還沒有'+esc(plabel)+'。</div>')+'</section>' : '';
+    (pl.length ? '<ol class="projlist">'+pl.map(function(p,i){ return '<li><span class="pp">'+esc(p.period||(i===0?ym(c.created):"")||"—")+'</span><span class="pn">'+esc(p.name)+'</span></li>'; }).join("")+'</ol>' : '<div class="muted">還沒有'+esc(plabel)+'。</div>')+'</section>' : '';
   var facts = [[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
     .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
     .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
@@ -1069,7 +1069,8 @@ function editChar(id, only){
     var o = catObj(d.cat); if(!o || !o.sub) return '';
     var list = []; state.chars.forEach(function(c){ if(c.cat===d.cat) projNames(c).forEach(function(x){ if(list.indexOf(x)<0) list.push(x); }); });
     if(!d.projects.length) d.projects.push({name:"", period:""});
-    return '<div class="field wide"><label>'+esc(o.name)+' › '+esc(o.sub)+'（可以填多個，第一個會當作主要的）</label>'+
+    if(!d.projects[0].period && ym(d.created)) d.projects[0].period = ym(d.created);
+    return '<div class="field wide"><label>'+esc(o.name)+' › '+esc(o.sub)+'（可以填多個，第一個會當作主要的；第一個的時間預設為創角年月，可以修改）</label>'+
       d.projects.map(function(x,i){ return '<div class="projrow"><input aria-label="'+esc(o.sub)+'" data-list="projects" data-i="'+i+'" data-k="name" list="projlist" placeholder="選擇或輸入新的'+esc(o.sub)+'" value="'+esc(x.name||"")+'">'+
         '<input aria-label="時間" data-list="projects" data-i="'+i+'" data-k="period" placeholder="時間，例如 2021-07～2022-03" value="'+esc(x.period||"")+'">'+
         '<button class="btn sm ghost" type="button" data-rm="projects" data-i="'+i+'">移除</button></div>'; }).join("")+
