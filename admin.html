@@ -687,6 +687,11 @@ body.od-lock{overflow:hidden}
 .pcard.tsm.active .slip{pointer-events:auto}
 .pcard.tsm.active .slip .tlgo{pointer-events:auto;cursor:pointer}
 .tsm .slip .tlgo:hover{text-decoration:underline}
+/* [樣式] 資料紙頭像置中 */
+.od-head{flex-direction:column;align-items:center;text-align:center;gap:8px}
+.od-head .pills{justify-content:center;margin-top:6px}
+.od-head img{width:104px;height:104px}
+@media (max-width:640px){.od-head img{width:96px;height:96px}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
