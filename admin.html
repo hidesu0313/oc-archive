@@ -819,7 +819,11 @@ function hoText(p){ var v = String((p&&p.ho)||"").trim(); return /^\d+$/.test(v)
 function hasHO(cat){ var o = catObj(cat); return !!o && (/trpg/i.test(o.name) || /劇本/.test(o.sub||"")); }
 function projLabel(p){ var h = hoText(p); return p.name + (h ? "（"+h+"）" : ""); }
 function projNames(c){ return projs(c).map(function(p){ return p.name; }); }
-function fileNo(c){ var i = (ALLCHARS||state.chars).map(function(x){ return x.id; }).indexOf(c.id); return "No." + ("00"+(i+1)).slice(-3); }
+function fileNo(c){
+  var all = (ALLCHARS||state.chars).map(function(x, i){ return {id:x.id, k:ym(x.created)||"9999-99", i:i}; });
+  all.sort(function(a, b){ return a.k<b.k ? -1 : a.k>b.k ? 1 : a.i - b.i; });
+  var i = all.map(function(x){ return x.id; }).indexOf(c.id); return "No." + ("00"+(i+1)).slice(-3);
+}
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function uid(p){ return (p||"x") + Math.random().toString(36).slice(2,8); }
 function color(c){ return /^#[0-9a-fA-F]{6}$/.test(c||"") ? c : "#737986"; }
