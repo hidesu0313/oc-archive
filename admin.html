@@ -587,6 +587,67 @@ details.more > summary{padding:16px 28px}
 .mgrp .mtag{text-align:right}
 #root .mcards .pcard.tsm:first-child .slip{left:-4px;transform:none}
 }
+/* [樣式] 角色卡片與浮出資料 */
+.ocwrap{position:relative}
+.ocards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 16px;align-items:stretch}
+.ocard{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 10px 10px;background:var(--surface);border:1px solid var(--line);border-radius:2px;cursor:pointer;font:inherit;color:inherit;text-align:center;transition:transform .45s cubic-bezier(.3,1.3,.5,1),opacity .3s,filter .3s,box-shadow .3s,border-color .2s}
+.ocard:hover{border-color:var(--gold)}
+.oc-av{position:relative;width:100%;max-width:118px;aspect-ratio:1;background:#fff;padding:4px;border:1px solid var(--line);box-shadow:0 2px 5px rgba(90,70,40,.12)}
+.oc-av img{width:100%;height:100%;object-fit:cover;display:block}
+.oc-av .hidden-note{position:absolute;left:4px;bottom:4px;font-size:10.5px;background:var(--black);color:#fff;padding:0 5px}
+.oc-nm{font-family:var(--display);font-size:15px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.oc-sub{font-size:11px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:-4px}
+.oc-avs{margin-top:auto;width:100%;min-height:31px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;padding-top:7px;border-top:1px dashed var(--line);transition:opacity .3s,transform .4s}
+.oc-avs img{width:22px;height:22px;object-fit:cover;border:1px solid var(--line);border-radius:2px}
+.oc-more{font-size:11px;color:var(--muted)}
+#root.oc-focus .ocard:not(.active):not(.mate){opacity:.35;filter:grayscale(.6)}
+#root.oc-focus .ocard.mate{border-color:var(--gold)}
+.ocard.active{z-index:7;transform:rotate(-7deg) translate(-6px,4px);border-color:var(--accent);box-shadow:0 12px 26px rgba(90,70,40,.24)}
+.ocard.active.tiltR{transform:rotate(7deg) translate(6px,4px)}
+.ocard.active .oc-avs{opacity:0;transform:translateY(10px)}
+.ocard.flipping{transform:perspective(700px) rotateY(90deg);opacity:0;transition:transform .25s ease-in,opacity .25s}
+.osheet{position:absolute;z-index:6;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--black);box-shadow:0 14px 34px rgba(90,70,40,.2);opacity:0;transition:transform .45s cubic-bezier(.25,1,.4,1),opacity .3s;max-height:calc(100vh - 110px);overflow:auto;overscroll-behavior:contain}
+.osheet.fromR{transform:translateX(-70px) rotate(-1deg) scale(.97);transform-origin:left top}
+.osheet.fromL{transform:translateX(70px) rotate(1deg) scale(.97);transform-origin:right top}
+.osheet.in{opacity:1;transform:none}
+.osheet.noanim,.osheet.noanim *{transition:none !important;animation:none !important}
+.osheet.mob{position:fixed;inset:0;z-index:80;max-height:none;border:0;box-shadow:none;transform:perspective(1300px) rotateY(-90deg);transform-origin:left center;transition:transform .38s cubic-bezier(.25,1,.4,1) .12s,opacity .2s .12s}
+.osheet.mob.in{transform:perspective(1300px) rotateY(0)}
+body.od-lock{overflow:hidden}
+.odet{padding:0 22px 22px}
+.od-bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;margin:0 -22px 14px;padding:10px 14px 10px 22px;background:var(--surface);border-bottom:1px dashed var(--line)}
+.od-no{font-family:var(--latin);letter-spacing:.14em;font-size:12px;color:var(--muted);text-transform:uppercase}
+.od-full{margin-left:auto;font-size:12.5px;color:var(--accent)}
+.od-x{border:0;background:none;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:2px 6px}
+.od-x:hover{color:var(--ink)}
+.od-back{display:none;border:1px solid var(--line);background:var(--paper2);color:var(--ink);font:inherit;font-size:14px;padding:5px 12px;border-radius:2px;cursor:pointer}
+.osheet.mob .od-back{display:inline-block}
+.osheet.mob .od-x{display:none}
+.osheet.mob .od-full{margin-left:auto}
+.osheet:not(.mob) .od-full + .od-x{margin-left:0}
+.osheet.mob .od-no{display:none}
+.od-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.od-head img{width:86px;height:86px;object-fit:cover;border:1px solid var(--line);padding:3px;background:#fff;cursor:zoom-in;flex:none}
+.od-head h2{font-family:var(--display);font-size:24px;margin:0;line-height:1.25}
+.od-head .al{color:var(--muted);font-size:13px}
+.od-head .pills{margin-top:6px}
+.od-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:4px 0 14px;overflow-x:auto}
+.od-tabs button{border:1px solid transparent;border-bottom:0;background:none;font:inherit;font-size:14px;color:var(--muted);padding:6px 14px;cursor:pointer;margin-bottom:-1px;white-space:nowrap}
+.od-tabs button[aria-selected=true]{color:var(--ink);background:var(--surface);border-color:var(--line);border-top:2px solid var(--accent)}
+.od-sec + .od-sec{margin-top:16px}
+.od-sec h4{font-family:var(--display);font-size:14.5px;margin:0 0 8px;color:var(--black)}
+.odet .facts{margin:0 0 12px}
+.odet .swatches{justify-content:flex-start}
+.od-ravs{display:flex;flex-wrap:wrap;gap:10px}
+.od-rav{display:flex;flex-direction:column;align-items:center;gap:3px;width:62px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0;opacity:0;transform:translate(-46px,-26px) scale(.55);transition:opacity .35s,transform .5s cubic-bezier(.3,1.3,.5,1);transition-delay:calc(.22s + var(--i,0) * .05s)}
+.osheet.in .od-rav{opacity:1;transform:none}
+.od-rav img{width:46px;height:46px;object-fit:cover;border:1px solid var(--line);border-radius:2px;background:#fff}
+.od-rav small{font-size:11.5px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.od-rav:hover img{border-color:var(--accent)}
+.od-rav.ext{cursor:default}
+.odet .rel-list{padding:0}
+@media (max-width:640px){.ocards{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px 10px}.oc-nm{font-size:13.5px}.ocard{padding:9px 7px 8px}.oc-avs img{width:18px;height:18px}.odet{padding:0 16px 30px}.od-bar{margin:0 -16px 12px;padding:10px 16px}.od-head img{width:72px;height:72px}}
+@media (prefers-reduced-motion:reduce){.ocard,.osheet,.od-rav{transition:none !important}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -835,6 +896,7 @@ var IC = {
 };
 function shell(inner, r){
   var items = [["list","",L("nav_list"),IC.list],["relations","relations",L("nav_rel"),IC.rel],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
+  if(ro()) items = items.filter(function(n){ return n[0]!=="relations"; });
   var dock = items.map(function(n){
     var on = r.view===n[0] || (n[0]==="list" && r.view==="char");
     return '<a href="#'+n[1]+'" class="fitem'+(on?" on":"")+'"'+(on?' aria-current="page"':'')+' title="'+esc(n[2])+'">'+n[3]+'<span>'+esc(n[2])+'</span></a>';
@@ -860,8 +922,9 @@ function render(){
   try{ render0(); } finally { state.chars = keepC; state.relations = keepR; ALLCHARS = null; }
 }
 function render0(){
-  root.classList.remove("pc-focus");
+  root.classList.remove("pc-focus","oc-focus");
   var r = route(), html;
+  if(r.view==="char" && ro()){ OPEN = r.id; r = {view:"list"}; }
   if(r.view==="char"){ var c = byId(r.id); html = c ? charView(c) : '<div class="empty">找不到這個角色。<a href="#">回到列表</a></div>'; }
   else if(r.view==="relations") html = relView();
   else if(r.view==="notes") html = notesView();
@@ -870,6 +933,8 @@ function render0(){
   if(r.view!=="list" && r.view!=="char") html = '<div class="sheet">'+html+'</div>';
   root.innerHTML = shell(html, r);
   if(r.view==="relations"){ bindGraph(); if(ui.relEgo) relOpen(ui.relEgo); }
+  document.body.classList.remove("od-lock");
+  if(r.view==="list" && OPEN){ var want = OPEN; OPEN = ""; if(!ocOpen(want, true) && ro() && history.replaceState) history.replaceState(null, "", location.pathname + location.search); } else OPEN = "";
 }
 
 /* 列表 */
@@ -906,14 +971,119 @@ function listView(){
   else if(ui.group){
     var groups = {}, order = [];
     list.forEach(function(c){ var y = ym(c.created).slice(0,4) || "未填年月"; if(!groups[y]){ groups[y]=[]; order.push(y); } groups[y].push(c); });
-    body = order.map(function(y){ return '<div class="group-h"><h2>'+esc(y)+'</h2><span>'+groups[y].length+' 位</span></div><div class="grid photos">'+groups[y].map(card).join("")+'</div>'; }).join("");
-  } else body = '<div class="grid photos">'+list.map(card).join("")+'</div>';
+    body = order.map(function(y){ return '<div class="group-h"><h2>'+esc(y)+'</h2><span>'+groups[y].length+' 位</span></div><div class="ocards">'+groups[y].map(ocard).join("")+'</div>'; }).join("");
+  } else body = '<div class="ocards">'+list.map(ocard).join("")+'</div>';
+  if(list.length) body = '<div class="ocwrap">'+body+list.map(function(c){ return '<template data-for="'+esc(c.id)+'">'+detailHTML(c)+'</template>'; }).join("")+'</div>';
   return '<div class="ptitle"><h1>'+esc(L("nav_list"))+'<span class="ornament">共 '+state.chars.length+' 位角色</span></h1>'+
     '<input class="search" id="q" type="search" aria-label="搜尋角色" placeholder="搜尋名字、企劃、標籤" value="'+esc(ui.q)+'"></div>'+
     '<div class="filters"><div class="chips">'+cats+'</div><span class="fsep"></span><div class="chips">'+gen+'</div><span class="fsep"></span>'+
     '<div class="chips"><button data-sort="'+(ui.sort==="new"?"old":"new")+'">'+(ui.sort==="new"?"新 → 舊":"舊 → 新")+'</button><button class="'+(ui.group?"on":"")+'" data-act="group">依年份</button></div>'+
     '<button class="linkbtn needs-write" data-act="cats">管理分類</button></div>'+body;
 }
+
+/* 角色卡片＋浮出資料 */
+var OPEN = "";
+function relPeople(c){
+  var seen = {}, out = [];
+  relsOf(c.id).forEach(function(r){ var o = relOther(r, c.id); if(o && !seen[o.id]){ seen[o.id] = 1; out.push(o); } });
+  return out;
+}
+function ocard(c){
+  var avs = relPeople(c), max = 5, more = avs.length - max;
+  return '<button class="ocard" type="button" data-oc="'+esc(c.id)+'" data-mates="'+esc(avs.filter(function(o){ return !o.ext; }).map(function(o){ return o.id; }).join(" "))+'" style="--cc:'+color(c.color)+'" aria-expanded="false" aria-label="'+esc(c.name)+'，打開資料">'+
+    '<span class="oc-av'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+'</span>'+
+    '<b class="oc-nm">'+esc(c.name)+'</b>'+(projNames(c).length?'<small class="oc-sub">'+esc(projNames(c)[0])+'</small>':'')+
+    '<span class="oc-avs">'+avs.slice(0, max).map(function(o){ return '<img src="'+o.img+'" alt="" title="'+esc(o.name)+'">'; }).join("")+(more>0?'<span class="oc-more">+'+more+'</span>':'')+'</span></button>';
+}
+function detailHTML(c){
+  var pl = projs(c), hasSub = catObj(c.cat) && catObj(c.cat).sub;
+  var facts = [[L("f_gender"),c.gender],[L("f_age"),c.age],[L("f_birthday"),c.birthday],[L("f_height"),c.height],[L("f_species"),c.species],[L("f_role"),c.role]]
+    .concat((c.fields||[]).filter(function(f){ return f.k||f.v; }).map(function(f){ return [f.k,f.v]; }))
+    .filter(function(f){ return f[1]; }).map(function(f){ return '<div><dt>'+esc(f[0])+'</dt><dd>'+esc(f[1])+'</dd></div>'; }).join("");
+  var pal = (c.palette||[]).filter(function(p){ return p.k||p.color; });
+  var sw = (pal.length ? pal : [{k:"代表色", color:c.color}]).map(function(p){ return '<span class="sw"><i style="background:'+color(p.color)+'"></i>'+esc(p.k||"顏色")+'</span>'; }).join("");
+  var tags = (c.tags||[]).length ? '<div class="pills tagrow">'+c.tags.map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join("")+'</div>' : '';
+  var projHTML = (hasSub && pl.length) ? '<div class="od-sec"><h4>'+esc(projTitle(c))+'</h4><ol class="projlist">'+pl.map(function(p,i){ return '<li><span class="pp">'+esc(p.period||(i===0?ym(c.created):"")||"—")+'</span><span class="pn">'+esc(p.name)+(hoText(p)?'<span class="hotag">'+esc(hoText(p))+'</span>':'')+'</span></li>'; }).join("")+'</ol></div>' : '';
+  var people = relPeople(c);
+  var ravs = people.length ? '<div class="od-sec"><h4>'+esc(L("sec_rel"))+'</h4><div class="od-ravs">'+people.map(function(o, i){
+      return o.ext ? '<span class="od-rav ext" style="--i:'+i+'"><img src="'+o.img+'" alt=""><small>'+esc(o.name)+'</small></span>'
+                   : '<button type="button" class="od-rav" style="--i:'+i+'" data-ocjump="'+esc(o.id)+'"><img src="'+o.img+'" alt=""><small>'+esc(o.name)+'</small></button>';
+    }).join("")+'</div></div>' : '';
+  var basic = (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+projHTML+ravs;
+  var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
+    .map(function(x){ return '<div class="od-sec"><h4>'+esc(L(x[0]))+'</h4><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
+  var art = (c.mainImages||[]).filter(function(x){ return safeSrc(x.src); }), gal = (c.gallery||[]).filter(function(x){ return safeSrc(x.src); });
+  var imgs = (art.length?'<div class="od-sec"><h4>'+esc(L("tab_art"))+'</h4>'+galleryHTML(c, c.mainImages, "mainImages", false)+'</div>':'')+(gal.length?'<div class="od-sec"><h4>'+esc(L("tab_gallery"))+'</h4>'+galleryHTML(c, c.gallery, "gallery", false)+'</div>':'');
+  var rels = pairUp(relsOf(c.id), function(){ return c.id; }).map(function(r){ return relRow(r, c.id); }).join("");
+  var st = sortStories(visibleStories(c)), outfits = (c.outfits||[]).filter(function(x){ return safeSrc(x.src) || x.name; });
+  var more = (st.length?'<div class="od-sec"><h4>'+esc(L("tab_stories"))+'</h4><div class="storylist">'+st.map(function(x){
+      var when = [x.date, x.when].filter(Boolean).join(" ・ ");
+      return '<div class="story'+(x.public===false?" private":"")+'"><div class="d">'+esc(when||"未標時間")+'</div><h4>'+esc(x.title||"未命名故事")+'</h4>'+(x.content?'<div class="prose">'+esc(x.content)+'</div>':'')+'</div>';
+    }).join("")+'</div></div>':'')+(outfits.length?'<div class="od-sec"><h4>'+esc(L("tab_outfits"))+'</h4>'+galleryHTML(c, c.outfits, "outfits", true)+'</div>':'');
+  var tabs = [["basic","基本",basic],["intro","介紹",intro],["img","圖片",imgs],["rel","關係",rels?'<div class="rel-list">'+rels+'</div>':''],["more","更多",more]].filter(function(t){ return t[2]; });
+  return '<div class="odet" data-cid="'+esc(c.id)+'" style="--cc:'+color(c.color)+'" role="dialog" aria-label="'+esc(c.name)+' 的資料">'+
+    '<div class="od-bar"><button type="button" class="od-back" data-odclose>← 返回</button><span class="od-no">CHARACTER FILE ・ '+fileNo(c)+'</span>'+
+    '<a class="od-full needs-write" href="#c-'+esc(c.id)+'">完整頁面・編輯</a><button type="button" class="od-x" data-odclose aria-label="關閉">×</button></div>'+
+    '<div class="od-head"><img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><div><h2>'+esc(c.name)+'</h2>'+(c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+
+    '<div class="pills">'+catPill(c)+(ym(c.created)?'<span class="ymtag">'+esc(ym(c.created))+'</span>':'')+'</div></div></div>'+
+    (tabs.length>1?'<div class="od-tabs" role="tablist">'+tabs.map(function(t,i){ return '<button type="button" role="tab" data-odtab="'+t[0]+'" aria-selected="'+(i===0)+'">'+t[1]+'</button>'; }).join("")+'</div>':'')+
+    tabs.map(function(t,i){ return '<div class="od-pane" data-pane="'+t[0]+'"'+(i?' hidden':'')+'>'+t[2]+'</div>'; }).join("")+'</div>';
+}
+function isMobileSheet(){ return window.matchMedia && window.matchMedia("(max-width:640px)").matches; }
+function ocClose(instant){
+  var el = root.querySelector(".osheet"), card = root.querySelector(".ocard.active");
+  root.classList.remove("oc-focus"); document.body.classList.remove("od-lock");
+  root.querySelectorAll(".ocard.mate").forEach(function(x){ x.classList.remove("mate"); });
+  if(card){ card.setAttribute("aria-expanded","false"); }
+  var wasOpen = OPEN; OPEN = "";
+  if(ro() && /^#c-/.test(location.hash) && history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+  if(!el){ if(card) card.classList.remove("active","tiltR","flipping"); return; }
+  if(instant){ el.remove(); if(card) card.classList.remove("active","tiltR","flipping"); return; }
+  el.classList.remove("in");
+  setTimeout(function(){ el.remove(); if(card){ card.classList.remove("flipping"); setTimeout(function(){ card.classList.remove("active","tiltR"); if(wasOpen) card.focus({preventScroll:true}); }, el.classList.contains("mob")?260:0); } }, el.classList.contains("mob")?360:220);
+}
+function ocOpen(id, noAnim){
+  var wrap = root.querySelector(".ocwrap"); if(!wrap) return false;
+  var card = wrap.querySelector('.ocard[data-oc="'+id+'"]'), tpl = wrap.querySelector('template[data-for="'+id+'"]');
+  if(!card || !tpl) return false;
+  ocClose(true);
+  OPEN = id;
+  var el = document.createElement("div"); el.className = "osheet"; el.appendChild(tpl.content.cloneNode(true));
+  root.classList.add("oc-focus"); card.classList.add("active"); card.setAttribute("aria-expanded","true");
+  var mates = (card.getAttribute("data-mates")||"").split(" ");
+  wrap.querySelectorAll(".ocard").forEach(function(x){ if(mates.indexOf(x.getAttribute("data-oc"))>=0) x.classList.add("mate"); });
+  var W = wrap.clientWidth, wr = wrap.getBoundingClientRect(), cr = card.getBoundingClientRect();
+  var cl = cr.left - wr.left, ct = cr.top - wr.top, spaceR = W - (cl + cr.width), mob = isMobileSheet();
+  if(!mob){
+    var side = (spaceR + 30 >= 380 || spaceR >= cl) ? "right" : "left";
+    var width = side==="right" ? Math.min(580, W - (cl + cr.width - 30)) : Math.min(580, cl + 30);
+    if(width < 330) mob = true;
+    else {
+      var left = side==="right" ? cl + cr.width - 30 : cl + 30 - width;
+      el.style.left = left+"px"; el.style.top = Math.max(0, ct - 16)+"px"; el.style.width = width+"px";
+      el.classList.add(side==="right" ? "fromR" : "fromL"); card.classList.toggle("tiltR", side==="left");
+      wrap.appendChild(el);
+      var sr = el.getBoundingClientRect(); if(sr.top < 0 || sr.top > innerHeight - 160) window.scrollBy({top: sr.top - 90, behavior: noAnim ? "auto" : "smooth"});
+    }
+  }
+  if(mob){
+    el.classList.add("mob"); card.classList.add("flipping"); root.appendChild(el); document.body.classList.add("od-lock");
+  }
+  if(noAnim) el.classList.add("in", "noanim");
+  else requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.add("in"); }); });
+  if(ro() && history.replaceState) history.replaceState(null, "", "#c-"+id);
+  var f = el.querySelector(mob ? ".od-back" : ".od-x"); if(f) setTimeout(function(){ f.focus({preventScroll:true}); }, noAnim?0:350);
+  return true;
+}
+function ocJump(id){
+  ocClose(true);
+  if(!root.querySelector('.ocard[data-oc="'+id+'"]')){ ui.cat = "全部"; ui.gender = "全部"; ui.q = ""; keepUI(); OPEN = id; render(); return; }
+  var card = root.querySelector('.ocard[data-oc="'+id+'"]');
+  card.scrollIntoView({block:"center", behavior:"smooth"});
+  setTimeout(function(){ ocOpen(id); }, 380);
+}
+window.addEventListener("keydown", function(e){ if(e.key==="Escape" && OPEN && !document.querySelector(".modal")) ocClose(); });
+var ocResizeT; window.addEventListener("resize", function(){ clearTimeout(ocResizeT); ocResizeT = setTimeout(function(){ if(OPEN && !root.querySelector(".osheet.mob")) ocOpen(OPEN, true); }, 200); });
 
 /* 角色頁 */
 function editBtn(c, sec, label){ return '<button class="edit needs-write" data-act="edit" data-id="'+esc(c.id)+'" data-sec="'+sec+'">'+(label||"編輯")+'</button>'; }
@@ -1648,6 +1818,14 @@ function settings(){
 var TOUCH = window.matchMedia && matchMedia("(hover: none)").matches;
 root.addEventListener("click", function(e){
   var t = e.target;
+  var ocd = t.closest && t.closest(".ocard");
+  if(ocd){ e.preventDefault(); if(ocd.classList.contains("active")) ocClose(); else ocOpen(ocd.getAttribute("data-oc")); return; }
+  if(t.closest && t.closest("[data-odclose]")){ ocClose(); return; }
+  var ojb = t.closest && t.closest("[data-ocjump]"); if(ojb){ ocJump(ojb.getAttribute("data-ocjump")); return; }
+  var otb = t.closest && t.closest("[data-odtab]");
+  if(otb){ var od = otb.closest(".odet"); od.querySelectorAll("[data-odtab]").forEach(function(x){ x.setAttribute("aria-selected", String(x===otb)); });
+    od.querySelectorAll(".od-pane").forEach(function(p){ p.hidden = p.getAttribute("data-pane")!==otb.getAttribute("data-odtab"); }); return; }
+  if(OPEN && !t.closest(".osheet") && !t.closest(".fmenu")){ ocClose(); return; }
   var rcd = t.closest && t.closest(".rcard");
   if(rcd){ e.preventDefault(); relOpen(rcd.classList.contains("active") ? "" : rcd.getAttribute("data-rcard")); return; }
   if(t.closest && t.closest("[data-rclose]")){ relOpen(""); return; }
@@ -1680,7 +1858,7 @@ root.addEventListener("click", function(e){
   else if(ds.redit && ds.redit.indexOf(",")>0){ pickRel(ds.redit.split(","), "edit"); }
   else if(ds.redit){ editRel(ds.redit); }
   else if(ds.zoom==="notes"){ lightbox({name:"", notes:[{src:state.settings.notesImg, note:state.settings.notesCaption}]}, "notes", 0); }
-  else if(ds.zoom){ var c = byId(route().id); if(c) lightbox(c, ds.zoom, +ds.i); }
+  else if(ds.zoom){ var zc = b.closest("[data-cid]"); var c = byId(zc ? zc.getAttribute("data-cid") : route().id); if(c) lightbox(c, ds.zoom, +ds.i); }
   else if(ds.rdel && ds.rdel.indexOf(",")>0){ pickRel(ds.rdel.split(","), "del"); }
   else if(ds.rdel){ state.relations = state.relations.filter(function(r){return r.id!==ds.rdel;}); save(); render(); }
   else if(ds.ev!==undefined){ editEvent(ds.ev, (ds.pre||"").split(",").filter(Boolean)); }
