@@ -1120,7 +1120,7 @@ function detailHTML(c){
     '<a class="od-full needs-write" href="#c-'+esc(c.id)+'">完整頁面・編輯</a><button type="button" class="od-x" data-odclose aria-label="關閉">×</button></div>'+
     '<div class="od-head"><img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><div><h2>'+esc(c.name)+'</h2>'+(c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+
     (ym(c.created)?'<div class="pills"><span class="ymtag">'+esc(ym(c.created))+'</span></div>':'')+'</div></div>'+
-    (tabs.length>1?'<div class="od-tabs" role="tablist">'+tabs.map(function(t,i){ return '<button type="button" role="tab" data-odtab="'+t[0]+'" aria-selected="'+(i===0)+'">'+t[1]+'</button>'; }).join("")+'</div>':'')+
+    (tabs.length?'<div class="od-tabs" role="tablist">'+tabs.map(function(t,i){ return '<button type="button" role="tab" data-odtab="'+t[0]+'" aria-selected="'+(i===0)+'">'+t[1]+'</button>'; }).join("")+'</div>':'')+
     tabs.map(function(t,i){ return '<div class="od-pane" data-pane="'+t[0]+'"'+(i?' hidden':'')+'>'+t[2]+'</div>'; }).join("")+'</div>';
 }
 var SPOILOK = {}; try{ SPOILOK = JSON.parse(sessionStorage.getItem("oc-spoil")||"{}"); }catch(e){}
