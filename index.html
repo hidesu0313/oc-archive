@@ -717,6 +717,16 @@ body.od-lock{overflow:hidden}
 .tb-x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:22px;line-height:1;color:var(--muted);padding:2px 6px;cursor:pointer}
 }
 @media (prefers-reduced-motion:reduce){.tlbar{transition:none}}
+/* [樣式] 電腦版資料紙精簡 */
+.od-tabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.od-tabs::-webkit-scrollbar{display:none}
+.osheet{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.osheet:not(.mob) .od-head img{display:none}
+.osheet:not(.mob) .od-head{margin-top:2px}
+.osheet.fromR .odet{padding-left:46px}
+.osheet.fromR .od-bar{margin-left:-46px;padding-left:46px}
+.osheet.fromL .odet{padding-right:46px}
+.osheet.fromL .od-bar{margin-right:-46px;padding-right:46px}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -967,8 +977,7 @@ var IC = {
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
 };
 function shell(inner, r){
-  var items = [["list","","原創／企劃",IC.list],["trpg","trpg","TRPG",IC.dice],["relations","relations",L("nav_rel"),IC.rel],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
-  if(ro()) items = items.filter(function(n){ return n[0]!=="relations"; });
+  var items = [["list","","原創／企劃",IC.list],["trpg","trpg","TRPG",IC.dice],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
   var dock = items.map(function(n){
     var on = r.view===n[0] || (n[0]==="list" && r.view==="char" && !isTrpgChar(byId(r.id))) || (n[0]==="trpg" && r.view==="char" && isTrpgChar(byId(r.id)));
     return '<a href="#'+n[1]+'" class="fitem'+(on?" on":"")+'"'+(on?' aria-current="page"':'')+' title="'+esc(n[2])+'">'+n[3]+'<span>'+esc(n[2])+'</span></a>';
@@ -980,6 +989,7 @@ function shell(inner, r){
     '<div class="fmenu"><div class="fitems" id="fitems">'+dock+
     '<span class="fdiv needs-write"></span>'+
     '<button class="fitem needs-write" data-act="new" title="新增角色" aria-label="新增角色">'+IC.plus+'</button>'+
+    '<a href="#relations" class="fitem needs-write'+(r.view==="relations"?" on":"")+'"'+(r.view==="relations"?' aria-current="page"':'')+' title="'+esc(L("nav_rel"))+'">'+IC.rel+'<span>'+esc(L("nav_rel"))+'</span></a>'+
     '<button class="fitem needs-write" data-act="settings" title="設定與備份" aria-label="設定與備份">'+IC.gear+'</button>'+
     '<button class="fitem editor-only'+(ui.guest?" on":"")+'" data-act="guest" title="'+(ui.guest?"離開訪客模式":"訪客模式預覽")+'" aria-label="'+(ui.guest?"離開訪客模式":"訪客模式預覽")+'">'+IC.eye+'</button></div>'+
     '<button class="ftoggle" data-act="menu" aria-expanded="false" aria-controls="fitems" aria-label="開啟選單">'+IC.menu+IC.close+'</button></div>';
