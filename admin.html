@@ -703,20 +703,17 @@ body.od-lock{overflow:hidden}
 #root .pcard.tsm .slip small{justify-content:flex-start}
 #root .pcard.tsm .slip .tlgo{align-self:stretch}
 }
-/* [樣式] 手機時間軸底部卡片 */
-.tlbar{display:none}
-@media (max-width:520px){
+/* [樣式] 時間軸底部卡片 */
 #root .pcard.tsm .slip{display:none}
-.tlbar{display:flex;position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:75;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--black);box-shadow:0 -6px 20px rgba(90,70,40,.18);padding:12px 40px 12px 12px;transform:translateY(140%);transition:transform .32s cubic-bezier(.25,1,.4,1)}
-.tlbar.show{transform:none}
+.tlbar{display:flex;position:fixed;left:50%;width:min(480px,calc(100% - 20px));bottom:calc(14px + env(safe-area-inset-bottom));z-index:75;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--black);box-shadow:0 -6px 20px rgba(90,70,40,.18);padding:12px 40px 12px 12px;transform:translate(-50%,160%);transition:transform .32s cubic-bezier(.25,1,.4,1)}
+.tlbar.show{transform:translate(-50%,0)}
 .tlbar > img{width:58px;height:58px;object-fit:cover;border:1px solid var(--line);padding:2px;background:#fff;flex:none}
-.tb-body{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;line-height:1.4}
+.tb-body{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;line-height:1.4;text-align:left;align-items:flex-start}
 .tb-body b{font-family:var(--display);font-size:16px}
 .tb-body small{display:flex;align-items:center;gap:4px;font-size:12.5px;flex-wrap:wrap}
 .tb-body .sm2{color:var(--muted)}
 .tb-body .tlgo{display:block;align-self:stretch;margin-top:5px;padding-top:5px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--accent);text-decoration:none;font-family:var(--display);pointer-events:auto}
 .tb-x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:22px;line-height:1;color:var(--muted);padding:2px 6px;cursor:pointer}
-}
 @media (prefers-reduced-motion:reduce){.tlbar{transition:none}}
 /* [樣式] 電腦版資料紙精簡 */
 .od-tabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
@@ -1966,7 +1963,7 @@ root.addEventListener("click", function(e){
       pc.classList.toggle("sideR", mobT && roomR >= 175); pc.classList.toggle("sideL", mobT && roomR < 175 && roomL >= 175); }
     root.querySelectorAll(".tlgo").forEach(function(x){ x.tabIndex = -1; });
     pc.classList.add("active"); root.classList.add("pc-focus"); var lg = pc.querySelector(".tlgo"); if(lg) lg.tabIndex = 0;
-    tlBar(pc.classList.contains("tsm") && vw0 <= 520 ? pc : null);
+    tlBar(pc.classList.contains("tsm") ? pc : null);
     var mk = (pc.getAttribute("data-k")||"").split(" ").filter(Boolean); if(mk.length) root.querySelectorAll(".pcard").forEach(function(x){ if(x===pc) return; var xk = (x.getAttribute("data-k")||"").split(" "); if(mk.some(function(k){ return xk.indexOf(k)>=0; })) x.classList.add("mate"); });
     return;
   }
