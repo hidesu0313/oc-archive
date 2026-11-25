@@ -638,6 +638,21 @@ body.od-lock{overflow:hidden}
 .od-sec h4{font-family:var(--display);font-size:14.5px;margin:0 0 8px;color:var(--black)}
 .odet .facts{margin:0 0 12px}
 .odet .swatches{justify-content:flex-start}
+#root .odet .projlist li{grid-template-columns:5.2em minmax(0,1fr);gap:10px;padding:5px 0;align-items:baseline}
+#root .odet .projlist .pp{font-size:13px}
+#root .odet .projlist .pn{font-size:15px}
+.od-sec h4{margin-bottom:4px}
+.odet .swatches + .od-sec,.odet .tagrow + .od-sec{margin-top:14px}
+.cathead{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.cathead:first-child{margin-top:4px}
+.cathead h2{font-family:var(--display);font-size:20px;margin:0;color:var(--ink)}
+.cathead i{display:inline-block;width:14px;height:4px;background:var(--pc);align-self:center}
+.cathead span{font-size:12.5px;color:var(--muted)}
+.spoil h2{font-family:var(--display);font-size:19px;margin:0 0 10px}
+.spoil p{margin:0 0 6px;line-height:1.8}
+.spoil .ttl{display:inline-block;margin:0 3px;padding:0 6px;border:1px solid currentColor;color:var(--sage);font-family:var(--display);border-radius:2px}
+.spoil .mfoot{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.spoil .mfoot .btn{width:100%;justify-content:center}
 .od-ravs{display:flex;flex-wrap:wrap;gap:10px}
 .od-rav{display:flex;flex-direction:column;align-items:center;gap:3px;width:62px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0;opacity:0;transform:translate(-46px,-26px) scale(.55);transition:opacity .35s,transform .5s cubic-bezier(.3,1.3,.5,1);transition-delay:calc(.22s + var(--i,0) * .05s)}
 .osheet.in .od-rav{opacity:1;transform:none}
@@ -934,7 +949,8 @@ function render0(){
   root.innerHTML = shell(html, r);
   if(r.view==="relations"){ bindGraph(); if(ui.relEgo) relOpen(ui.relEgo); }
   document.body.classList.remove("od-lock");
-  if(r.view==="list" && OPEN){ var want = OPEN; OPEN = ""; if(!ocOpen(want, true) && ro() && history.replaceState) history.replaceState(null, "", location.pathname + location.search); } else OPEN = "";
+  if(r.view==="list" && OPEN){ var want = OPEN; OPEN = "";
+    if(root.querySelector('.ocard[data-oc="'+want+'"]')) ocRequest(want, function(){ ocOpen(want, true); }); } else OPEN = "";
 }
 
 /* 列表 */
@@ -968,6 +984,13 @@ function listView(){
   var gen = ["全部"].concat(GENDERS).map(function(g){ return '<button class="'+(ui.gender===g?"on":"")+'" data-gender="'+g+'">'+esc(g==="全部"?"全部性別":g)+'</button>'; }).join("");
   var list = sortChars(filtered(ui.cat)), body;
   if(!list.length) body = '<div class="empty">這裡還沒有角色。'+(ro()?'':'按右下角的「＋」建立第一位角色。')+'</div>';
+  else if(!ui.group && ui.cat==="全部"){
+    var ck = catIds().concat(["__none"]);
+    body = ck.map(function(k){
+      var g = list.filter(function(c){ return k==="__none" ? !catObj(c.cat) : c.cat===k; }); if(!g.length) return "";
+      return '<div class="cathead" style="--pc:'+(k==="__none"?"#c9c2b4":catColor(k))+'"><i></i><h2>'+esc(catName(k))+'</h2><span>'+g.length+' 位</span></div><div class="ocards">'+g.map(ocard).join("")+'</div>';
+    }).join("");
+  }
   else if(ui.group){
     var groups = {}, order = [];
     list.forEach(function(c){ var y = ym(c.created).slice(0,4) || "未填年月"; if(!groups[y]){ groups[y]=[]; order.push(y); } groups[y].push(c); });
@@ -1029,6 +1052,19 @@ function detailHTML(c){
     (tabs.length>1?'<div class="od-tabs" role="tablist">'+tabs.map(function(t,i){ return '<button type="button" role="tab" data-odtab="'+t[0]+'" aria-selected="'+(i===0)+'">'+t[1]+'</button>'; }).join("")+'</div>':'')+
     tabs.map(function(t,i){ return '<div class="od-pane" data-pane="'+t[0]+'"'+(i?' hidden':'')+'>'+t[2]+'</div>'; }).join("")+'</div>';
 }
+var SPOILOK = {}; try{ SPOILOK = JSON.parse(sessionStorage.getItem("oc-spoil")||"{}"); }catch(e){}
+function needSpoil(c){ return c && ro() && hasHO(c.cat) && !SPOILOK[c.id]; }
+function ocRequest(id, go){
+  var c = byId(id) || (ALLCHARS||[]).filter(function(x){ return x.id===id; })[0];
+  if(!needSpoil(c)){ go(); return; }
+  var names = projNames(c);
+  var m = modal('<div class="spoil"><h2>劇透預警</h2><p>接下來可能會有'+(names.length?names.map(function(n){ return '<span class="ttl">'+esc(n)+'</span>'; }).join("、"):'劇本')+'的內容，</p><p>有劇透的可能，請注意。</p>'+
+    '<div class="mfoot"><button class="btn primary" type="button" data-sp="ok">OK</button><button class="btn" type="button" data-sp="no">那我還是先不要看好了</button></div></div>', "small");
+  m.addEventListener("click", function(e){ var t = e.target.closest("[data-sp]"); if(!t) return; m.remove();
+    if(t.getAttribute("data-sp")==="ok"){ SPOILOK[c.id] = 1; try{ sessionStorage.setItem("oc-spoil", JSON.stringify(SPOILOK)); }catch(x){} go(); }
+    else if(/^#c-/.test(location.hash) && history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+  });
+}
 function isMobileSheet(){ return window.matchMedia && window.matchMedia("(max-width:640px)").matches; }
 function ocClose(instant){
   var el = root.querySelector(".osheet"), card = root.querySelector(".ocard.active");
@@ -1077,10 +1113,10 @@ function ocOpen(id, noAnim){
 }
 function ocJump(id){
   ocClose(true);
-  if(!root.querySelector('.ocard[data-oc="'+id+'"]')){ ui.cat = "全部"; ui.gender = "全部"; ui.q = ""; keepUI(); OPEN = id; render(); return; }
+  if(!root.querySelector('.ocard[data-oc="'+id+'"]')){ ocRequest(id, function(){ ui.cat = "全部"; ui.gender = "全部"; ui.q = ""; keepUI(); OPEN = id; render(); }); return; }
   var card = root.querySelector('.ocard[data-oc="'+id+'"]');
   card.scrollIntoView({block:"center", behavior:"smooth"});
-  setTimeout(function(){ ocOpen(id); }, 380);
+  setTimeout(function(){ ocRequest(id, function(){ ocOpen(id); }); }, 380);
 }
 window.addEventListener("keydown", function(e){ if(e.key==="Escape" && OPEN && !document.querySelector(".modal")) ocClose(); });
 var ocResizeT; window.addEventListener("resize", function(){ clearTimeout(ocResizeT); ocResizeT = setTimeout(function(){ if(OPEN && !root.querySelector(".osheet.mob")) ocOpen(OPEN, true); }, 200); });
@@ -1819,7 +1855,7 @@ var TOUCH = window.matchMedia && matchMedia("(hover: none)").matches;
 root.addEventListener("click", function(e){
   var t = e.target;
   var ocd = t.closest && t.closest(".ocard");
-  if(ocd){ e.preventDefault(); if(ocd.classList.contains("active")) ocClose(); else ocOpen(ocd.getAttribute("data-oc")); return; }
+  if(ocd){ e.preventDefault(); if(ocd.classList.contains("active")) ocClose(); else { var oid = ocd.getAttribute("data-oc"); ocRequest(oid, function(){ ocOpen(oid); }); } return; }
   if(t.closest && t.closest("[data-odclose]")){ ocClose(); return; }
   var ojb = t.closest && t.closest("[data-ocjump]"); if(ojb){ ocJump(ojb.getAttribute("data-ocjump")); return; }
   var otb = t.closest && t.closest("[data-odtab]");
