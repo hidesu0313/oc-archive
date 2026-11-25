@@ -565,7 +565,7 @@ details.more > summary{padding:16px 28px}
 /* [樣式] 篩選列平均 */
 #root .filters{justify-content:center;gap:10px 14px}
 #root .filters .chips{justify-content:center}
-#root .filters .chips button{min-width:4.6em;text-align:center;justify-content:center}
+#root .filters .chips button{min-width:4.6em;text-align:center;justify-content:center;white-space:nowrap}
 #root .grid.photos{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));justify-items:center;justify-content:stretch;gap:22px 12px;padding-left:0;padding-right:0}
 @media (max-width:520px){
 #root .grid.photos{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:18px 8px}
@@ -662,6 +662,25 @@ body.od-lock{overflow:hidden}
 .odet .rel-list{padding:0}
 @media (max-width:640px){.ocards{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px 10px}.oc-nm{font-size:13.5px}.ocard{padding:9px 7px 8px}.oc-avs img{width:18px;height:18px}.odet{padding:0 16px 30px}.od-bar{margin:0 -16px 12px;padding:10px 16px}.od-head img{width:72px;height:72px}}
 @media (prefers-reduced-motion:reduce){.ocard,.osheet,.od-rav{transition:none !important}}
+/* [樣式] 時間軸精簡 */
+.ycnt{font-size:12.5px;color:var(--muted);font-family:var(--body);font-weight:400}
+.yh{width:150px}
+.yr{padding:10px 0}
+.yr.closed{padding:6px 0}
+.yr.closed .yh h2{font-size:18px}
+#root .tlcats i{display:none}
+@media (max-width:520px){
+.yr{flex-direction:column;align-items:stretch;gap:8px;padding:8px 0}
+.yr.closed{padding:4px 0}
+.yh{width:100%;gap:10px}
+.yh h2{font-size:21px !important}
+.yr.closed .yh h2{font-size:16px !important}
+.yh .ycnt{margin-left:auto}
+.mgrp{padding-top:8px;gap:6px}
+#root .filters .chips.tlcats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#root .filters .chips.tlcats button{white-space:nowrap;padding:4px 10px}
+.tflow{gap:8px}
+}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1464,8 +1483,8 @@ function tlView(){
 
   function yearRow(y, label, entriesHTML, n, small){
     var o = isOpen(y);
-    return '<div class="yr'+(o?'':' closed')+'"><button class="yh" data-tlyear="'+esc(y)+'" aria-expanded="'+o+'"><h2'+(small?' class="muted" style="font-size:18px"':'')+'>'+esc(label)+'</h2><span class="ytog">'+(o?'▾':'▸')+'</span></button>'+
-      (o ? '<div class="tflow">'+entriesHTML+'</div>' : '<button class="ysum" data-tlyear="'+esc(y)+'" aria-label="展開 '+esc(label)+'，'+n+' 位">'+n+' 位</button>')+'</div>';
+    return '<div class="yr'+(o?'':' closed')+'"><button class="yh" data-tlyear="'+esc(y)+'" aria-expanded="'+o+'" aria-label="'+(o?'收合 ':'展開 ')+esc(label)+'，'+n+' 位"><h2'+(small?' class="muted" style="font-size:18px"':'')+'>'+esc(label)+'</h2><span class="ycnt">'+n+' 位</span><span class="ytog">'+(o?'▾':'▸')+'</span></button>'+
+      (o ? '<div class="tflow">'+entriesHTML+'</div>' : '')+'</div>';
   }
   var body = years.slice().reverse().map(function(y){
     var months = Object.keys(by[y]).sort(), n = 0;
@@ -1473,10 +1492,11 @@ function tlView(){
     return yearRow(y, y, html, n);
   }).join("");
   if(undated.length) body += yearRow("__nodate", "未填年月", undated.map(tcard).join(""), undated.length, true);
-  var chips = '<div class="chips tlcats"><button class="'+(tc==="全部"?"on":"")+'" data-tlcat="全部">全部</button>'+
-    catKeys.map(function(k){ return '<button class="'+(tc===k?"on":"")+'" data-tlcat="'+esc(k)+'" style="--pc:'+catColor(k)+'"><i></i>'+esc(catName(k))+'</button>'; }).join("")+
-    (hasNone?'<button class="'+(tc==="__none"?"on":"")+'" data-tlcat="__none"><i style="background:#c9c2b4"></i>其他</button>':'')+'</div>';
-  return '<div class="head" style="margin-bottom:12px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1>'+chips+'</div>'+
+  var ncat = function(k){ return all.filter(function(e){ return k==="全部" || (k==="__none" ? !e.proj : (e.proj && e.cat===k)); }).length; };
+  var chips = '<div class="chips tlcats"><button class="'+(tc==="全部"?"on":"")+'" data-tlcat="全部">全部<span class="n">'+ncat("全部")+'</span></button>'+
+    catKeys.map(function(k){ return '<button class="'+(tc===k?"on":"")+'" data-tlcat="'+esc(k)+'">'+esc(catName(k))+'<span class="n">'+ncat(k)+'</span></button>'; }).join("")+
+    (hasNone?'<button class="'+(tc==="__none"?"on":"")+'" data-tlcat="__none">其他<span class="n">'+ncat("__none")+'</span></button>':'')+'</div>';
+  return '<div class="head" style="margin-bottom:12px"><h1 style="font-size:32px">'+esc(L("nav_tl"))+'</h1></div><div class="filters">'+chips+'</div>'+
     (body || '<div class="empty">這個分類還沒有角色。</div>');
 }
 function tlList(ids, compact){
