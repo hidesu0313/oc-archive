@@ -884,6 +884,7 @@ function route(){
   var h = (location.hash||"").slice(1);
   if(h.indexOf("c-")===0) return {view:"char", id:h.slice(2)};
   if(h==="relations") return {view:"relations"};
+  if(h==="trpg") return {view:"trpg"};
   if(h==="timeline") return {view:"timeline"};
   if(h==="notes") return {view:"notes"};
   return {view:"list"};
@@ -902,6 +903,7 @@ var SUNFLOWER = (function(){
 var IC = {
   list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.8 14.2c2.3.2 3.9 1.7 4.4 4.3"/></svg>',
   rel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6.5" cy="12" r="3"/><circle cx="17.5" cy="6.5" r="3"/><circle cx="17.5" cy="17.5" r="3"/><path d="M9.2 10.7l5.6-2.9M9.2 13.3l5.6 2.9"/></svg>',
+  dice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l8 4.6v9.2l-8 4.6-8-4.6V7.4z"/><path d="M4.3 7.6L12 12l7.7-4.4M12 12v8.9"/><circle cx="12" cy="7.2" r=".9" fill="currentColor"/><circle cx="7.6" cy="13.4" r=".9" fill="currentColor"/><circle cx="16.4" cy="13.4" r=".9" fill="currentColor"/></svg>',
   tl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>',
@@ -910,10 +912,10 @@ var IC = {
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/></svg>'
 };
 function shell(inner, r){
-  var items = [["list","",L("nav_list"),IC.list],["relations","relations",L("nav_rel"),IC.rel],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
+  var items = [["list","","原創／企劃",IC.list],["trpg","trpg","TRPG",IC.dice],["relations","relations",L("nav_rel"),IC.rel],["timeline","timeline",L("nav_tl"),IC.tl],["notes","notes",L("nav_notes"),SUNFLOWER]];
   if(ro()) items = items.filter(function(n){ return n[0]!=="relations"; });
   var dock = items.map(function(n){
-    var on = r.view===n[0] || (n[0]==="list" && r.view==="char");
+    var on = r.view===n[0] || (n[0]==="list" && r.view==="char" && !isTrpgChar(byId(r.id))) || (n[0]==="trpg" && r.view==="char" && isTrpgChar(byId(r.id)));
     return '<a href="#'+n[1]+'" class="fitem'+(on?" on":"")+'"'+(on?' aria-current="page"':'')+' title="'+esc(n[2])+'">'+n[3]+'<span>'+esc(n[2])+'</span></a>';
   }).join("");
   return (ui.guest?'<div class="guestbar editor-only">訪客模式預覽中，訪客看到的就是這個畫面。<button class="btn sm" data-act="guest">離開訪客模式</button></div>':'')+
@@ -941,17 +943,17 @@ function render(){
 function render0(){
   root.classList.remove("pc-focus","oc-focus");
   var r = route(), html;
-  if(r.view==="char" && ro()){ OPEN = r.id; r = {view:"list"}; }
+  if(r.view==="char" && ro()){ OPEN = r.id; r = {view: isTrpgChar(byId(r.id)) ? "trpg" : "list"}; }
   if(r.view==="char"){ var c = byId(r.id); html = c ? charView(c) : '<div class="empty">找不到這個角色。<a href="#">回到列表</a></div>'; }
   else if(r.view==="relations") html = relView();
   else if(r.view==="notes") html = notesView();
   else if(r.view==="timeline") html = tlView();
-  else html = listView();
-  if(r.view!=="list" && r.view!=="char") html = '<div class="sheet">'+html+'</div>';
+  else html = listView(r.view==="trpg" ? "trpg" : "orig");
+  if(r.view!=="list" && r.view!=="trpg" && r.view!=="char") html = '<div class="sheet">'+html+'</div>';
   root.innerHTML = shell(html, r);
   if(r.view==="relations"){ bindGraph(); if(ui.relEgo) relOpen(ui.relEgo); }
   document.body.classList.remove("od-lock");
-  if(r.view==="list" && OPEN){ var want = OPEN; OPEN = "";
+  if((r.view==="list" || r.view==="trpg") && OPEN){ var want = OPEN; OPEN = "";
     if(root.querySelector('.ocard[data-oc="'+want+'"]')) ocRequest(want, function(){ ocOpen(want, true); }); } else OPEN = "";
 }
 
@@ -979,29 +981,33 @@ function card(c){
     '<span class="slip"><b>'+esc(c.name)+'</b>'+(projs(c).length?'<small>'+esc(projs(c).map(projLabel).join("、"))+'</small>':'')+
     (function(){ var parts = []; if(catObj(c.cat)) parts.push(catName(c.cat)); if(ym(c.created)) parts.push(ym(c.created)); return parts.length ? '<small class="sm2">'+esc(parts.join("・"))+'</small>' : ''; })()+'</span></button>';
 }
-function listView(){
-  var keys = ["全部"].concat(catIds()); if(state.chars.some(function(c){ return !catObj(c.cat); })) keys.push("__none");
-  if(keys.indexOf(ui.cat)<0) ui.cat = "全部";
-  var cats = keys.map(function(k){ return '<button class="'+(ui.cat===k?"on":"")+'" data-cat="'+esc(k)+'">'+esc(catName(k))+'<span class="n">'+filtered(k).length+'</span></button>'; }).join("");
-  var gen = ["全部"].concat(GENDERS).map(function(g){ return '<button class="'+(ui.gender===g?"on":"")+'" data-gender="'+g+'">'+esc(g==="全部"?"全部性別":g)+'</button>'; }).join("");
-  var list = sortChars(filtered(ui.cat)), body;
+function isTrpgChar(c){ return !!c && hasHO(c.cat); }
+function pageChars(page){ return state.chars.filter(function(c){ return page==="trpg" ? isTrpgChar(c) : !isTrpgChar(c); }); }
+function listView(page){
+  var q = ui.q.trim().toLowerCase();
+  var base = pageChars(page).filter(function(c){
+    if(!q) return true; var hay = [c.name,c.alias,projNames(c).join(" "),c.role,c.species,(c.tags||[]).join(" ")].join(" ").toLowerCase(); return hay.indexOf(q)>=0; });
+  if(ui.gender!=="全部" && GENDERS.indexOf(ui.gender)<0) ui.gender = "全部";
+  var cnt = function(g){ return base.filter(function(c){ return g==="全部" || (g==="其他" ? GENDERS.slice(0,2).indexOf(c.gender)<0 : c.gender===g); }).length; };
+  var gen = ["全部"].concat(GENDERS).map(function(g){ return '<button class="'+(ui.gender===g?"on":"")+'" data-gender="'+g+'">'+esc(g)+'<span class="n">'+cnt(g)+'</span></button>'; }).join("");
+  var list = sortChars(base.filter(function(c){ return ui.gender==="全部" || (ui.gender==="其他" ? GENDERS.slice(0,2).indexOf(c.gender)<0 : c.gender===ui.gender); })), body;
   if(!list.length) body = '<div class="empty">這裡還沒有角色。'+(ro()?'':'按右下角的「＋」建立第一位角色。')+'</div>';
-  else if(!ui.group && ui.cat==="全部"){
-    var ck = catIds().concat(["__none"]);
-    body = ck.map(function(k){
-      var g = list.filter(function(c){ return k==="__none" ? !catObj(c.cat) : c.cat===k; }); if(!g.length) return "";
-      return '<div class="cathead" style="--pc:'+(k==="__none"?"#c9c2b4":catColor(k))+'"><i></i><h2>'+esc(catName(k))+'</h2><span>'+g.length+' 位</span></div><div class="ocards">'+g.map(ocard).join("")+'</div>';
-    }).join("");
-  }
   else if(ui.group){
     var groups = {}, order = [];
     list.forEach(function(c){ var y = ym(c.created).slice(0,4) || "未填年月"; if(!groups[y]){ groups[y]=[]; order.push(y); } groups[y].push(c); });
     body = order.map(function(y){ return '<div class="group-h"><h2>'+esc(y)+'</h2><span>'+groups[y].length+' 位</span></div><div class="ocards">'+groups[y].map(ocard).join("")+'</div>'; }).join("");
-  } else body = '<div class="ocards">'+list.map(ocard).join("")+'</div>';
+  } else {
+    var ck = catIds().concat(["__none"]).filter(function(k){ return list.some(function(c){ return k==="__none" ? !catObj(c.cat) : c.cat===k; }); });
+    body = ck.length<2 ? '<div class="ocards">'+list.map(ocard).join("")+'</div>' : ck.map(function(k){
+      var g = list.filter(function(c){ return k==="__none" ? !catObj(c.cat) : c.cat===k; });
+      return '<div class="cathead" style="--pc:'+(k==="__none"?"#c9c2b4":catColor(k))+'"><i></i><h2>'+esc(catName(k))+'</h2><span>'+g.length+' 位</span></div><div class="ocards">'+g.map(ocard).join("")+'</div>';
+    }).join("");
+  }
   if(list.length) body = '<div class="ocwrap">'+body+list.map(function(c){ return '<template data-for="'+esc(c.id)+'">'+detailHTML(c)+'</template>'; }).join("")+'</div>';
-  return '<div class="ptitle"><h1>'+esc(L("nav_list"))+'<span class="ornament">共 '+state.chars.length+' 位角色</span></h1>'+
-    '<input class="search" id="q" type="search" aria-label="搜尋角色" placeholder="搜尋名字、企劃、標籤" value="'+esc(ui.q)+'"></div>'+
-    '<div class="filters"><div class="chips">'+cats+'</div><span class="fsep"></span><div class="chips">'+gen+'</div><span class="fsep"></span>'+
+  var title = page==="trpg" ? "TRPG" : L("nav_list"), sub = page==="trpg" ? "TRPG 角色" : "原創／企劃";
+  return '<div class="ptitle"><h1>'+esc(title)+'<span class="ornament">'+esc(sub)+' ・ 共 '+pageChars(page).length+' 位</span></h1>'+
+    '<input class="search" id="q" type="search" aria-label="搜尋角色" placeholder="搜尋名字、'+(page==="trpg"?"劇本":"企劃")+'、標籤" value="'+esc(ui.q)+'"></div>'+
+    '<div class="filters"><div class="chips">'+gen+'</div><span class="fsep"></span>'+
     '<div class="chips"><button data-sort="'+(ui.sort==="new"?"old":"new")+'">'+(ui.sort==="new"?"新 → 舊":"舊 → 新")+'</button><button class="'+(ui.group?"on":"")+'" data-act="group">依年份</button></div>'+
     '<button class="linkbtn needs-write" data-act="cats">管理分類</button></div>'+body;
 }
@@ -1115,7 +1121,8 @@ function ocOpen(id, noAnim){
 }
 function ocJump(id){
   ocClose(true);
-  if(!root.querySelector('.ocard[data-oc="'+id+'"]')){ ocRequest(id, function(){ ui.cat = "全部"; ui.gender = "全部"; ui.q = ""; keepUI(); OPEN = id; render(); }); return; }
+  if(!root.querySelector('.ocard[data-oc="'+id+'"]')){ ocRequest(id, function(){ ui.gender = "全部"; ui.q = ""; keepUI(); OPEN = id;
+      var pg = isTrpgChar(byId(id)) ? "trpg" : "list"; if(route().view===pg) render(); else location.hash = pg==="trpg" ? "trpg" : ""; }); return; }
   var card = root.querySelector('.ocard[data-oc="'+id+'"]');
   card.scrollIntoView({block:"center", behavior:"smooth"});
   setTimeout(function(){ ocRequest(id, function(){ ocOpen(id); }); }, 380);
