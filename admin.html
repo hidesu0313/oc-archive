@@ -698,6 +698,11 @@ body.od-lock{overflow:hidden}
 #root .pcard.tsm.sideL .slip,#root .mcards .pcard.tsm.sideL:first-child .slip{right:calc(100% + 10px);left:auto;top:50%;transform:translateY(-50%);width:160px;clip-path:inset(0 0 0 100%)}
 #root .mcards .pcard.tsm.sideR.active .slip,#root .mcards .pcard.tsm.sideL.active .slip,#root .mcards .pcard.tsm.sideR.active:first-child .slip,#root .mcards .pcard.tsm.sideL.active:first-child .slip{clip-path:inset(0 0 0 0)}
 }
+@media (max-width:520px){
+#root .pcard.tsm .slip{text-align:left;align-items:flex-start}
+#root .pcard.tsm .slip small{justify-content:flex-start}
+#root .pcard.tsm .slip .tlgo{align-self:stretch}
+}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
