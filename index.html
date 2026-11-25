@@ -700,6 +700,7 @@ state.settings = state.settings || {siteTitle:"原創角色檔案館"};
 state.chars = state.chars || []; state.relations = state.relations || []; state.timeline = state.timeline || [];
 function cats(){ return state.settings.cats; }
 function catIds(){ return cats().map(function(x){ return x.id; }); }
+function origCat(){ var o = null; cats().forEach(function(x){ if(!o && (x.id==="企劃" || x.name==="企劃" || x.name==="原創／企劃")) o = x; }); return o; }
 function catObj(id){ var o = null; cats().forEach(function(x){ if(x.id===id) o = x; }); return o; }
 function hasSub(id){ var o = catObj(id); return !!(o && o.sub); }
 function catColor(id){ var o = catObj(id); return o ? color(o.color) : "#6b6257"; }
@@ -755,7 +756,7 @@ function hoText(p){ var v = String((p&&p.ho)||"").trim(); return /^\d+$/.test(v)
 function hasHO(cat){ var o = catObj(cat); return !!o && (/trpg/i.test(o.name) || /劇本/.test(o.sub||"")); }
 function projLabel(p){ var h = hoText(p); return p.name + (h ? "（"+h+"）" : ""); }
 function projNames(c){ return projs(c).map(function(p){ return p.name; }); }
-function fileNo(c){ var i = (ALLCHARS||state.chars).indexOf(c); return "No." + ("00"+(i+1)).slice(-3); }
+function fileNo(c){ var i = (ALLCHARS||state.chars).map(function(x){ return x.id; }).indexOf(c.id); return "No." + ("00"+(i+1)).slice(-3); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
 function uid(p){ return (p||"x") + Math.random().toString(36).slice(2,8); }
 function color(c){ return /^#[0-9a-fA-F]{6}$/.test(c||"") ? c : "#737986"; }
@@ -928,9 +929,11 @@ function shell(inner, r){
 }
 function render(){
   var keepC = state.chars, keepR = state.relations;
+  ALLCHARS = keepC;
+  var oc0 = origCat(); if(oc0) state.chars = keepC.map(function(c){ return catObj(c.cat) ? c : Object.assign({}, c, {cat:oc0.id}); });
   if(ro()){
-    var ok = {}; ALLCHARS = keepC;
-    state.chars = keepC.filter(function(c){ if(isPublic(c)){ ok[c.id] = 1; return true; } return false; });
+    var ok = {}; var src = state.chars;
+    state.chars = src.filter(function(c){ if(isPublic(c)){ ok[c.id] = 1; return true; } return false; });
     state.relations = keepR.filter(function(r){ return ok[r.a] && (r.ext || ok[r.b]); });
   }
   try{ render0(); } finally { state.chars = keepC; state.relations = keepR; ALLCHARS = null; }
@@ -969,7 +972,7 @@ function sortChars(arr){
     return ui.sort==="new" ? (y<x?-1:y>x?1:0) : (x<y?-1:x>y?1:0);
   });
 }
-function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? o.name : "未分類"; }
+function catName(k){ if(k==="全部") return L("all"); if(k==="__none") return "未分類"; var o = catObj(k); return o ? (o.name==="企劃" ? "原創／企劃" : o.name) : "未分類"; }
 function card(c){
   return '<button class="pcard" style="--cc:'+color(c.color)+'" data-go="c-'+esc(c.id)+'" aria-label="'+esc(c.name)+(projNames(c).length?'（'+esc(projNames(c).join("、"))+'）':'')+'">'+
     '<span class="ph'+(isPublic(c)?'':' noav')+'"><img src="'+cover(c)+'" alt="">'+(isPublic(c)?'':'<span class="hidden-note">不公開</span>')+'</span>'+
