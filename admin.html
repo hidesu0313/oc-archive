@@ -692,6 +692,12 @@ body.od-lock{overflow:hidden}
 .od-head .pills{justify-content:center;margin-top:6px}
 .od-head img{width:104px;height:104px}
 @media (max-width:640px){.od-head img{width:96px;height:96px}}
+/* [樣式] 手機時間軸紙條放旁邊 */
+@media (max-width:520px){
+#root .pcard.tsm.sideR .slip,#root .mcards .pcard.tsm.sideR:first-child .slip{left:calc(100% + 10px);right:auto;top:50%;transform:translateY(-50%);width:160px;clip-path:inset(0 100% 0 0)}
+#root .pcard.tsm.sideL .slip,#root .mcards .pcard.tsm.sideL:first-child .slip{right:calc(100% + 10px);left:auto;top:50%;transform:translateY(-50%);width:160px;clip-path:inset(0 0 0 100%)}
+#root .mcards .pcard.tsm.sideR.active .slip,#root .mcards .pcard.tsm.sideL.active .slip,#root .mcards .pcard.tsm.sideR.active:first-child .slip,#root .mcards .pcard.tsm.sideL.active:first-child .slip{clip-path:inset(0 0 0 0)}
+}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1086,7 +1092,7 @@ function detailHTML(c){
     '<div class="od-bar"><button type="button" class="od-back" data-odclose>← 返回</button><span class="od-no">CHARACTER FILE ・ '+fileNo(c)+'</span>'+
     '<a class="od-full needs-write" href="#c-'+esc(c.id)+'">完整頁面・編輯</a><button type="button" class="od-x" data-odclose aria-label="關閉">×</button></div>'+
     '<div class="od-head"><img src="'+cover(c)+'" alt="'+esc(c.name)+'" data-zoom="main"><div><h2>'+esc(c.name)+'</h2>'+(c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+
-    '<div class="pills">'+catPill(c)+(ym(c.created)?'<span class="ymtag">'+esc(ym(c.created))+'</span>':'')+'</div></div></div>'+
+    (ym(c.created)?'<div class="pills"><span class="ymtag">'+esc(ym(c.created))+'</span></div>':'')+'</div></div>'+
     (tabs.length>1?'<div class="od-tabs" role="tablist">'+tabs.map(function(t,i){ return '<button type="button" role="tab" data-odtab="'+t[0]+'" aria-selected="'+(i===0)+'">'+t[1]+'</button>'; }).join("")+'</div>':'')+
     tabs.map(function(t,i){ return '<div class="od-pane" data-pane="'+t[0]+'"'+(i?' hidden':'')+'>'+t[2]+'</div>'; }).join("")+'</div>';
 }
@@ -1913,7 +1919,9 @@ root.addEventListener("click", function(e){
   if(pc && !pc.classList.contains("active")){
     e.preventDefault();
     root.querySelectorAll(".pcard.active,.pcard.mate").forEach(function(x){ x.classList.remove("active"); x.classList.remove("mate"); });
-    var r0 = pc.getBoundingClientRect(); pc.classList.toggle("flip", r0.right + 190 > (document.documentElement.clientWidth||innerWidth));
+    var r0 = pc.getBoundingClientRect(), vw0 = (document.documentElement.clientWidth||innerWidth); pc.classList.toggle("flip", r0.right + 190 > vw0);
+    if(pc.classList.contains("tsm")){ var mobT = vw0 <= 520, roomR = vw0 - r0.right, roomL = r0.left;
+      pc.classList.toggle("sideR", mobT && roomR >= 175); pc.classList.toggle("sideL", mobT && roomR < 175 && roomL >= 175); }
     root.querySelectorAll(".tlgo").forEach(function(x){ x.tabIndex = -1; });
     pc.classList.add("active"); root.classList.add("pc-focus"); var lg = pc.querySelector(".tlgo"); if(lg) lg.tabIndex = 0;
     var mk = (pc.getAttribute("data-k")||"").split(" ").filter(Boolean); if(mk.length) root.querySelectorAll(".pcard").forEach(function(x){ if(x===pc) return; var xk = (x.getAttribute("data-k")||"").split(" "); if(mk.some(function(k){ return xk.indexOf(k)>=0; })) x.classList.add("mate"); });
