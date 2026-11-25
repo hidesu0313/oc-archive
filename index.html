@@ -681,6 +681,11 @@ body.od-lock{overflow:hidden}
 #root .filters .chips.tlcats button{white-space:nowrap;padding:4px 10px}
 .tflow{gap:8px}
 }
+/* [樣式] 時間軸查看角色按鈕 */
+.tsm .slip .tlgo{display:block;margin-top:5px;padding:3px 0 1px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--accent);text-decoration:none;font-family:var(--display);pointer-events:none}
+.pcard.tsm.active .slip{pointer-events:auto}
+.pcard.tsm.active .slip .tlgo{pointer-events:auto;cursor:pointer}
+.tsm .slip .tlgo:hover{text-decoration:underline}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1478,7 +1483,7 @@ function tlView(){
     return '<button class="pcard tsm'+(ps.length>1?' multi':'')+'" style="--cc:'+(e.proj?catColor(e.cat):"#c9c2b4")+'" data-go="c-'+esc(e.c.id)+'" data-k="'+esc(k)+'" aria-label="'+esc(e.c.name+(names?"（"+names+"）":""))+'">'+
       '<span class="ph"><img src="'+e.img+'" alt="">'+(ps.length>1?'<span class="mcount">'+ps.length+'</span>':'')+'</span><span class="slip"><b>'+esc(e.c.name)+'</b>'+
       ps.map(function(x){ return '<small><span class="pgcat" style="--pc:'+catColor(x.cat)+'">'+esc(catName(x.cat))+'</span> '+esc(x.proj)+(x.ho?'<span class="hotag">'+esc(x.ho)+'</span>':'')+'</small>'; }).join("")+
-      (e.date?'<small class="sm2">'+esc(e.date)+'</small>':'')+'</span></button>';
+      (e.date?'<small class="sm2">'+esc(e.date)+'</small>':'')+'<a class="tlgo" href="#c-'+esc(e.c.id)+'" data-tlgo="'+esc(e.c.id)+'" tabindex="-1">查看角色 →</a></span></button>';
   }
 
   function yearRow(y, label, entriesHTML, n, small){
@@ -1895,12 +1900,16 @@ root.addEventListener("click", function(e){
   if(rcd){ e.preventDefault(); relOpen(rcd.classList.contains("active") ? "" : rcd.getAttribute("data-rcard")); return; }
   if(t.closest && t.closest("[data-rclose]")){ relOpen(""); return; }
   if(root.querySelector(".rcards.rc-focus") && !t.closest(".rdetail") && !t.closest(".fmenu") && !t.closest("[data-act]")){ relOpen(""); }
+  var tg = t.closest && t.closest("[data-tlgo]");
+  if(tg){ e.preventDefault(); e.stopPropagation(); go("c-"+tg.getAttribute("data-tlgo")); return; }
   var pc = t.closest && t.closest(".pcard");
+  if(pc && pc.classList.contains("active") && pc.classList.contains("tsm")){ e.preventDefault(); pc.classList.remove("active"); root.querySelectorAll(".pcard.mate").forEach(function(x){ x.classList.remove("mate"); }); root.classList.remove("pc-focus"); return; }
   if(pc && !pc.classList.contains("active")){
     e.preventDefault();
     root.querySelectorAll(".pcard.active,.pcard.mate").forEach(function(x){ x.classList.remove("active"); x.classList.remove("mate"); });
     var r0 = pc.getBoundingClientRect(); pc.classList.toggle("flip", r0.right + 190 > (document.documentElement.clientWidth||innerWidth));
-    pc.classList.add("active"); root.classList.add("pc-focus");
+    root.querySelectorAll(".tlgo").forEach(function(x){ x.tabIndex = -1; });
+    pc.classList.add("active"); root.classList.add("pc-focus"); var lg = pc.querySelector(".tlgo"); if(lg) lg.tabIndex = 0;
     var mk = (pc.getAttribute("data-k")||"").split(" ").filter(Boolean); if(mk.length) root.querySelectorAll(".pcard").forEach(function(x){ if(x===pc) return; var xk = (x.getAttribute("data-k")||"").split(" "); if(mk.some(function(k){ return xk.indexOf(k)>=0; })) x.classList.add("mate"); });
     return;
   }
