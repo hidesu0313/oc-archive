@@ -728,6 +728,12 @@ body.od-lock{overflow:hidden}
 /* [樣式] 關係頭像名字不截斷 */
 .od-rav{width:auto;min-width:62px;max-width:110px}
 .od-rav small{white-space:normal;overflow:visible;text-overflow:clip;text-align:center;word-break:break-word}
+/* [樣式] 介紹標題放左側 */
+.cbox .sec.isec{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:4px 18px;align-items:start}
+.cbox .sec.isec h3{margin:0;padding-top:2px;border-bottom:0}
+.od-pane[data-pane=intro] .od-sec{display:grid;grid-template-columns:5em minmax(0,1fr);gap:4px 14px;align-items:start}
+.od-pane[data-pane=intro] .od-sec h4{margin:0;padding-top:2px}
+@media (max-width:520px){.cbox .sec.isec,.od-pane[data-pane=intro] .od-sec{grid-template-columns:1fr}}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
@@ -1230,7 +1236,7 @@ function charView(c){
     (c.alias?'<div class="al">'+esc(c.alias)+'</div>':'')+'<div class="pills">'+catPill(c)+(ym(c.created)?'<span class="ymtag">'+esc(ym(c.created))+'</span>':'')+(c.example?'<span class="ex">範例</span>':'')+'</div>'+
     (facts?'<dl class="facts">'+facts+'</dl>':'')+'<div class="swatches">'+sw+'</div>'+tags+'</div></div></section>';
   var intro = [["sec_personality","personality"],["sec_background","background"]].filter(function(x){ return c[x[1]]; })
-    .map(function(x){ return '<div class="sec"><h3>'+esc(L(x[0]))+'</h3><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
+    .map(function(x){ return '<div class="sec isec"><h3>'+esc(L(x[0]))+'</h3><div class="prose">'+esc(c[x[1]])+'</div></div>'; }).join("");
   var introBox = (intro || !ro()) ? '<section class="cbox" style="--cc:'+color(c.color)+'"><h2>介紹'+editBtn(c,"story")+'</h2>'+(intro||'<div class="muted">還沒有介紹。</div>')+'</section>' : '';
   var art = (c.mainImages||[]).filter(function(x){ return safeSrc(x.src); }), gal = (c.gallery||[]).filter(function(x){ return safeSrc(x.src); });
   var imgs = (art.length?'<div class="sec"><h3>'+esc(L("tab_art"))+'</h3>'+galleryHTML(c, c.mainImages, "mainImages", false)+'</div>':'')+(gal.length?'<div class="sec"><h3>'+esc(L("tab_gallery"))+'</h3>'+galleryHTML(c, c.gallery, "gallery", false)+'</div>':'');
