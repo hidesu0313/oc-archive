@@ -731,6 +731,12 @@ body.od-lock{overflow:hidden}
 .od-pane[data-pane=intro] .od-sec{display:grid;grid-template-columns:5em minmax(0,1fr);gap:4px 14px;align-items:start}
 .od-pane[data-pane=intro] .od-sec h4{margin:0;padding-top:2px}
 @media (max-width:520px){.cbox .sec.isec,.od-pane[data-pane=intro] .od-sec{grid-template-columns:1fr}}
+/* [樣式] 介紹對齊 */
+.cbox .sec.isec{align-items:baseline}
+.cbox .sec.isec h3{padding-top:0;line-height:inherit}
+.cbox h2 + .sec.isec{margin-top:18px}
+.od-pane[data-pane=intro] .od-sec{align-items:baseline}
+.od-pane[data-pane=intro] .od-sec h4{padding-top:0}
 /* [樣式] 不公開標示 */
 .privbadge{flex:none;font-size:12px;color:#fff;background:var(--accent);border-radius:2px;padding:1px 8px;align-self:center}
 
