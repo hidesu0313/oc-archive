@@ -720,10 +720,8 @@ body.od-lock{overflow:hidden}
 .osheet{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .osheet:not(.mob) .od-head img{display:none}
 .osheet:not(.mob) .od-head{margin-top:2px}
-.osheet.fromR .odet{padding-left:46px}
-.osheet.fromR .od-bar{margin-left:-46px;padding-left:46px}
-.osheet.fromL .odet{padding-right:46px}
-.osheet.fromL .od-bar{margin-right:-46px;padding-right:46px}
+.osheet:not(.mob) .odet{padding-left:38px;padding-right:38px}
+.osheet:not(.mob) .od-bar{margin-left:-38px;margin-right:-38px;padding-left:38px;padding-right:30px}
 /* [樣式] 關係頭像名字不截斷 */
 .od-rav{width:auto;min-width:62px;max-width:110px}
 .od-rav small{white-space:normal;overflow:visible;text-overflow:clip;text-align:center;word-break:break-word}
@@ -1186,10 +1184,10 @@ function ocOpen(id, noAnim){
   var cl = cr.left - wr.left, ct = cr.top - wr.top, spaceR = W - (cl + cr.width), mob = isMobileSheet();
   if(!mob){
     var side = (spaceR + 30 >= 380 || spaceR >= cl) ? "right" : "left";
-    var width = side==="right" ? Math.min(580, W - (cl + cr.width - 30)) : Math.min(580, cl + 30);
+    var width = side==="right" ? Math.min(580, W - (cl + cr.width - 12)) : Math.min(580, cl + 12);
     if(width < 330) mob = true;
     else {
-      var left = side==="right" ? cl + cr.width - 30 : cl + 30 - width;
+      var left = side==="right" ? cl + cr.width - 12 : cl + 12 - width;
       el.style.left = left+"px"; el.style.top = Math.max(0, ct - 16)+"px"; el.style.width = width+"px";
       el.classList.add(side==="right" ? "fromR" : "fromL"); card.classList.toggle("tiltR", side==="left");
       wrap.appendChild(el);
